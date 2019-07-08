@@ -25,6 +25,8 @@ The models and algorithms are developped and written in Matlab by Faicel Chamrou
 
 #References
 
+Faicel Chamroukhi and Bao T. Huynh. Regularized Maximum Likelihood Estimation and Feature Selection in Mixtures-of-Experts Models. Journal de la Société Française de Statistique, Vol. 160(1), pages:57–85, March, 2019 
+
 Hien D. Nguyen and Faicel Chamroukhi. Practical and theoretical aspects of mixture-of-experts modeling: An overview. Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery Wiley Periodicals, Inc., pages:e1246–n/a, Feb., 2018
 
 F. Chamroukhi. Skew $t$ mixture of experts. Neurocomputing - Elsevier, Vol. 266, pages:390-408, November, 2017 
