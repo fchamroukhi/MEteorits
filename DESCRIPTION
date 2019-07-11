@@ -1,0 +1,50 @@
+Type: Package
+Package: meteorit
+Title: Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
+Version: 0.1.0
+Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
+    email = "faicel.chamroukhi@unicaen.fr",
+    comment = c(ORCID = "0000-0002-5894-3103")),
+    person("Marius", "Bartcus", role = c("aut"), 
+    email = "marius.bartcus@gmail.com"),
+    person("Florian", "Lecocq", role = c("aut", "cre"),
+    email = "florian.lecocq@outlook.com"))
+Description: MEteoritS is a toolbox containg several original and flexible mixtures-of-experts models to model, 
+    cluster and classify heteregenous data in many complex situations where the data are distributed according non-normal, 
+    possibly skewed distributions, and when they might be corrupted by atypical observations. 
+    The toolbox contains in particular sparse mixture-of-experts models for high-dimensional data.
+License: GPL (>= 3)
+Depends: 
+    R (>= 2.10)
+Imports: 
+    methods,
+    stats,
+    Rcpp
+Suggests: 
+    knitr,
+    rmarkdown
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo
+Collate:
+    meteorit-package.R
+    RcppExports.R
+    utils.R
+    FData.R
+    ParamSNMoE.R
+    ParamStMoE.R
+    ParamTMoE.R
+    StatSNMoE.R
+    StatStMoE.R
+    StatTMoE.R
+    ModelSNMoE.R
+    ModelStMoE.R
+    ModelTMoE.R
+    emSNMoE.R
+    emStMoE.R
+    emTMoE.R
+VignetteBuilder: knitr
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1

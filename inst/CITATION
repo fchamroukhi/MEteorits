@@ -1,0 +1,97 @@
+citHeader("To cite meteorit in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "Practical and theoretical aspects of mixture-of-experts modeling: An overview",
+  author = personList(person(given="Hien D.", family="Nguyen"),
+                      person(given="F.", family="Chamroukhi")),
+  journal  = "Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery",
+  publisher = "Wiley Periodicals, Inc",
+  year     = "2018",
+  pages = "e1246--n/a",
+  doi = "10.1002/widm.1246",
+  url      = "https://chamroukhi.com/papers/Nguyen-Chamroukhi-MoE-DMKD-2018",
+  textVersion = "Nguyen H and Chamroukhi F (2018). \u201cPractical and theoretical aspects
+  of mixture-of-experts modeling: An overview.\u201d Wiley Interdisciplinary Reviews:
+  Data Mining and Knowledge Discovery, pp. e1246-n/a.
+  doi: 10.1002/widm.1246 (URL:https://doi.org/10.1002/widm.1246),
+  <URL: https://chamroukhi.com/papers/Nguyen-Chamroukhi-MoE-DMKD-2018>."
+)
+
+citEntry(
+  entry    = "InProceedings",
+  title    = "Skew-Normal Mixture of Experts",
+  author = personList(person(given="F.", family="Chamroukhi")),
+  booktitle  = "The International Joint Conference on Neural Networks (IJCNN)",
+  year     = "2016",
+  url      = "https://chamroukhi.com/papers/Chamroukhi-SNMoE-IJCNN2016.pdf",
+  textVersion = "Chamroukhi F (2016). \u201cSkew-Normal Mixture of Experts.\u201d In
+  The International Joint Conference on Neural Networks (IJCNN).
+  <URL:https://chamroukhi.com/papers/Chamroukhi-SNMoE-IJCNN2016.pdf>."
+)
+
+citEntry(
+  entry    = "Misc",
+  title    = "Non-Normal Mixtures of Experts",
+  author = personList(person(given="F.", family="Chamroukhi")),
+  year     = "2015",
+  url      = "http://arxiv.org/pdf/1506.06707.pdf",
+  textVersion = "Chamroukhi F (2015). \u201cNon-Normal Mixtures of Experts.\u201d
+                <URL: http://arxiv.org/pdf/1506.06707.pdf>."
+)
+
+citEntry(
+  entry = "Article",
+  title = "Model-Based Clustering and Classification of Functional Data",
+  author = personList(person(given="F.", family="Chamroukhi"),
+                      person(given="Hien D.", family="Nguyen")),
+  journal = "Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery",
+  year = "2019",
+  url = "https://chamroukhi.com/papers/MBCC-FDA.pdf",
+  doi = "10.1002/widm.1298",
+  textVersion = "Chamroukhi F, Nguyen H (2019). \u201cModel-Based Clustering and
+  Classification of Functional Data.\u201d Wiley Interdisciplinary Reviews: Data Mining and
+  Knowledge Discovery. doi: 10.1002/widm.1298 (URL: https://doi.org/10.1002/widm.1298),
+  <URL:https://chamroukhi.com/papers/MBCC-FDA.pdf>."
+)
+
+citEntry(
+  entry    = "Article",
+  title    = "Skew t mixture of experts",
+  author   = personList(person(given="F.", family="Chamroukhi")),
+  journal  = "Neurocomputing - Elsevier",
+  year     = "2017",
+  volume   = "266",
+  pages    = "390-408",
+  url      = "https://chamroukhi.com/papers/STMoE.pdf",
+  textVersion = "Chamroukhi F (2017). \u201cSkew t mixture of experts.\u201d
+  Neurocomputing - Elsevier,
+  266, pp. 390-408. <URL:https://chamroukhi.com/papers/STMoE.pdf>."
+)
+
+citEntry(
+  entry = "Article",
+  title = "Robust mixture of experts modeling using the t-distribution",
+  author = personList(person(given="F.", family="Chamroukhi")),
+  journal = "Neural Networks - Elsevier",
+  year = "2016",
+  volume = "79",
+  pages = "20--36",
+  url = "https://chamroukhi.com/papers/TMoE.pdf",
+  textVersion = "Chamroukhi F (2016). \u201cRobust mixture of experts modeling using the
+  t-distribution.\u201d Neural Networks - Elsevier, 79, pp. 20-36.
+  <URL: https://chamroukhi.com/papers/TMoE.pdf>."
+)
+
+citEntry(
+  entry = "PhdThesis",
+  title = "Statistical learning of latent data models for complex data analysis",
+  author = person(given="F.", family="Chamroukhi"),
+  school = "Universit\u00e9 de Toulon",
+  year = "2015",
+  type = "Habilitation Thesis (HDR)",
+  url = "https://chamroukhi.com/Dossier/FChamroukhi-Habilitation.pdf",
+  textVersion = "Chamroukhi F (2015). Statistical learning of latent data models for
+  complex data analysis. Habilitation Thesis (HDR), Universit\u00e9 de Toulon.
+  <URL: https://chamroukhi.com/Dossier/FChamroukhi-Habilitation.pdf>."
+)
