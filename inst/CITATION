@@ -2,6 +2,17 @@ citHeader("To cite meteorit in publications use:")
 
 citEntry(
   entry    = "Article",
+  title    = "Regularized Maximum Likelihood Estimation and Feature Selection in Mixtures-of-Experts Models.",
+  author = personList(person(given="F.", family="Chamroukhi"),
+                      person(given="Bao T.", family="Huynh")),
+  journal  = "Journal de la Soci\u00e9t\u00e9 Fran\u00e7aise de Statistique",
+  volume   = "160(1)",
+  pages = "57???85",
+  year = "2019"
+)
+
+citEntry(
+  entry    = "Article",
   title    = "Practical and theoretical aspects of mixture-of-experts modeling: An overview",
   author = personList(person(given="Hien D.", family="Nguyen"),
                       person(given="F.", family="Chamroukhi")),
@@ -16,43 +27,6 @@ citEntry(
   Data Mining and Knowledge Discovery, pp. e1246-n/a.
   doi: 10.1002/widm.1246 (URL:https://doi.org/10.1002/widm.1246),
   <URL: https://chamroukhi.com/papers/Nguyen-Chamroukhi-MoE-DMKD-2018>."
-)
-
-citEntry(
-  entry    = "InProceedings",
-  title    = "Skew-Normal Mixture of Experts",
-  author = personList(person(given="F.", family="Chamroukhi")),
-  booktitle  = "The International Joint Conference on Neural Networks (IJCNN)",
-  year     = "2016",
-  url      = "https://chamroukhi.com/papers/Chamroukhi-SNMoE-IJCNN2016.pdf",
-  textVersion = "Chamroukhi F (2016). \u201cSkew-Normal Mixture of Experts.\u201d In
-  The International Joint Conference on Neural Networks (IJCNN).
-  <URL:https://chamroukhi.com/papers/Chamroukhi-SNMoE-IJCNN2016.pdf>."
-)
-
-citEntry(
-  entry    = "Misc",
-  title    = "Non-Normal Mixtures of Experts",
-  author = personList(person(given="F.", family="Chamroukhi")),
-  year     = "2015",
-  url      = "http://arxiv.org/pdf/1506.06707.pdf",
-  textVersion = "Chamroukhi F (2015). \u201cNon-Normal Mixtures of Experts.\u201d
-                <URL: http://arxiv.org/pdf/1506.06707.pdf>."
-)
-
-citEntry(
-  entry = "Article",
-  title = "Model-Based Clustering and Classification of Functional Data",
-  author = personList(person(given="F.", family="Chamroukhi"),
-                      person(given="Hien D.", family="Nguyen")),
-  journal = "Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery",
-  year = "2019",
-  url = "https://chamroukhi.com/papers/MBCC-FDA.pdf",
-  doi = "10.1002/widm.1298",
-  textVersion = "Chamroukhi F, Nguyen H (2019). \u201cModel-Based Clustering and
-  Classification of Functional Data.\u201d Wiley Interdisciplinary Reviews: Data Mining and
-  Knowledge Discovery. doi: 10.1002/widm.1298 (URL: https://doi.org/10.1002/widm.1298),
-  <URL:https://chamroukhi.com/papers/MBCC-FDA.pdf>."
 )
 
 citEntry(
@@ -84,6 +58,18 @@ citEntry(
 )
 
 citEntry(
+  entry    = "InProceedings",
+  title    = "Skew-Normal Mixture of Experts",
+  author = personList(person(given="F.", family="Chamroukhi")),
+  booktitle  = "The International Joint Conference on Neural Networks (IJCNN)",
+  year     = "2016",
+  url      = "https://chamroukhi.com/papers/Chamroukhi-SNMoE-IJCNN2016.pdf",
+  textVersion = "Chamroukhi F (2016). \u201cSkew-Normal Mixture of Experts.\u201d In
+  The International Joint Conference on Neural Networks (IJCNN).
+  <URL:https://chamroukhi.com/papers/Chamroukhi-SNMoE-IJCNN2016.pdf>."
+)
+
+citEntry(
   entry = "PhdThesis",
   title = "Statistical learning of latent data models for complex data analysis",
   author = person(given="F.", family="Chamroukhi"),
@@ -94,4 +80,25 @@ citEntry(
   textVersion = "Chamroukhi F (2015). Statistical learning of latent data models for
   complex data analysis. Habilitation Thesis (HDR), Universit\u00e9 de Toulon.
   <URL: https://chamroukhi.com/Dossier/FChamroukhi-Habilitation.pdf>."
+)
+
+citEntry(
+  entry    = "PhdThesis",
+  title    = "Hidden process regression for curve modeling, classification and tracking.",
+  author = person(given="F.", family="Chamroukhi"),
+  school = "Universit\u00e9 de Compi\u00e8gne",
+  year = "2010"
+)
+
+citEntry(
+  entry = "Article",
+  title = "Time series modeling by a regression approach based on a latent process.",
+  author = personList(person(given="F.", family="Chamroukhi"),
+                      person(given="A.", family="Sam\u00e9"),
+                      person(given="G.", family="Govaert"),
+                      person(given="P.", family="Aknin")),
+  journal = "Neural Networks Elsevier Science Ltd.",
+  year = "2009",
+  volume = "22(5-6)",
+  pages = "593--602"
 )
