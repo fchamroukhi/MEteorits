@@ -9,7 +9,14 @@ Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
 
 MEteoritS is a toolbox containg several original and flexible mixtures-of-experts models to model, cluster and classify heteregenous data in many complex situations where the data are distributed according non-normal, possibly skewed distributions, and when they might be corrupted by atypical observations. The toolbox contains in particular sparse mixture-of-experts models for high-dimensional data.
 
-Our (dis-)covered meteorites are for instance the following: \* NMoE \* NNMoE \* tMoE \* StMoE \* SNMoE \* RMoE
+Our (dis-)covered meteorites are for instance the following:
+
+-   NMoE
+-   NNMoE
+-   tMoE
+-   StMoE
+-   SNMoE
+-   RMoE
 
 The models and algorithms are developped and written in Matlab by Faicel Chamroukhi, and translated and designed into R packages by Florian Lecocq, Marius Bartcus and Faicel Chamroukhi.
 
