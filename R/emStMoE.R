@@ -18,6 +18,8 @@
 #' @param p The order of the polynomial regression.
 #' @param q The dimension of the logistic regression. For the purpose of
 #' segmentation, it must be set to 1.
+#' @param variance_type Numeric indicating if the model is homoskedastic
+#' (`variance_type` = 1) or heteroskedastic (`variance_type` = 2).
 #' @param n_tries Number of times EM algorithm will be launched.
 #' The solution providing the highest log-likelihood will be returned.
 #'
@@ -88,7 +90,7 @@ emStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, thresho
         } # Basically for the first iteration when prev_loglik is -Inf
 
         prev_loglik <- stat$log_lik
-        stat$stored_loglik[iter] <- stat$log_lik
+        stat$stored_loglik <- c(stat$stored_loglik, stat$log_lik)
       }# FIN EM LOOP
 
       # end of computation of all estimates (param and stat)

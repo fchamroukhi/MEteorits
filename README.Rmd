@@ -15,10 +15,12 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-"
 )
 ```
-## Overview
 
 <!-- badges: start -->
 <!-- badges: end -->
+
+## Overview
+
 Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
 
 MEteoritS is a toolbox containg several original and flexible mixtures-of-experts models to model, cluster and classify heteregenous data in many complex situations where the data are distributed according non-normal, possibly skewed distributions, and when they might be corrupted by atypical observations. The toolbox contains in particular sparse mixture-of-experts models for high-dimensional data. 

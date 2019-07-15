@@ -1,11 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-## Overview
-
 <!-- badges: start -->
 
 <!-- badges: end -->
+
+## Overview
 
 Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
 

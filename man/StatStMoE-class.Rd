@@ -16,10 +16,10 @@ StatMRHLP contains all the parameters of a \link[=ParamStMoE]{StMoE} model.
 latent variable \eqn{zi,\ i = 1,\dots,m}{zi, i = 1,\dots,n}.}
 
 \item{\code{z_ik}}{Hard segmentation logical matrix of dimension \eqn{(n, K)}
-obtained by the Maximum a posteriori (MAP) rule:
-\eqn{z_{ik} = 1 \ \textrm{if} \ z_{ik} = \textrm{arg} \ \textrm{max}_{k} \
-P(z_i = k | Y, W, \beta);\ 0 \ \textrm{otherwise}}{z_ik = 1 if z_ik =
-arg max_k P(z_i = k | Y, W, \beta); 0 otherwise}, \eqn{k = 1,\dots,K}.}
+obtained by the Maximum a posteriori (MAP) rule: \eqn{z_{ik} = 1 \
+  \textrm{if} \ z_{ik} = \textrm{arg} \ \textrm{max}_{k} \ P(z_i = k | Y, W,
+  \beta);\ 0 \ \textrm{otherwise}}{z_ik = 1 if z_ik = arg max_k P(z_i = k |
+  Y, W, \beta); 0 otherwise}, \eqn{k = 1,\dots,K}.}
 
 \item{\code{klas}}{Column matrix of the labels issued from \code{z_ik}. Its elements are
 \eqn{klas(i) = k}, \eqn{k = 1,\dots,K}.}
@@ -36,33 +36,33 @@ arg max_k P(z_i = k | Y, W, \beta); 0 otherwise}, \eqn{k = 1,\dots,K}.}
 
 \item{\code{com_loglik}}{Numeric. Complete log-likelihood of the StMoE model.}
 
-\item{\code{stored_loglik}}{List. Stored values of the log-likelihood at each EM
-iteration.}
+\item{\code{stored_loglik}}{Numeric vector. Stored values of the log-likelihood at
+each EM iteration.}
 
 \item{\code{BIC}}{Numeric. Value of the BIC (Bayesian Information Criterion)
-criterion. The formula is \eqn{BIC = log\_lik - nu \times
-\textrm{log}(n) / 2}{BIC = log\_lik - nu x log(n) / 2} with \emph{nu} the
-degree of freedom of the StMoE model.}
+criterion. The formula is \eqn{BIC = log\_lik - nu \times \textrm{log}(n) /
+  2}{BIC = log\_lik - nu x log(n) / 2} with \emph{nu} the degree of freedom
+of the StMoE model.}
 
 \item{\code{ICL}}{Numeric. Value of the ICL (Integrated Completed Likelihood)
 criterion. The formula is \eqn{ICL = com\_loglik - nu \times
-\textrm{log}(n) / 2}{ICL = com_loglik - nu x log(n) / 2} with \emph{nu} the
+  \textrm{log}(n) / 2}{ICL = com_loglik - nu x log(n) / 2} with \emph{nu} the
 degree of freedom of the StMoE model.}
 
 \item{\code{AIC}}{Numeric. Value of the AIC (Akaike Information Criterion)
 criterion. The formula is \eqn{AIC = log\_lik - nu}{AIC = log\_lik - nu}.}
 
 \item{\code{log_piik_fik}}{Matrix of size \eqn{(n, K)} giving the values of the
-logarithm of the joint probability
-\eqn{P(Y_{i}, \ zi = k)}{P(Yi, zi = k)}, \eqn{i = 1,\dots,n}.}
+logarithm of the joint probability \eqn{P(Y_{i}, \ zi = k)}{P(Yi, zi = k)},
+\eqn{i = 1,\dots,n}.}
 
 \item{\code{log_sum_piik_fik}}{Column matrix of size \emph{n} giving the values of
 \eqn{\sum_{k = 1}^{K} \textrm{log} P(Y_{i}, \ zi = k)}{\sum_{k = 1}^{K} log
-P(Yi, zi = k)}, \eqn{i = 1,\dots,n}.}
+  P(Yi, zi = k)}, \eqn{i = 1,\dots,n}.}
 
 \item{\code{tik}}{Matrix of size \eqn{(n, K)} giving the posterior probability that
-\eqn{Y_{i}}{Yi} originates from the \eqn{k}-th regression model
-\eqn{P(zi = k | Y, W, \beta)}.}
+\eqn{Y_{i}}{Yi} originates from the \eqn{k}-th regression model \eqn{P(zi =
+  k | Y, W, \beta)}.}
 
 \item{\code{wik}}{To define.}
 

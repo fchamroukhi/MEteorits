@@ -67,7 +67,7 @@ ModelTMoE <- setRefClass(
       if (any(what == "loglikelihood")) {
         # Observed data log-likelihood
         par(mfrow = c(1, 1), mai = c(0.6, 1, 0.5, 0.5), mgp = c(2, 1, 0))
-        plot.default(unlist(stat$stored_loglik), type = "l", col = "blue", xlab = "EM iteration number", ylab = "Observed data log-likelihood", ...)
+        plot.default(1:length(stat$stored_loglik), stat$stored_loglik, type = "l", col = "blue", xlab = "EM iteration number", ylab = "Observed data log-likelihood", ...)
         title(main = "Log-Likelihood")
       }
 

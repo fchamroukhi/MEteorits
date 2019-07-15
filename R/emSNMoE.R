@@ -87,7 +87,7 @@ emSNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, thresho
         } # Basically for the first iteration when prev_loglik is Inf
 
         prev_loglik <- stat$log_lik
-        stat$stored_loglik[iter] <- stat$log_lik
+        stat$stored_loglik <- c(stat$stored_loglik, stat$log_lik)
       }# FIN EM LOOP
 
       # at this point we have computed param and stat that contains all the information
