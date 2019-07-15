@@ -40,9 +40,6 @@ log-likelihood should be printed during EM iterations.}
 \item{verbose_IRLS}{A logical value indicating whether values of the
 criterion optimized by IRLS should be printed at each step of the EM
 algorithm.}
-
-\item{variance_type}{Numeric indicating if the model is homoskedastic
-(\code{variance_type} = 1) or heteroskedastic (\code{variance_type} = 2).}
 }
 \value{
 EM returns an object of class \link{ModelStMoE}.

@@ -1,5 +1,7 @@
 ---
 output: github_document
+bibliography: bibliography.bib
+nocite: '@*'
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -16,8 +18,20 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 <!-- badges: end -->
+# MEteorit
+Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
 
-User-friendly and flexible algorithm for modeling, sampling, inference, and clustering heteregenous data with the Skew-Normal Mixture-of-Experts (SNMoE) model.
+MEteoritS is a toolbox containg several original and flexible mixtures-of-experts models to model, cluster and classify heteregenous data in many complex situations where the data are distributed according non-normal, possibly skewed distributions, and when they might be corrupted by atypical observations. The toolbox contains in particular sparse mixture-of-experts models for high-dimensional data. 
+
+Our (dis-)covered meteorites are for instance the following:
+- NMoE
+- NNMoE
+- tMoE
+- StMoE 
+- SNMoE : : User-friendly and flexible algorithm for modeling, sampling, inference, and clustering heteregenous data with the Skew-Normal Mixture-of-Experts (SNMoE) model.
+- RMoE
+
+The models and algorithms are developped and written in Matlab by Faicel Chamroukhi, and translated and designed into R packages by Florian Lecocq, Marius Bartcus and Faicel Chamroukhi.
 
 ## Installation
 
@@ -25,14 +39,14 @@ You can install the development version of STMoE from [GitHub](https://github.co
 
 ```{r, eval = FALSE}
 # install.packages("devtools")
-devtools::install_github("fchamroukhi/SNMoE")
+devtools::install_github("fchamroukhi/MEteorits")
 ```
 
 To build *vignettes* for examples of usage, type the command below instead:
 
 ```{r, eval = FALSE}
 # install.packages("devtools")
-devtools::install_github("fchamroukhi/SNMoE", 
+devtools::install_github("fchamroukhi/MEteorits", 
                          build_opts = c("--no-resave-data", "--no-manual"), 
                          build_vignettes = TRUE)
 ```
@@ -40,13 +54,14 @@ devtools::install_github("fchamroukhi/SNMoE",
 Use the following command to display vignettes:
 
 ```{r, eval = FALSE}
-browseVignettes("SNMoE")
+browseVignettes("MEteorits")
 ```
 
 ## Usage
-
+<details>
+  <summary>SNMoE</summary>
 ```{r, message = FALSE}
-library(SNMoE)
+library(meteorit)
 
 data("simulatedstructureddata")
 
@@ -65,3 +80,56 @@ snmoe <- emSNMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y),
 
 snmoe$plot()
 ```
+</details>
+
+<details>
+<summary>StMoE</summary>
+
+```{r, message = FALSE}
+library(meteorit)
+
+data("simulatedstructureddata")
+
+K <- 2 # Number of regimes (mixture components)
+p <- 1 # Dimension of beta (order of the polynomial regressors)
+q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
+
+n_tries <- 1
+max_iter <- 1500
+threshold <- 1e-5
+verbose <- TRUE
+verbose_IRLS <- FALSE
+
+stmoe <- emStMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), 
+                 K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+
+stmoe$plot()
+```
+</details>
+
+<details>
+<summary>TMoE</summary>
+```{r, message = FALSE}
+library(meteorit)
+
+data("simulatedstructureddata")
+
+K <- 2 # Number of regimes (mixture components)
+p <- 1 # Dimension of beta (order of the polynomial regressors)
+q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
+
+n_tries <- 1
+max_iter <- 1500
+threshold <- 1e-5
+verbose <- TRUE
+verbose_IRLS <- FALSE
+
+tmoe <- emTMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+
+tmoe$plot()
+```
+
+</details>
+
+# References
+
