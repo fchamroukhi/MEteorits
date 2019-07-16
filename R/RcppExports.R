@@ -2,10 +2,10 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 IRLS <- function(X, Tau, Gamma, Winit, verbose = FALSE) {
-    .Call(`_meteorit_IRLS`, X, Tau, Gamma, Winit, verbose)
+    .Call(`_meteorits_IRLS`, X, Tau, Gamma, Winit, verbose)
 }
 
 multinomialLogit <- function(W, X, Y, Gamma) {
-    .Call(`_meteorit_multinomialLogit`, W, X, Y, Gamma)
+    .Call(`_meteorits_multinomialLogit`, W, X, Y, Gamma)
 }
 

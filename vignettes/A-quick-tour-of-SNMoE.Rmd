@@ -26,7 +26,7 @@ knit_hooks$set(par = function(before, options, envir)
 ```
 
 ```{r, message = FALSE, echo = FALSE}
-library(meteorit)
+library(meteorits)
 ```
 
 # Introduction

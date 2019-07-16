@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // IRLS
 List IRLS(arma::mat& X, arma::mat& Tau, arma::mat& Gamma, arma::mat& Winit, bool verbose);
-RcppExport SEXP _meteorit_IRLS(SEXP XSEXP, SEXP TauSEXP, SEXP GammaSEXP, SEXP WinitSEXP, SEXP verboseSEXP) {
+RcppExport SEXP _meteorits_IRLS(SEXP XSEXP, SEXP TauSEXP, SEXP GammaSEXP, SEXP WinitSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -23,7 +23,7 @@ END_RCPP
 }
 // multinomialLogit
 List multinomialLogit(arma::mat& W, arma::mat& X, arma::mat& Y, arma::mat& Gamma);
-RcppExport SEXP _meteorit_multinomialLogit(SEXP WSEXP, SEXP XSEXP, SEXP YSEXP, SEXP GammaSEXP) {
+RcppExport SEXP _meteorits_multinomialLogit(SEXP WSEXP, SEXP XSEXP, SEXP YSEXP, SEXP GammaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -37,12 +37,12 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_meteorit_IRLS", (DL_FUNC) &_meteorit_IRLS, 5},
-    {"_meteorit_multinomialLogit", (DL_FUNC) &_meteorit_multinomialLogit, 4},
+    {"_meteorits_IRLS", (DL_FUNC) &_meteorits_IRLS, 5},
+    {"_meteorits_multinomialLogit", (DL_FUNC) &_meteorits_multinomialLogit, 4},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_meteorit(DllInfo *dll) {
+RcppExport void R_init_meteorits(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

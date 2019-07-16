@@ -64,7 +64,7 @@ browseVignettes("MEteorits")
 <details>
   <summary>SNMoE</summary>
 ```{r, message = FALSE}
-library(meteorit)
+library(meteorits)
 
 data("simulatedstructureddata")
 
@@ -89,7 +89,7 @@ snmoe$plot()
 <summary>StMoE</summary>
 
 ```{r, message = FALSE}
-library(meteorit)
+library(meteorits)
 
 data("simulatedstructureddata")
 
@@ -113,7 +113,7 @@ stmoe$plot()
 <details>
 <summary>TMoE</summary>
 ```{r, message = FALSE}
-library(meteorit)
+library(meteorits)
 
 data("simulatedstructureddata")
 

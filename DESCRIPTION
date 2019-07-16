@@ -1,5 +1,5 @@
 Type: Package
-Package: meteorit
+Package: meteorits
 Title: Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
 Version: 0.1.0
 Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
@@ -30,7 +30,7 @@ LinkingTo:
     Rcpp,
     RcppArmadillo
 Collate:
-    meteorit-package.R
+    meteorits-package.R
     RcppExports.R
     utils.R
     FData.R
