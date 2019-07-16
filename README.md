@@ -88,6 +88,34 @@ snmoe$plot()
 
 <details>
 
+<summary>TMoE</summary>
+
+``` r
+library(meteorit)
+
+data("simulatedstructureddata")
+
+K <- 2 # Number of regimes (mixture components)
+p <- 1 # Dimension of beta (order of the polynomial regressors)
+q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
+
+n_tries <- 1
+max_iter <- 1500
+threshold <- 1e-5
+verbose <- TRUE
+verbose_IRLS <- FALSE
+
+tmoe <- emTMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+
+tmoe$plot()
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-4.png" style="display: block; margin: auto;" />
+
+</details>
+
+<details>
+
 <summary>StMoE</summary>
 
 ``` r
@@ -112,34 +140,6 @@ stmoe$plot()
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-4.png" style="display: block; margin: auto;" />
-
-</details>
-
-<details>
-
-<summary>TMoE</summary>
-
-``` r
-library(meteorit)
-
-data("simulatedstructureddata")
-
-K <- 2 # Number of regimes (mixture components)
-p <- 1 # Dimension of beta (order of the polynomial regressors)
-q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
-
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-5
-verbose <- TRUE
-verbose_IRLS <- FALSE
-
-tmoe <- emTMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
-
-tmoe$plot()
-```
-
-<img src="man/figures/README-unnamed-chunk-7-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-4.png" style="display: block; margin: auto;" />
 
 </details>
 
