@@ -134,5 +134,31 @@ tmoe$plot()
 
 </details>
 
+
+
+<details>
+<summary>NMoE</summary>
+```{r, message = FALSE}
+library(meteorits)
+
+data("simulatedstructureddata")
+
+K <- 2 # Number of regimes (mixture components)
+p <- 1 # Dimension of beta (order of the polynomial regressors)
+q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
+
+n_tries <- 1
+max_iter <- 1500
+threshold <- 1e-5
+verbose <- TRUE
+verbose_IRLS <- FALSE
+
+nmoe <- emNMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+
+nmoe$plot()
+```
+
+</details>
+
 # References
 

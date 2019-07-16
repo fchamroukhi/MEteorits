@@ -15,10 +15,9 @@
 #' @field sigma The variances for the \emph{K} mixture component.
 #' @field delta the skewness parameter lambda (by equivalence delta)
 #' @seealso [FData]
-#' @importFrom pracma fzero
 #' @export
 ParamNMoE <- setRefClass(
-  "ParamTMoE",
+  "ParamNMoE",
   fields = list(
     fData = "FData",
     phiBeta = "list",
@@ -106,8 +105,8 @@ ParamNMoE <- setRefClass(
 
     MStep = function(statNMoE, verbose_IRLS) {
       # M-Step
-      res_irls <- IRLS(phiAlpha$XBeta, statTMoE$tik, ones(nrow(statTMoE$tik), 1), alpha, verbose_IRLS)
-      statTMoE$piik <- res_irls$piik
+      res_irls <- IRLS(phiAlpha$XBeta, statNMoE$tik, ones(nrow(statNMoE$tik), 1), alpha, verbose_IRLS)
+      statNMoE$piik <- res_irls$piik
       reg_irls <- res_irls$reg_irls
 
       alpha <<- res_irls$W
@@ -115,14 +114,14 @@ ParamNMoE <- setRefClass(
       for (k in 1:K) {
         #update the regression coefficients
 
-        Xbeta <- phiBeta$XBeta * matrix( sqrt(statTMoE$tik[,k] %*% ones(1, p + 1)))
-        yk <- fData$Y * sqrt(statTMoE$tik[,k])
+        Xbeta <- phiBeta$XBeta * sqrt(statNMoE$tik[,k] %*% ones(1, p + 1))
+        yk <- fData$Y * sqrt(statNMoE$tik[,k])
 
         #update the regression coefficients
         beta[, k] <<- solve((t(Xbeta) %*% Xbeta)) %*% (t(Xbeta) %*% yk)
 
         # update the variances sigma2k
-        sigma[k] <<- sum(statTMoE$tik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k])^2)) / sum(statTMoE$tik[,k])
+        sigma[k] <<- sum(statNMoE$tik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k])^2)) / sum(statNMoE$tik[,k])
 
       }
 

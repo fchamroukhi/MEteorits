@@ -40,9 +40,6 @@ log-likelihood should be printed during EM iterations.}
 \item{verbose_IRLS}{A logical value indicating whether values of the
 criterion optimized by IRLS should be printed at each step of the EM
 algorithm.}
-
-\item{variance_type}{Numeric indicating if the model is homoskedastic
-(\code{variance_type} = 1) or heteroskedastic (\code{variance_type} = 2).}
 }
 \value{
 EM returns an object of class \link{ModelTMoE}.
@@ -52,7 +49,7 @@ emTMoE is used to fit a TMoE model. The estimation method is performed by
 the Expectation-Maximization algorithm.
 }
 \details{
-emStMoE function is based on the EM algorithm. This functions starts
+emTMoE function is based on the EM algorithm. This functions starts
 with an initialization of the parameters done by the method \code{initParam} of
 the class \link{ParamTMoE}, then it alternates between a E-Step
 (method of the class \link{StatTMoE}) and a M-Step (method of the class

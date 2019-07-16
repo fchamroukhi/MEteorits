@@ -6,7 +6,7 @@
 \alias{ModelTMoE}
 \title{A Reference Class which represents a fitted TMoE model.}
 \description{
-ModelMRHLP represents a \link[=ModelTMoE]{TMoE} model for which parameters have
+ModelTMoE represents a \link[=ModelTMoE]{TMoE} model for which parameters have
 been estimated.
 }
 \section{Fields}{
