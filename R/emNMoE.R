@@ -1,13 +1,13 @@
-#' emStMoE is used to fit a StMoE model.
+#' emNMoE is used to fit a NMoE model.
 #'
-#' emStMoE is used to fit a StMoE model. The estimation method is performed by
+#' emNMoE is used to fit a NMoE model. The estimation method is performed by
 #' the Expectation-Maximization algorithm.
 #'
-#' @details emStMoE function is based on the EM algorithm. This functions starts
+#' @details emNMoE function is based on the EM algorithm. This functions starts
 #' with an initialization of the parameters done by the method `initParam` of
-#' the class [ParamStMoE][ParamStMoE], then it alternates between a E-Step
-#' (method of the class [StatStMoE][StatStMoE]) and a M-Step (method of the class
-#' [ParamStMoE][ParamStMoE]) until convergence (until the absolute difference of
+#' the class [ParamNMoE][ParamNMoE], then it alternates between a E-Step
+#' (method of the class [StatNMoE][StatNMoE]) and a M-Step (method of the class
+#' [ParamNMoE][ParamNMoE]) until convergence (until the absolute difference of
 #' log-likelihood between two steps of the EM algorithm is less than the
 #' `threshold` parameter).
 #'
@@ -34,10 +34,10 @@
 #' @param verbose_IRLS A logical value indicating whether values of the
 #' criterion optimized by IRLS should be printed at each step of the EM
 #' algorithm.
-#' @return EM returns an object of class [ModelStMoE][ModelStMoE].
-#' @seealso [ModelStMoE], [ParamStMoE], [StatStMoE]
+#' @return EM returns an object of class [ModelNMoE][ModelNMoE].
+#' @seealso [ModelNMoE], [ParamNMoE], [StatNMoE]
 #' @export
-emStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
+emNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
 
     fData <- FData(X, Y)
 
@@ -50,8 +50,8 @@ emStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, thresho
       message("EM try nr ", try_EM)
 
       # Initializations
-      param <- ParamStMoE$new(fData = fData, K = K, p = p, q = q)
-      param$initParam(try_EM, segmental = FALSE)
+      param <- ParamNMoE$new(fData = fData, K = K, p = p, q = q)
+      param$initParam(try_EM, segmental = TRUE)
 
 
 
@@ -59,8 +59,7 @@ emStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, thresho
       converge <- FALSE
       prev_loglik <- -Inf
 
-      stat <- StatStMoE(paramStMoE = param)
-      stat$univStMoEpdf(param)
+      stat <- StatNMoE(paramNMoE = param)
 
       while (!converge && (iter <= max_iter)) {
         stat$EStep(param)
@@ -85,13 +84,13 @@ emStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, thresho
         converge <- abs((stat$log_lik - prev_loglik) / prev_loglik) <= threshold
         if (is.na(converge)) {
           converge <- FALSE
-        } # Basically for the first iteration when prev_loglik is -Inf
+        } # Basically for the first iteration when prev_loglik is Inf
 
         prev_loglik <- stat$log_lik
         stat$stored_loglik <- c(stat$stored_loglik, stat$log_lik)
       }# FIN EM LOOP
 
-      # end of computation of all estimates (param and stat)
+      # at this point we have computed param and stat that contains all the information
 
       if (stat$log_lik > best_loglik) {
         statSolution <- stat$copy()
@@ -115,6 +114,6 @@ emStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, thresho
     # FINISH computation of statSolution
     statSolution$computeStats(paramSolution)
 
-    return(ModelStMoE(param = paramSolution, stat = statSolution))
+    return(ModelNMoE(param = paramSolution, stat = statSolution))
 
   }

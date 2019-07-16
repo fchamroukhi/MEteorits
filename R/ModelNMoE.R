@@ -1,18 +1,18 @@
-#' A Reference Class which represents a fitted TMoE model.
+#' A Reference Class which represents a fitted NMoE model.
 #'
-#' ModelTMoE represents a [TMoE][ModelTMoE] model for which parameters have
+#' ModelNMoE represents a [NMoE][ModelNMoE] model for which parameters have
 #' been estimated.
 #'
 #' @usage NULL
-#' @field param A [ParamTMoE][ParamTMoE] object. It contains the estimated values of the parameters.
-#' @field stat A [StatTMoE][StatTMoE] object. It contains all the statistics associated to the TMoE model.
-#' @seealso [ParamTMoE], [StatTMoE]
+#' @field param A [ParamNMoE][ParamNMoE] object. It contains the estimated values of the parameters.
+#' @field stat A [StatNMoE][StatNMoE] object. It contains all the statistics associated to the NMoE model.
+#' @seealso [ParamNMoE], [StatNMoE]
 #' @export
-ModelTMoE <- setRefClass(
-  "ModelTMoE",
+ModelNMoE <- setRefClass(
+  "ModelNMoE",
   fields = list(
-    param = "ParamTMoE",
-    stat = "StatTMoE"
+    param = "ParamNMoE",
+    stat = "StatNMoE"
   ),
   methods = list(
     plot = function(what = c("meancurve", "confregions", "clusters", "loglikelihood"), ...) {

@@ -59,7 +59,7 @@ ParamSNMoE <- setRefClass(
     },
 
     initParam = function(try_EM, segmental = FALSE) {
-      alpha <<- matrix(runif((q + 1) * (K - 1)), nrow = q + 1, ncol = K - 1) #initialisation al??atoire du vercteur param???tre du IRLS
+      alpha <<- matrix(runif((q + 1) * (K - 1)), nrow = q + 1, ncol = K - 1) #random initialization of parameter vector of IRLS
 
       #Initialise the regression parameters (coeffecients and variances):
       if (segmental == FALSE) {

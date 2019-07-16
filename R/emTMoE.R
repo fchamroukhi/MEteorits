@@ -3,7 +3,7 @@
 #' emTMoE is used to fit a TMoE model. The estimation method is performed by
 #' the Expectation-Maximization algorithm.
 #'
-#' @details emStMoE function is based on the EM algorithm. This functions starts
+#' @details emTMoE function is based on the EM algorithm. This functions starts
 #' with an initialization of the parameters done by the method `initParam` of
 #' the class [ParamTMoE][ParamTMoE], then it alternates between a E-Step
 #' (method of the class [StatTMoE][StatTMoE]) and a M-Step (method of the class
@@ -18,8 +18,6 @@
 #' @param p The order of the polynomial regression.
 #' @param q The dimension of the logistic regression. For the purpose of
 #' segmentation, it must be set to 1.
-#' @param variance_type Numeric indicating if the model is homoskedastic
-#' (`variance_type` = 1) or heteroskedastic (`variance_type` = 2).
 #' @param n_tries Number of times EM algorithm will be launched.
 #' The solution providing the highest log-likelihood will be returned.
 #'

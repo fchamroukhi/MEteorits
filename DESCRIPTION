@@ -37,15 +37,19 @@ Collate:
     ParamSNMoE.R
     ParamStMoE.R
     ParamTMoE.R
+    ParamNMoE.R
     StatSNMoE.R
     StatStMoE.R
     StatTMoE.R
+    StatNMoE.R
     ModelSNMoE.R
     ModelStMoE.R
     ModelTMoE.R
+    ModelNMoE.R
     emSNMoE.R
     emStMoE.R
     emTMoE.R
+    emNMoE.R
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true
