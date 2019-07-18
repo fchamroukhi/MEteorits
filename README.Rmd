@@ -19,11 +19,9 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-## Overview
+## **MEteorits:** Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
 
-Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
-
-MEteoritS is a toolbox containg several original and flexible mixtures-of-experts models to model, cluster and classify heteregenous data in many complex situations where the data are distributed according non-normal, possibly skewed distributions, and when they might be corrupted by atypical observations. The toolbox contains in particular sparse mixture-of-experts models for high-dimensional data. 
+MEteoritS is an open source toolbox (available in R and Matlab) containg several original and flexible mixtures-of-experts models to model, cluster and classify heteregenous data in many complex situations where the data are distributed according non-normal, possibly skewed distributions, and when they might be corrupted by atypical observations. The toolbox contains in particular sparse mixture-of-experts models for high-dimensional data. 
 
 Our (dis-)covered meteorites are for instance the following:
 
@@ -38,7 +36,7 @@ The models and algorithms are developped and written in Matlab by Faicel Chamrou
 
 ## Installation
 
-You can install the development version of STMoE from [GitHub](https://github.com/) with:
+You can install the development version of MEteorits from [GitHub](https://github.com/fchamroukhi/MEteorits) with:
 
 ```{r, eval = FALSE}
 # install.packages("devtools")
@@ -62,33 +60,10 @@ browseVignettes("MEteorits")
 
 ## Usage
 <details>
-  <summary>SNMoE</summary>
+<summary>NMoE</summary>
 ```{r, message = FALSE}
-library(meteorits)
+# (fyi: NMoE is for  the standard normal mixture-of-experts model)
 
-data("simulatedstructureddata")
-
-K <- 2 # Number of regimes (mixture components)
-p <- 1 # Dimension of beta (order of the polynomial regressors)
-q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
-
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-6
-verbose <- TRUE
-verbose_IRLS <- FALSE
-
-snmoe <- emSNMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), 
-                 K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
-
-snmoe$plot()
-```
-</details>
-
-<details>
-<summary>StMoE</summary>
-
-```{r, message = FALSE}
 library(meteorits)
 
 data("simulatedstructureddata")
@@ -103,12 +78,12 @@ threshold <- 1e-5
 verbose <- TRUE
 verbose_IRLS <- FALSE
 
-stmoe <- emStMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), 
-                 K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+nmoe <- emNMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
 
-stmoe$plot()
+nmoe$plot()
 ```
 </details>
+
 
 <details>
 <summary>TMoE</summary>
@@ -135,9 +110,34 @@ tmoe$plot()
 </details>
 
 
+<details>
+  <summary>SNMoE</summary>
+```{r, message = FALSE}
+library(meteorits)
+
+data("simulatedstructureddata")
+
+K <- 2 # Number of regimes (mixture components)
+p <- 1 # Dimension of beta (order of the polynomial regressors)
+q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
+
+n_tries <- 1
+max_iter <- 1500
+threshold <- 1e-6
+verbose <- TRUE
+verbose_IRLS <- FALSE
+
+snmoe <- emSNMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), 
+                 K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+
+snmoe$plot()
+```
+</details>
+
 
 <details>
-<summary>NMoE</summary>
+<summary>StMoE</summary>
+
 ```{r, message = FALSE}
 library(meteorits)
 
@@ -153,12 +153,13 @@ threshold <- 1e-5
 verbose <- TRUE
 verbose_IRLS <- FALSE
 
-nmoe <- emNMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+stmoe <- emStMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), 
+                 K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
 
-nmoe$plot()
+stmoe$plot()
 ```
-
 </details>
+
 
 # References
 

@@ -2,12 +2,10 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
 <!-- badges: end -->
-Overview
---------
+**MEteorits:** Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
+------------------------------------------------------------------------------------
 
-Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
-
-MEteoritS is a toolbox containg several original and flexible mixtures-of-experts models to model, cluster and classify heteregenous data in many complex situations where the data are distributed according non-normal, possibly skewed distributions, and when they might be corrupted by atypical observations. The toolbox contains in particular sparse mixture-of-experts models for high-dimensional data.
+MEteoritS is an open source toolbox (available in R and Matlab) containg several original and flexible mixtures-of-experts models to model, cluster and classify heteregenous data in many complex situations where the data are distributed according non-normal, possibly skewed distributions, and when they might be corrupted by atypical observations. The toolbox contains in particular sparse mixture-of-experts models for high-dimensional data.
 
 Our (dis-)covered meteorites are for instance the following:
 
@@ -23,7 +21,7 @@ The models and algorithms are developped and written in Matlab by Faicel Chamrou
 Installation
 ------------
 
-You can install the development version of STMoE from [GitHub](https://github.com/) with:
+You can install the development version of MEteorits from [GitHub](https://github.com/fchamroukhi/MEteorits) with:
 
 ``` r
 # install.packages("devtools")
@@ -48,6 +46,58 @@ browseVignettes("MEteorits")
 Usage
 -----
 
+<details> <summary>NMoE</summary>
+
+``` r
+# (fyi: NMoE is for  the standard normal mixture-of-experts model)
+
+library(meteorits)
+
+data("simulatedstructureddata")
+
+K <- 2 # Number of regimes (mixture components)
+p <- 1 # Dimension of beta (order of the polynomial regressors)
+q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
+
+n_tries <- 1
+max_iter <- 1500
+threshold <- 1e-5
+verbose <- TRUE
+verbose_IRLS <- FALSE
+
+nmoe <- emNMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+
+nmoe$plot()
+```
+
+<img src="man/figures/README-unnamed-chunk-5-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-4.png" style="display: block; margin: auto;" /> </details>
+
+<details> <summary>TMoE</summary>
+
+``` r
+library(meteorits)
+
+data("simulatedstructureddata")
+
+K <- 2 # Number of regimes (mixture components)
+p <- 1 # Dimension of beta (order of the polynomial regressors)
+q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
+
+n_tries <- 1
+max_iter <- 1500
+threshold <- 1e-5
+verbose <- TRUE
+verbose_IRLS <- FALSE
+
+tmoe <- emTMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+
+tmoe$plot()
+```
+
+<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-4.png" style="display: block; margin: auto;" />
+
+</details>
+
 <details> <summary>SNMoE</summary>
 
 ``` r
@@ -71,7 +121,7 @@ snmoe <- emSNMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y),
 snmoe$plot()
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-4.png" style="display: block; margin: auto;" /> </details>
+<img src="man/figures/README-unnamed-chunk-7-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-4.png" style="display: block; margin: auto;" /> </details>
 
 <details> <summary>StMoE</summary>
 
@@ -96,59 +146,7 @@ stmoe <- emStMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y),
 stmoe$plot()
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-4.png" style="display: block; margin: auto;" /> </details>
-
-<details> <summary>TMoE</summary>
-
-``` r
-library(meteorits)
-
-data("simulatedstructureddata")
-
-K <- 2 # Number of regimes (mixture components)
-p <- 1 # Dimension of beta (order of the polynomial regressors)
-q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
-
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-5
-verbose <- TRUE
-verbose_IRLS <- FALSE
-
-tmoe <- emTMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
-
-tmoe$plot()
-```
-
-<img src="man/figures/README-unnamed-chunk-7-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-4.png" style="display: block; margin: auto;" />
-
-</details>
-
-<details> <summary>NMoE</summary>
-
-``` r
-library(meteorits)
-
-data("simulatedstructureddata")
-
-K <- 2 # Number of regimes (mixture components)
-p <- 1 # Dimension of beta (order of the polynomial regressors)
-q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
-
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-5
-verbose <- TRUE
-verbose_IRLS <- FALSE
-
-nmoe <- emNMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
-
-nmoe$plot()
-```
-
-<img src="man/figures/README-unnamed-chunk-8-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-4.png" style="display: block; margin: auto;" />
-
-</details>
+<img src="man/figures/README-unnamed-chunk-8-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-4.png" style="display: block; margin: auto;" /> </details>
 
 References
 ==========
