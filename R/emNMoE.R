@@ -1,9 +1,9 @@
-#' emNMoE is used to fit a NMoE model.
+#' emNMoE implements the EM algorithm to fit a NMoE model.
 #'
-#' emNMoE is used to fit a NMoE model. The estimation method is performed by
-#' the Expectation-Maximization algorithm.
+#' emNMoE implements the maximum-likelihood parameter estimation of a NMoE
+#' model by the Expectation-Maximization (EM) algorithm.
 #'
-#' @details emNMoE function is based on the EM algorithm. This functions starts
+#' @details emNMoE function function implements the EM algorithm for the NMoE model. This functions starts
 #' with an initialization of the parameters done by the method `initParam` of
 #' the class [ParamNMoE][ParamNMoE], then it alternates between a E-Step
 #' (method of the class [StatNMoE][StatNMoE]) and a M-Step (method of the class
@@ -11,20 +11,17 @@
 #' log-likelihood between two steps of the EM algorithm is less than the
 #' `threshold` parameter).
 #'
-#' @param X Numeric vector of length \emph{m} representing the covariates.
-#' @param Y Matrix of size \eqn{(n, m)} representing \emph{n} functions of `X`
-#' observed at points \eqn{1,\dots,m}.
-#' @param K The number of mixture components.
-#' @param p The order of the polynomial regression.
-#' @param q The dimension of the logistic regression. For the purpose of
+#' @param X Numeric vector of length \emph{n} representing the covariates/inputs
+#'   \eqn{x_{1},\dots,x_{m}}.
+#' @param Y Numeric vector of length \emph{n} representing the observed
+#'   response/output \eqn{y_{1},\dots,y_{m}}.
+#' @param K The number of expert components.
+#' @param p The order of the polynomial regression for the expert regressors network.
+#' @param q The dimension of the logistic regression for the gating network. For the purpose of
 #' segmentation, it must be set to 1.
-#' @param n_tries Number of times EM algorithm will be launched.
+#' @param n_tries Number of times EM algorithm will be launched with different initializations.
 #' The solution providing the highest log-likelihood will be returned.
 #'
-#' If `n_tries` > 1, then for the first pass, parameters are initialized
-#' by uniformly segmenting the data into K segments, and for the next passes,
-#' parameters are initialized by randomly segmenting the data into K contiguous
-#'  segments.
 #' @param max_iter The maximum number of iterations for the EM algorithm.
 #' @param threshold A numeric value specifying the threshold for the relative
 #'  difference of log-likelihood between two steps  of the EM as stopping
@@ -34,7 +31,7 @@
 #' @param verbose_IRLS A logical value indicating whether values of the
 #' criterion optimized by IRLS should be printed at each step of the EM
 #' algorithm.
-#' @return EM returns an object of class [ModelNMoE][ModelNMoE].
+#' @return Th EM algorithm returns an object of class [ModelNMoE][ModelNMoE].
 #' @seealso [ModelNMoE], [ParamNMoE], [StatNMoE]
 #' @export
 emNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {

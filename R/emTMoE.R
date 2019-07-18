@@ -1,40 +1,37 @@
-#' emTMoE is used to fit a TMoE model.
+#' emTMoE implements the ECM algorithm to fit a tMoE model.
 #'
-#' emTMoE is used to fit a TMoE model. The estimation method is performed by
-#' the Expectation-Maximization algorithm.
+#' emTMoE implements the maximum-likelihood parameter estimation of a tMoE
+#' model by the Expectation Conditional Maximization (ECM) algorithm.
 #'
-#' @details emTMoE function is based on the EM algorithm. This functions starts
+#' @details emTMoE function function implements the ECM algorithm for the tMoE model. This functions starts
 #' with an initialization of the parameters done by the method `initParam` of
 #' the class [ParamTMoE][ParamTMoE], then it alternates between a E-Step
-#' (method of the class [StatTMoE][StatTMoE]) and a M-Step (method of the class
+#' (method of the class [StatTMoE][StatTMoE]) and a CM-Step (method of the class
 #' [ParamTMoE][ParamTMoE]) until convergence (until the absolute difference of
-#' log-likelihood between two steps of the EM algorithm is less than the
+#' log-likelihood between two steps of the ECM algorithm is less than the
 #' `threshold` parameter).
 #'
-#' @param X Numeric vector of length \emph{m} representing the covariates.
-#' @param Y Matrix of size \eqn{(n, m)} representing \emph{n} functions of `X`
-#' observed at points \eqn{1,\dots,m}.
-#' @param K The number of mixture components.
-#' @param p The order of the polynomial regression.
-#' @param q The dimension of the logistic regression. For the purpose of
+#' @param X Numeric vector of length \emph{n} representing the covariates/inputs
+#'   \eqn{x_{1},\dots,x_{m}}.
+#' @param Y Numeric vector of length \emph{n} representing the observed
+#'   response/output \eqn{y_{1},\dots,y_{m}}.
+#' @param K The number of expert components.
+#' @param p The order of the polynomial regression for the expert regressors network.
+#' @param q The dimension of the logistic regression for the gating network. For the purpose of
 #' segmentation, it must be set to 1.
-#' @param n_tries Number of times EM algorithm will be launched.
+#' @param n_tries Number of times ECM algorithm will be launched with different initializations.
 #' The solution providing the highest log-likelihood will be returned.
 #'
-#' If `n_tries` > 1, then for the first pass, parameters are initialized
-#' by uniformly segmenting the data into K segments, and for the next passes,
-#' parameters are initialized by randomly segmenting the data into K contiguous
-#'  segments.
-#' @param max_iter The maximum number of iterations for the EM algorithm.
+#' @param max_iter The maximum number of iterations for the ECM algorithm.
 #' @param threshold A numeric value specifying the threshold for the relative
-#'  difference of log-likelihood between two steps  of the EM as stopping
+#'  difference of log-likelihood between two steps  of the ECM as stopping
 #'  criteria.
 #' @param verbose A logical value indicating whether values of the
-#' log-likelihood should be printed during EM iterations.
+#' log-likelihood should be printed during ECM iterations.
 #' @param verbose_IRLS A logical value indicating whether values of the
-#' criterion optimized by IRLS should be printed at each step of the EM
+#' criterion optimized by IRLS should be printed at each step of the ECM
 #' algorithm.
-#' @return EM returns an object of class [ModelTMoE][ModelTMoE].
+#' @return Th ECM algorithm returns an object of class [ModelTMoE][ModelTMoE].
 #' @seealso [ModelTMoE], [ParamTMoE], [StatTMoE]
 #' @export
 emTMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
@@ -49,7 +46,7 @@ emTMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
       try_EM <- try_EM + 1
       message("EM try nr ", try_EM)
 
-      # Initializations
+      # Initialization
       param <- ParamTMoE$new(fData = fData, K = K, p = p, q = q)
       param$initParam(try_EM, segmental = TRUE)
 
@@ -80,7 +77,7 @@ emTMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
             break
         }
 
-        # TEST OF CONVERGENCE
+        # test of convergence
         converge <- abs((stat$log_lik - prev_loglik) / prev_loglik) <= threshold
         if (is.na(converge)) {
           converge <- FALSE
@@ -88,9 +85,9 @@ emTMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
 
         prev_loglik <- stat$log_lik
         stat$stored_loglik <- c(stat$stored_loglik, stat$log_lik)
-      }# FIN EM LOOP
+      }# End of an EM run
 
-      # at this point we have computed param and stat that contains all the information
+      # at this point we have computed param and stat that contain all the information
 
       if (stat$log_lik > best_loglik) {
         statSolution <- stat$copy()
@@ -103,7 +100,7 @@ emTMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
       }
     }
 
-    # Computation of c_ig the hard partition of the curves and klas
+    # Computation of z_ik the hard partition of the data and the class labels klas
     statSolution$MAP()
 
     if (n_tries > 1) {
@@ -111,7 +108,7 @@ emTMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
     }
 
 
-    # FINISH computation of statSolution
+    # End of the calculation of statSolution
     statSolution$computeStats(paramSolution)
 
     return(ModelTMoE(param = paramSolution, stat = statSolution))
