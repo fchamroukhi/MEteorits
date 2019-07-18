@@ -1,4 +1,17 @@
-citHeader("To cite meteorit in publications use:")
+citHeader("To cite meteorits in publications use:")
+
+citEntry(
+  Journal = "{"Journal de la Societe Francaise de Statistique"}",
+  author = personList(person(given="B-T.", family="Huynh"),
+                      person(given="F.", family="Chamroukhi")),
+  Title = "{{"Estimation and Feature Selection in Mixtures of Generalized Linear Experts Models}},
+	Volume = "",
+	Month = "July",
+	Year = "2019",
+	url =  "https://chamroukhi.com/papers/prEMME.pdf",
+	eprint = "arXiv:1907.06994",
+	url =  {https://chamroukhi.com/papers/Chamroukhi_Huynh_jsfds-published.pdf}
+)
 
 citEntry(
   entry    = "Article",
@@ -8,7 +21,7 @@ citEntry(
   journal  = "Journal de la Soci\u00e9t\u00e9 Fran\u00e7aise de Statistique",
   volume   = "160(1)",
   pages = "57--85",
-  year = "2019"
+  year = "2019",
 )
 
 citEntry(
@@ -87,8 +100,7 @@ citEntry(
   title    = "Hidden process regression for curve modeling, classification and tracking.",
   author = person(given="F.", family="Chamroukhi"),
   school = "Universit\u00e9 de Compi\u00e8gne",
-  year = "2010",
-  <URL: https://chamroukhi.com/papers/FChamroukhi-Thesis.pdf>."
+  year = "2010"
 )
 
 citEntry(

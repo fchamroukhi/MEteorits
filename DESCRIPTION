@@ -9,8 +9,8 @@ Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
     email = "marius.bartcus@gmail.com"),
     person("Florian", "Lecocq", role = c("aut", "cre"),
     email = "florian.lecocq@outlook.com"))
-Description: MEteoritS is a toolbox containg several original and flexible 
-    mixtures-of-experts models to model, cluster and classify heteregenous 
+Description: MEteoritS is an open source toolbox containing several original and flexible 
+    mixtures-of-experts models to model, cluster and classify heterogeneous 
     data in many complex situations where the data are distributed according 
     non-normal, possibly skewed distributions, and when they might be 
     corrupted by atypical observations. The toolbox contains in particular 
