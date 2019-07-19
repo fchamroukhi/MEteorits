@@ -91,7 +91,7 @@ ParamNMoE <- setRefClass(
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% (t(Xk) %*% yk)
 
-          muk <- Xk %*% beta[, k]
+          muk <- Xk %*% beta[, k, drop = FALSE]
 
           sigma[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
         }

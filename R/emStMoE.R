@@ -36,6 +36,16 @@
 #' @export
 emStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
 
+  tryCatch(suppressWarnings(fitStMoE(X, Y, K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)),
+           error = function(err) {
+             message("Numerical instability... Relaunching EM algorithm!\n")
+             emStMoE(X, Y, K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+          })
+
+}
+
+fitStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
+
     fData <- FData(X, Y)
 
     top <- 0

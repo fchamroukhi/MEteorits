@@ -96,7 +96,7 @@ ParamSNMoE <- setRefClass(
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% (t(Xk) %*% yk)
 
-          muk <- Xk %*% beta[, k]
+          muk <- Xk %*% beta[, k, drop = FALSE]
 
           sigma[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
         }
@@ -124,7 +124,7 @@ ParamSNMoE <- setRefClass(
         #update the regression coefficients
 
         tauik_Xbeta <- (statSNMoE$tik[, k] %*% ones(1, p + 1)) * phiBeta$XBeta
-        beta[, k] <<- solve((t(tauik_Xbeta) %*% phiAlpha$XBeta)) %*% (t(tauik_Xbeta) %*% (fData$Y - delta[k] * statSNMoE$E1ik[, k]))
+        beta[, k] <<- solve((t(tauik_Xbeta) %*% phiBeta$XBeta)) %*% (t(tauik_Xbeta) %*% (fData$Y - delta[k] * statSNMoE$E1ik[, k]))
 
         # update the variances sigma2k
 

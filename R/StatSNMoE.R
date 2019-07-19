@@ -177,7 +177,28 @@ StatSNMoE <- setRefClass(
         sigma_uk <- sqrt(sigma2_uk)
 
         E1ik[, k] <<- mu_uk + sigma_uk * dnorm(paramSNMoE$lambda[k] * dik, 0, 1) / pnorm(paramSNMoE$lambda[k] * dik, 0, 1)
+
+        #######################################################################
+        # Handle numerical instability
+        #######################################################################
+        temp <- E1ik[, k]
+        temp[is.nan(temp)] <- mu_uk[is.nan(temp)] + sigma_uk * paramSNMoE$lambda[k] * dik[is.nan(temp)]
+        temp[is.infinite(temp)] <- mu_uk[is.infinite(temp)] + sigma_uk * paramSNMoE$lambda[k] * dik[is.infinite(temp)]
+        E1ik[, k] <<- temp
+        #######################################################################
+        #######################################################################
+
         E2ik[, k] <<- mu_uk ^ 2 + sigma_uk ^ 2 + sigma_uk * mu_uk * dnorm(paramSNMoE$lambda[k] * dik, 0, 1) / pnorm(paramSNMoE$lambda[k] * dik, 0, 1)
+
+        #######################################################################
+        # Handle numerical instability
+        #######################################################################
+        temp <- E2ik[, k]
+        temp[is.nan(temp)] <- mu_uk[is.nan(temp)] ^ 2 + sigma_uk ^ 2 + sigma_uk * mu_uk[is.nan(temp)] * paramSNMoE$lambda[k] * dik[is.nan(temp)]
+        temp[is.infinite(temp)] <- mu_uk[is.infinite(temp)] ^ 2 + sigma_uk ^ 2 + sigma_uk * mu_uk[is.infinite(temp)] * paramSNMoE$lambda[k] * dik[is.infinite(temp)]
+        E2ik[, k] <<- temp
+        #######################################################################
+        #######################################################################
 
         # weighted skew normal linear expert likelihood
         piik_fik[, k] <- piik[, k] * (2 / sigmak) * dnorm(dik, 0, 1) * pnorm(paramSNMoE$lambda[k] * dik)

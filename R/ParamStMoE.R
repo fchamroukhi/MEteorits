@@ -134,7 +134,7 @@ ParamStMoE <- setRefClass(
         #update the regression coefficients
         TauikWik <- (statStMoE$tik[,k] * statStMoE$wik[,k]) %*% ones(1, p+1)
         TauikX <- phiBeta$XBeta * (statStMoE$tik[,k] %*% ones(1, p+1))
-        betak <- solve((t(TauikWik * phiBeta$XBeta) %*% phiAlpha$XBeta)) %*% (t(TauikX) %*% ( (statStMoE$wik[,k] * fData$Y) - (delta[k] * statStMoE$E1ik[ ,k]) ))
+        betak <- solve((t(TauikWik * phiBeta$XBeta) %*% phiBeta$XBeta)) %*% (t(TauikX) %*% ( (statStMoE$wik[,k] * fData$Y) - (delta[k] * statStMoE$E1ik[ ,k]) ))
 
         beta[,k] <<- betak;
         # update the variances sigma2k
