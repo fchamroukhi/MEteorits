@@ -2,31 +2,27 @@
 % Please edit documentation in R/emNMoE.R
 \name{emNMoE}
 \alias{emNMoE}
-\title{emNMoE is used to fit a NMoE model.}
+\title{emNMoE implements the EM algorithm to fit a NMoE model.}
 \usage{
 emNMoE(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500,
   threshold = 1e-06, verbose = FALSE, verbose_IRLS = FALSE)
 }
 \arguments{
-\item{X}{Numeric vector of length \emph{m} representing the covariates.}
+\item{X}{Numeric vector of length \emph{n} representing the covariates/inputs
+\eqn{x_{1},\dots,x_{m}}.}
 
-\item{Y}{Matrix of size \eqn{(n, m)} representing \emph{n} functions of \code{X}
-observed at points \eqn{1,\dots,m}.}
+\item{Y}{Numeric vector of length \emph{n} representing the observed
+response/output \eqn{y_{1},\dots,y_{m}}.}
 
-\item{K}{The number of mixture components.}
+\item{K}{The number of expert components.}
 
-\item{p}{The order of the polynomial regression.}
+\item{p}{The order of the polynomial regression for the expert regressors network.}
 
-\item{q}{The dimension of the logistic regression. For the purpose of
+\item{q}{The dimension of the logistic regression for the gating network. For the purpose of
 segmentation, it must be set to 1.}
 
-\item{n_tries}{Number of times EM algorithm will be launched.
-The solution providing the highest log-likelihood will be returned.
-
-If \code{n_tries} > 1, then for the first pass, parameters are initialized
-by uniformly segmenting the data into K segments, and for the next passes,
-parameters are initialized by randomly segmenting the data into K contiguous
-segments.}
+\item{n_tries}{Number of times EM algorithm will be launched with different initializations.
+The solution providing the highest log-likelihood will be returned.}
 
 \item{max_iter}{The maximum number of iterations for the EM algorithm.}
 
@@ -42,14 +38,14 @@ criterion optimized by IRLS should be printed at each step of the EM
 algorithm.}
 }
 \value{
-EM returns an object of class \link{ModelNMoE}.
+Th EM algorithm returns an object of class \link{ModelNMoE}.
 }
 \description{
-emNMoE is used to fit a NMoE model. The estimation method is performed by
-the Expectation-Maximization algorithm.
+emNMoE implements the maximum-likelihood parameter estimation of a NMoE
+model by the Expectation-Maximization (EM) algorithm.
 }
 \details{
-emNMoE function is based on the EM algorithm. This functions starts
+emNMoE function function implements the EM algorithm for the NMoE model. This functions starts
 with an initialization of the parameters done by the method \code{initParam} of
 the class \link{ParamNMoE}, then it alternates between a E-Step
 (method of the class \link{StatNMoE}) and a M-Step (method of the class

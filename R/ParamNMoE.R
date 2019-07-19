@@ -12,7 +12,7 @@
 #' @field beta is the vector of regression coefficients of component k,
 #' the updates for each of the expert component parameters consist in analytically solving a weighted
 #' Gaussian linear regression problem.
-#' @field sigma The variances for the \emph{K} mixture component.
+#' @field sigma The variances for the \emph{K} mixture components.
 #' @field delta the skewness parameter lambda (by equivalence delta)
 #' @seealso [FData]
 #' @export

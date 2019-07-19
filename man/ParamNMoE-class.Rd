@@ -28,7 +28,7 @@ segmentation, it must be set to 1.}
 the updates for each of the expert component parameters consist in analytically solving a weighted
 Gaussian linear regression problem.}
 
-\item{\code{sigma}}{The variances for the \emph{K} mixture component.}
+\item{\code{sigma}}{The variances for the \emph{K} mixture components.}
 
 \item{\code{delta}}{the skewness parameter lambda (by equivalence delta)}
 }}

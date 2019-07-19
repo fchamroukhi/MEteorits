@@ -1,4 +1,4 @@
-#' A Reference Class which represents functional data.
+#' A Reference Class to represent a functional data set.
 #'
 #' FData is a reference class which represents general independent and
 #' identically distributed (i.i.d.) functional objects. The data can be
