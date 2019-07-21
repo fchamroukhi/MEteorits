@@ -96,7 +96,7 @@ ParamSNMoE <- setRefClass(
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% (t(Xk) %*% yk)
 
-          muk <- Xk %*% beta[, k]
+          muk <- Xk %*% beta[, k, drop = FALSE]
 
           sigma[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
         }
@@ -107,9 +107,8 @@ ParamSNMoE <- setRefClass(
       }
 
       # Initialize the skewness parameter Lambdak (by equivalence delta)
-      delta <<- -1 + 2 * rand(1, K)
-
-      lambda <<- delta / sqrt(1 - delta ^ 2)
+      lambda <<- -1 + 2 * rand(1, K)
+      delta <<- lambda ^ 2 / sqrt(1 + lambda ^ 2)
     },
 
     MStep = function(statSNMoE, verbose_IRLS) {
@@ -121,23 +120,22 @@ ParamSNMoE <- setRefClass(
       alpha <<- res_irls$W
 
       for (k in 1:K) {
-        #update the regression coefficients
+        # update the regression coefficients
 
         tauik_Xbeta <- (statSNMoE$tik[, k] %*% ones(1, p + 1)) * phiBeta$XBeta
-        beta[, k] <<- solve((t(tauik_Xbeta) %*% phiAlpha$XBeta)) %*% (t(tauik_Xbeta) %*% (fData$Y - delta[k] * statSNMoE$E1ik[, k]))
+        beta[, k] <<- solve((t(tauik_Xbeta) %*% phiBeta$XBeta)) %*% (t(tauik_Xbeta) %*% (fData$Y - delta[k] * statSNMoE$E1ik[, k]))
 
         # update the variances sigma2k
 
         sigma[k] <<- sum(statSNMoE$tik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2 - 2 * delta[k] * statSNMoE$E1ik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) + statSNMoE$E2ik[, k])) / (2 * (1 - delta[k] ^ 2) * sum(statSNMoE$tik[, k]))
 
-        # update the deltak (the skewness parameter)
-        delta[k] <<- uniroot(f <- function(dlt) {
-          sigma[k] * dlt * (1 - dlt ^ 2) * sum(statSNMoE$tik[, k]) + (1 + dlt ^ 2) * sum(statSNMoE$tik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) * statSNMoE$E1ik[, k])
-          - dlt * sum(statSNMoE$tik[, k] * (statSNMoE$E2ik[, k] + (fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2))
-        }, c(-1, 1))$root
+        # update the lambdak (the skewness parameter)
+        lambda[k] <<- uniroot(f <- function(lmbda) {
+          sigma[k] * (lmbda / sqrt(1 + lmbda ^ 2)) * (1 - (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statSNMoE$tik[, k]) + (1 + (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statSNMoE$tik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) * statSNMoE$E1ik[, k])
+          - (lmbda / sqrt(1 + (lmbda ^ 2 / (1 + lmbda ^ 2)))) * sum(statSNMoE$tik[, k] * (statSNMoE$E2ik[, k] + (fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2))
+        }, interval = c(-100, 100), extendInt = "yes")$root
 
-
-        lambda[k] <<- delta[k] / sqrt(1 - delta[k] ^ 2)
+        delta[k] <<- lambda[k] / sqrt(1 + lambda[k] ^ 2)
 
       }
 

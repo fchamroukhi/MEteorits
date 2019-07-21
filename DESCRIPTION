@@ -20,6 +20,7 @@ License: GPL (>= 3)
 Depends: 
     R (>= 2.10)
 Imports: 
+    pracma,
     methods,
     stats,
     Rcpp
@@ -32,6 +33,7 @@ LinkingTo:
 Collate:
     meteorits-package.R
     RcppExports.R
+    logsumexp.R
     utils.R
     FData.R
     ParamSNMoE.R

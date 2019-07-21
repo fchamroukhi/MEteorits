@@ -227,7 +227,7 @@ StatStMoE <- setRefClass(
         E3ik[, k] <<- wik[,k] - log((paramStMoE$nuk[k] + dik[,k]^2)/2) -(paramStMoE$nuk[k] + 1)/(paramStMoE$nuk[k] + dik[,k]^2) + psigamma((paramStMoE$nuk[k] + 1)/2) + ((paramStMoE$lambda[k] * dik[,k] * (dik[,k]^2 - 1)) / sqrt((paramStMoE$nuk[k] + 1)*((paramStMoE$nuk[k] + dik[,k]^2)^3))) * dt(mik[,k], paramStMoE$nuk[k]+1) / pt(mik[,k], paramStMoE$nuk[k] + 1) + (1./pt(mik[,k], paramStMoE$nuk[k] + 1)) * Integgtx;
 
         # weighted skew normal linear expert likelihood
-        piik_fik[, k] <- piik[, k] * (2 / sigmak) * dt(dik[, k], paramStMoE$nuk[k]) * pt(mik[,k], paramStMoE$nuk[k] + 1);
+        piik_fik[, k] <- piik[, k] * (2 / sigmak) * dt(dik[, k], paramStMoE$nuk[k]) * pt(mik[,k], paramStMoE$nuk[k] + 1)
       }
 
 
@@ -235,10 +235,11 @@ StatStMoE <- setRefClass(
 
       log_piik_fik <<- log(piik_fik)
 
-      log_sum_piik_fik <<- matrix(log(rowSums(piik_fik)))
+      log_sum_piik_fik <<- matrix(logsumexp(log_piik_fik, 1))
 
       #E[Zi=k|yi]
-      tik <<- piik_fik / (stme_pdf %*% ones(1,paramStMoE$K))
+      log_tik <- log_piik_fik - log_sum_piik_fik %*% ones(1, paramStMoE$K)
+      tik <<- exp(log_tik)
     }
   )
 )

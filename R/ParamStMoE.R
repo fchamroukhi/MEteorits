@@ -112,9 +112,8 @@ ParamStMoE <- setRefClass(
       }
 
       # Initialize the skewness parameter Lambdak (by equivalence delta)
-      delta <<- -0.9 + 1.8 * rand(1, K)
-
-      lambda <<- delta / sqrt(1 - delta ^ 2)
+      lambda <<- -.1 + .2 * rand(1, K)
+      delta <<- lambda / sqrt(1 + lambda ^ 2)
 
       # Intitialization of the degrees of freedm
       nuk <<- 1 + 5 * rand(1, K)
@@ -134,29 +133,41 @@ ParamStMoE <- setRefClass(
         #update the regression coefficients
         TauikWik <- (statStMoE$tik[,k] * statStMoE$wik[,k]) %*% ones(1, p+1)
         TauikX <- phiBeta$XBeta * (statStMoE$tik[,k] %*% ones(1, p+1))
-        betak <- solve((t(TauikWik * phiBeta$XBeta) %*% phiAlpha$XBeta)) %*% (t(TauikX) %*% ( (statStMoE$wik[,k] * fData$Y) - (delta[k] * statStMoE$E1ik[ ,k]) ))
+        betak <- solve((t(TauikWik * phiBeta$XBeta) %*% phiBeta$XBeta)) %*% (t(TauikX) %*% ( (statStMoE$wik[,k] * fData$Y) - (delta[k] * statStMoE$E1ik[ ,k]) ))
 
         beta[,k] <<- betak;
-        # update the variances sigma2k
 
-        sigma[k] <<- sum(statStMoE$tik[, k]*(statStMoE$wik[,k] * ((fData$Y-phiBeta$XBeta%*%betak)^2) - 2 * delta[k] * statStMoE$E1ik[,k] * (fData$Y - phiBeta$XBeta %*% betak) + statStMoE$E2ik[,k]))/(2*(1-delta[k]^2) * sum(statStMoE$tik[,k]))
+        # update the variances sigma2k
+        sigma2 <- sum(statStMoE$tik[, k]*(statStMoE$wik[,k] * ((fData$Y-phiBeta$XBeta%*%betak)^2) - 2 * delta[k] * statStMoE$E1ik[,k] * (fData$Y - phiBeta$XBeta %*% betak) + statStMoE$E2ik[,k]))/(2*(1-delta[k]^2) * sum(statStMoE$tik[,k]))
+
+        if (sigma2 > 0) {
+          sigma[k] <<- sigma2
+        }
 
         sigmak <- sqrt(sigma[k])
 
         # update the deltak (the skewness parameter)
-        delta[k] <<- uniroot(f <- function(dlt) {
-          return(dlt*(1-dlt^2)*sum(statStMoE$tik[, k])
-          + (1+ dlt^2)*sum(statStMoE$tik[, k] * statStMoE$dik[,k]*statStMoE$E1ik[,k]/sigmak)
-          - dlt * sum(statStMoE$tik[, k] * (statStMoE$wik[,k] * (statStMoE$dik[,k]^2) + statStMoE$E2ik[,k]/(sigmak^2))))
-        }, c(-1, 1))$root
+        lambda[k] <<- tryCatch(expr =
+                           {
+                             uniroot(f <- function(lmbda) {
+                               return((lmbda/sqrt(1+lmbda^2))*(1-(lmbda^2/(1+lmbda^2)))*sum(statStMoE$tik[, k])
+                                      + (1+ (lmbda^2/(1+lmbda^2)))*sum(statStMoE$tik[, k] * statStMoE$dik[,k]*statStMoE$E1ik[,k]/sigmak)
+                                      - (lmbda/sqrt(1+lmbda^2)) * sum(statStMoE$tik[, k] * (statStMoE$wik[,k] * (statStMoE$dik[,k]^2) + statStMoE$E2ik[,k]/(sigmak^2))))
+                             }, c(-100, 100), extendInt = "yes")$root
+                           },
+                         error =  function(x) return(lambda[k]))
 
 
-        lambda[k] <<- delta[k] / sqrt(1 - delta[k] ^ 2)
+        delta[k] <<- lambda[k] / sqrt(1 + lambda[k] ^ 2)
 
 
-        nuk[k] <<- uniroot(f <- function(nnu) {
-          return(- psigamma((nnu)/2) + log((nnu)/2) + 1 + sum(statStMoE$tik[,k] * (statStMoE$E3ik[,k] - statStMoE$wik[,k]))/sum(statStMoE$tik[,k]))
-        }, c(0.1, 200))$root
+        nuk[k] <<- tryCatch(expr =
+                              {
+                                uniroot(f <- function(nnu) {
+                                  return(-psigamma((nnu)/2) + log((nnu)/2) + 1 + sum(statStMoE$tik[,k] * (statStMoE$E3ik[,k] - statStMoE$wik[,k]))/sum(statStMoE$tik[,k]))
+                                }, c(0.1, 200))$root
+                              },
+                            error = function(x) return(nuk[k]))
       }
 
       return(reg_irls)

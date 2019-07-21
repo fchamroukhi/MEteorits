@@ -15,7 +15,6 @@
 #' @field sigma The variances for the \emph{K} mixture component.
 #' @field delta the skewness parameter lambda (by equivalence delta)
 #' @seealso [FData]
-#' @importFrom pracma fzero
 #' @export
 ParamTMoE <- setRefClass(
   "ParamTMoE",
@@ -94,7 +93,7 @@ ParamTMoE <- setRefClass(
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% (t(Xk) %*% yk)
 
-          muk <- Xk %*% beta[, k]
+          muk <- Xk %*% beta[, k, drop = FALSE]
 
           sigma[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
         }
@@ -134,9 +133,7 @@ ParamTMoE <- setRefClass(
 
 
         # update the deltak (the skewness parameter)
-
-
-        delta[k] <<- fzero(f <- function(dlt) {
+        delta[k] <<- pracma::fzero(f <- function(dlt) {
           return(-psigamma(dlt/2) + log(dlt/2) + 1 + (1 / sum(statTMoE$tik[, k])) * sum(statTMoE$tik[, k] * (log(statTMoE$Wik[,k]) - statTMoE$Wik[,k]))
                  + psigamma((delta[k] + 1)/2) - log((delta[k] + 1)/2))
         }, delta[k])$x
