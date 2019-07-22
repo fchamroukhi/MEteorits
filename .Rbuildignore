@@ -1,4 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
+^bibliography\.bib$
 ^chicago-author-date\.csl$
+^meteorits_0\.1\.0\.pdf$

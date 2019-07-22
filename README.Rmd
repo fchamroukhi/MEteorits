@@ -21,7 +21,12 @@ knitr::opts_chunk$set(
 
 ## **MEteorits:** Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
 
-MEteoritS is an open source toolbox (available in R and Matlab) containg several original and flexible mixtures-of-experts models to model, cluster and classify heteregenous data in many complex situations where the data are distributed according to non-normal and possibly skewed distributions, and when they might be corrupted by atypical observations. The toolbox also contains sparse mixture-of-experts models for high-dimensional data. 
+MEteoritS is an open source toolbox (available in R and Matlab) containg 
+several original and flexible mixtures-of-experts models to model, cluster and
+classify heteregenous data in many complex situations where the data are 
+distributed according to non-normal and possibly skewed distributions, and 
+when they might be corrupted by atypical observations. The toolbox also 
+contains sparse mixture-of-experts models for high-dimensional data.
 
 Our (dis-)covered meteorits are for instance the following ones:
 
@@ -32,7 +37,9 @@ Our (dis-)covered meteorits are for instance the following ones:
 * SNMoE 
 * RMoE
 
-The models and algorithms are developped and written in Matlab by Faicel Chamroukhi, and translated and designed into R packages by Florian Lecocq, Marius Bartcus and Faicel Chamroukhi.
+The models and algorithms are developped and written in Matlab by Faicel 
+Chamroukhi, and translated and designed into R packages by Florian Lecocq, 
+Marius Bartcus and Faicel Chamroukhi.
 
 ## Installation
 
@@ -160,6 +167,4 @@ stmoe$plot()
 ```
 </details>
 
-
 # References
-

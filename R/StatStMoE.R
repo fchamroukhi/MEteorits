@@ -235,10 +235,11 @@ StatStMoE <- setRefClass(
 
       log_piik_fik <<- log(piik_fik)
 
-      log_sum_piik_fik <<- matrix(log(rowSums(piik_fik)))
+      log_sum_piik_fik <<- matrix(logsumexp(log_piik_fik, 1))
 
       #E[Zi=k|yi]
-      tik <<- piik_fik / (stme_pdf %*% ones(1,paramStMoE$K))
+      log_tik <- log_piik_fik - log_sum_piik_fik %*% ones(1, paramStMoE$K)
+      tik <<- exp(log_tik)
     }
   )
 )
