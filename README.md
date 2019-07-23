@@ -3,6 +3,8 @@
 
 <!-- badges: start -->
 
+[![Travis build
+status](https://travis-ci.org/fchamroukhi/MEteorits.svg?branch=master)](https://travis-ci.org/fchamroukhi/MEteorits)
 <!-- badges: end -->
 
 ## **MEteorits:** Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
