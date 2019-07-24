@@ -1,0 +1,2 @@
+#' Toy sample
+"simulatedstructureddata"
