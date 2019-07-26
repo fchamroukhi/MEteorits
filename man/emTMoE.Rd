@@ -16,13 +16,15 @@ response/output \eqn{y_{1},\dots,y_{m}}.}
 
 \item{K}{The number of expert components.}
 
-\item{p}{The order of the polynomial regression for the expert regressors network.}
+\item{p}{The order of the polynomial regression for the expert regressors
+network.}
 
-\item{q}{The dimension of the logistic regression for the gating network. For the purpose of
-segmentation, it must be set to 1.}
+\item{q}{The dimension of the logistic regression for the gating network. For
+the purpose of segmentation, it must be set to 1.}
 
-\item{n_tries}{Number of times ECM algorithm will be launched with different initializations.
-The solution providing the highest log-likelihood will be returned.}
+\item{n_tries}{Number of times ECM algorithm will be launched with different
+initializations. The solution providing the highest log-likelihood will be
+returned.}
 
 \item{max_iter}{The maximum number of iterations for the ECM algorithm.}
 
@@ -41,17 +43,17 @@ algorithm.}
 Th ECM algorithm returns an object of class \link{ModelTMoE}.
 }
 \description{
-emTMoE implements the maximum-likelihood parameter estimation of a tMoE
-model by the Expectation Conditional Maximization (ECM) algorithm.
+emTMoE implements the maximum-likelihood parameter estimation of a tMoE model
+by the Expectation Conditional Maximization (ECM) algorithm.
 }
 \details{
-emTMoE function function implements the ECM algorithm for the tMoE model. This functions starts
-with an initialization of the parameters done by the method \code{initParam} of
-the class \link{ParamTMoE}, then it alternates between a E-Step
-(method of the class \link{StatTMoE}) and a CM-Step (method of the class
-\link{ParamTMoE}) until convergence (until the absolute difference of
-log-likelihood between two steps of the ECM algorithm is less than the
-\code{threshold} parameter).
+emTMoE function function implements the ECM algorithm for the tMoE
+model. This functions starts with an initialization of the parameters done
+by the method \code{initParam} of the class \link{ParamTMoE}, then it
+alternates between a E-Step (method of the class \link{StatTMoE}) and
+a CM-Step (method of the class \link{ParamTMoE}) until convergence
+(until the absolute difference of log-likelihood between two steps of the
+ECM algorithm is less than the \code{threshold} parameter).
 }
 \seealso{
 \link{ModelTMoE}, \link{ParamTMoE}, \link{StatTMoE}

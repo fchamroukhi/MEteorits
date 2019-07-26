@@ -1,4 +1,5 @@
 sampleUnivSN <- function(mu, sigma, lambda, n = 1) {
+
   delta = lambda / sqrt(1 + lambda ^ 2)
 
   u <- stats::rnorm(n = n, mean = 0, sd = sigma)
@@ -55,8 +56,8 @@ sampleUnivSNMoE <- function(alphak, betak, sigmak, lambdak, x) {
   K = ncol(betak)
 
   # Build the regression design matrices
-  XBeta <- designmatrix(x, p, q)$XBeta # for the polynomial regression
-  XAlpha <- designmatrix(x, p, q)$Xw # for the logistic regression
+  XBeta <- designmatrix(x, p, q)$XBeta # For the polynomial regression
+  XAlpha <- designmatrix(x, p, q)$Xw # For the logistic regression
 
   y <- zeros(n, 1)
   z <- zeros(n, K)
@@ -68,27 +69,30 @@ sampleUnivSNMoE <- function(alphak, betak, sigmak, lambdak, x) {
   piik <- multinomialLogit(alphak, XAlpha, zeros(n, K), ones(n, 1))$piik
 
   for (i in 1:n) {
-    zik <- stats::rmultinom(n = 1, size = 1, piik[i, ])
+    zik <- stats::rmultinom(n = 1, size = 1, piik[i,])
 
-    mu <- as.numeric(XBeta[i, ] %*% betak[, zik == 1])
+    mu <- as.numeric(XBeta[i,] %*% betak[, zik == 1])
     sigma <- sigmak[zik == 1]
     lambda <- lambdak[zik == 1]
 
     # Sample a skew-normal variable with the parameters of component k
     y[i] <- sampleUnivSN(mu, sigma, lambda)
-    z[i,] <- t(zik)
+    z[i, ] <- t(zik)
     zi[i] <- which.max(zik)
 
   }
 
   # Statistics (means, variances)
+
   # E[yi|xi,zi=k]
   Ey_k <- XBeta %*% betak + ones(n, 1) %*% (sqrt(2 / pi) * deltak * sigmak)
+
   # E[yi|xi]
   Ey <- rowSums(piik * Ey_k)
 
   # Var[yi|xi,zi=k]
   Vary_k <- (1 - (2 / pi) * (deltak ^ 2)) * (sigmak ^ 2)
+
   # Var[yi|xi]
   Vary <- rowSums(piik * (Ey_k ^ 2 + ones(n, 1) %*% Vary_k)) - Ey ^ 2
 

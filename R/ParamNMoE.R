@@ -23,13 +23,10 @@ ParamNMoE <- setRefClass(
     phiBeta = "list",
     phiAlpha = "list",
 
-    K = "numeric",
-    # number of regimes
-    p = "numeric",
-    # dimension of beta (order of polynomial regression)
-    q = "numeric",
-    # dimension of w (order of logistic regression)
-    nu = "numeric", # degree of freedom
+    K = "numeric", # Number of regimes
+    p = "numeric", # Dimension of beta (order of polynomial regression)
+    q = "numeric", # Dimension of w (order of logistic regression)
+    nu = "numeric", # Degree of freedom
 
     alpha = "matrix",
     beta = "matrix",
@@ -37,7 +34,6 @@ ParamNMoE <- setRefClass(
   ),
   methods = list(
     initialize = function(fData = FData(numeric(1), matrix(1)), K = 1, p = 3, q = 1) {
-
       fData <<- fData
 
       phiBeta <<- designmatrix(x = fData$X, p = p)
@@ -55,10 +51,12 @@ ParamNMoE <- setRefClass(
     },
 
     initParam = function(try_EM, segmental = FALSE) {
+
       alpha <<- matrix(runif((q + 1) * (K - 1)), nrow = q + 1, ncol = K - 1)  #random initialization of parameter vector of IRLS
 
-      #Initialise the regression parameters (coeffecients and variances):
+      # Initialize the regression parameters (coefficents and variances):
       if (segmental == FALSE) {
+
         Zik <- zeros(n, K)
 
         klas <- floor(K * matrix(runif(fData$n), fData$n)) + 1
@@ -67,10 +65,8 @@ ParamNMoE <- setRefClass(
 
         Tauik <- Zik
 
-        #beta <<- matrix(0, modelRHLP$p + 1, modelRHLP$K)
-        #sigma <<- matrix(0, modelRHLP$K)
-
         for (k in 1:K) {
+
           Xk <- phiBeta$XBeta * (sqrt(Tauik[, k] %*% ones(1, p + 1)))
           yk <- fData$Y * sqrt(Tauik[, k])
 
@@ -78,16 +74,15 @@ ParamNMoE <- setRefClass(
 
           sigma[k] <<- sum(Tauik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(Tauik[, k])
         }
-      }
-      else{
-        #segmental : segment uniformly the data and estimate the parameters
+      } else {# Segmental : segment uniformly the data and estimate the parameters
+
         nk <- round(fData$n / K) - 1
 
         for (k in 1:K) {
           i <- (k - 1) * nk + 1
           j <- (k * nk)
           yk <- matrix(fData$Y[i:j])
-          Xk <- phiBeta$XBeta[i:j,]
+          Xk <- phiBeta$XBeta[i:j, ]
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% (t(Xk) %*% yk)
 
@@ -104,7 +99,7 @@ ParamNMoE <- setRefClass(
     },
 
     MStep = function(statNMoE, verbose_IRLS) {
-      # M-Step
+
       res_irls <- IRLS(phiAlpha$XBeta, statNMoE$tik, ones(nrow(statNMoE$tik), 1), alpha, verbose_IRLS)
       statNMoE$piik <- res_irls$piik
       reg_irls <- res_irls$reg_irls
@@ -112,16 +107,15 @@ ParamNMoE <- setRefClass(
       alpha <<- res_irls$W
 
       for (k in 1:K) {
-        #update the regression coefficients
 
-        Xbeta <- phiBeta$XBeta * sqrt(statNMoE$tik[,k] %*% ones(1, p + 1))
-        yk <- fData$Y * sqrt(statNMoE$tik[,k])
+        # Update the regression coefficients
+        Xbeta <- phiBeta$XBeta * sqrt(statNMoE$tik[, k] %*% ones(1, p + 1))
+        yk <- fData$Y * sqrt(statNMoE$tik[, k])
 
-        #update the regression coefficients
         beta[, k] <<- solve((t(Xbeta) %*% Xbeta)) %*% (t(Xbeta) %*% yk)
 
-        # update the variances sigma2k
-        sigma[k] <<- sum(statNMoE$tik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k])^2)) / sum(statNMoE$tik[,k])
+        # Update the variances sigma2k
+        sigma[k] <<- sum(statNMoE$tik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(statNMoE$tik[, k])
 
       }
 

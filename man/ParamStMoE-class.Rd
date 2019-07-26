@@ -22,11 +22,12 @@ segmentation, it must be set to 1.}
 
 \item{\code{nu}}{degree of freedom}
 
-\item{\code{alpha}}{is the parameter vector of the logistic model with \eqn{alpha_K} being the null vector.}
+\item{\code{alpha}}{is the parameter vector of the logistic model with \eqn{alpha_K}
+being the null vector.}
 
-\item{\code{beta}}{is the vector of regression coefficients of component k,
-the updates for each of the expert component parameters consist in analytically solving a weighted
-Gaussian linear regression problem.}
+\item{\code{beta}}{is the vector of regression coefficients of component k, the
+updates for each of the expert component parameters consist in analytically
+solving a weighted Gaussian linear regression problem.}
 
 \item{\code{sigma}}{The variances for the \emph{K} mixture component.}
 

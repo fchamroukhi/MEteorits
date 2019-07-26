@@ -3,10 +3,10 @@ sampleUnivST <- function(mu, sigma, nu, lambda, n = 1) {
   e <- sampleUnivSN(0, 1, lambda, n = 1)
 
   # A gamma variable
-  w <- stats::rgamma(n = 1, shape = nu / 2, scale = 2 / nu) # chi2rnd(nu, n, 1) / nu
+  w <- stats::rgamma(n = 1, shape = nu / 2, scale = 2 / nu)
 
   # A skew-t variable
-  y <- mu + sigma * e/ sqrt(w)
+  y <- mu + sigma * e / sqrt(w)
 
   return(y)
 }
@@ -51,58 +51,62 @@ sampleUnivST <- function(mu, sigma, nu, lambda, n = 1) {
 #'    }
 #' }
 #' @export
-sampleUnivSTMoE <- function(alphak, betak, sigmak, lambdak, nuk, x) {
+sampleUnivSTMoE <-
+  function(alphak, betak, sigmak, lambdak, nuk, x) {
 
-  n <- length(x)
+    n <- length(x)
 
-  p <- nrow(betak) - 1
-  q <- nrow(alphak) - 1
-  K = ncol(betak)
+    p <- nrow(betak) - 1
+    q <- nrow(alphak) - 1
+    K = ncol(betak)
 
-  # Build the regression design matrices
-  XBeta <- designmatrix(x, p, q)$XBeta # for the polynomial regression
-  XAlpha <- designmatrix(x, p, q)$Xw # for the logistic regression
+    # Build the regression design matrices
+    XBeta <- designmatrix(x, p, q)$XBeta # For the polynomial regression
+    XAlpha <- designmatrix(x, p, q)$Xw # For the logistic regression
 
-  y <- zeros(n, 1)
-  z <- zeros(n, K)
-  zi <- rep.int(x = 0, times = K)
+    y <- zeros(n, 1)
+    z <- zeros(n, K)
+    zi <- rep.int(x = 0, times = K)
 
-  deltak <- lambdak / sqrt(1 + lambdak ^ 2)
+    deltak <- lambdak / sqrt(1 + lambdak ^ 2)
 
-  # Calculate the mixing proportions piik:
-  piik <- multinomialLogit(alphak, XAlpha, zeros(n, K), ones(n, 1))$piik
+    # Calculate the mixing proportions piik:
+    piik <- multinomialLogit(alphak, XAlpha, zeros(n, K), ones(n, 1))$piik
 
-  for (i in 1:n) {
-    zik <- stats::rmultinom(n = 1, size = 1, piik[i, ])
+    for (i in 1:n) {
+      zik <- stats::rmultinom(n = 1, size = 1, piik[i,])
 
-    mu <- as.numeric(XBeta[i, ] %*% betak[, zik == 1])
-    sigma <- sigmak[zik == 1]
-    lambda <- lambdak[zik == 1]
-    nu <- nuk[zik == 1]
+      mu <- as.numeric(XBeta[i,] %*% betak[, zik == 1])
+      sigma <- sigmak[zik == 1]
+      lambda <- lambdak[zik == 1]
+      nu <- nuk[zik == 1]
 
-    y[i] <- sampleUnivST(mu = mu, sigma = sigma, nu = nu, lambda = lambda)
-    z[i,] <- t(zik)
-    zi[i] <- which.max(zik)
+      y[i] <- sampleUnivST(mu = mu, sigma = sigma, nu = nu, lambda = lambda)
+      z[i, ] <- t(zik)
+      zi[i] <- which.max(zik)
 
-  }
+    }
 
-  # Statistics (means, variances)
-  Xi_nuk = sqrt(nuk / pi) * (gamma(nuk / 2 - 1 / 2)) / (gamma(nuk / 2))
-  # E[yi|xi,zi=k]
-  Ey_k <- XBeta %*% betak + ones(n, 1) %*% (sigmak * deltak * Xi_nuk)
-  # E[yi|xi]
-  Ey <- rowSums(piik * Ey_k)
+    # Statistics (means, variances)
+    Xi_nuk = sqrt(nuk / pi) * (gamma(nuk / 2 - 1 / 2)) / (gamma(nuk / 2))
 
-  # Var[yi|xi,zi=k]
-  Vary_k <- (nuk / (nuk - 2) - (deltak ^ 2) * (Xi_nuk ^ 2)) * (sigmak ^ 2)
-  # Var[yi|xi]
-  Vary <- rowSums(piik * (Ey_k ^ 2 + ones(n, 1) %*% Vary_k)) - Ey ^ 2
+    # E[yi|xi,zi=k]
+    Ey_k <- XBeta %*% betak + ones(n, 1) %*% (sigmak * deltak * Xi_nuk)
 
-  stats <- list()
-  stats$Ey_k <- Ey_k
-  stats$Ey <- Ey
-  stats$Vary_k <- Vary_k
-  stats$Vary <- Vary
+    # E[yi|xi]
+    Ey <- rowSums(piik * Ey_k)
 
-  return(list(y = y, zi = zi, z = z, stats = stats))
+    # Var[yi|xi,zi=k]
+    Vary_k <- (nuk / (nuk - 2) - (deltak ^ 2) * (Xi_nuk ^ 2)) * (sigmak ^ 2)
+
+    # Var[yi|xi]
+    Vary <- rowSums(piik * (Ey_k ^ 2 + ones(n, 1) %*% Vary_k)) - Ey ^ 2
+
+    stats <- list()
+    stats$Ey_k <- Ey_k
+    stats$Ey <- Ey
+    stats$Vary_k <- Vary_k
+    stats$Vary <- Vary
+
+    return(list(y = y, zi = zi, z = z, stats = stats))
 }

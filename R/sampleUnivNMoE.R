@@ -43,8 +43,8 @@ sampleUnivNMoE <- function(alphak, betak, sigmak, x) {
   K = ncol(betak)
 
   # Build the regression design matrices
-  XBeta <- designmatrix(x, p, q)$XBeta # for the polynomial regression
-  XAlpha <- designmatrix(x, p, q)$Xw # for the logistic regression
+  XBeta <- designmatrix(x, p, q)$XBeta # For the polynomial regression
+  XAlpha <- designmatrix(x, p, q)$Xw # For the logistic regression
 
   y <- zeros(n, 1)
   z <- zeros(n, K)
@@ -54,25 +54,28 @@ sampleUnivNMoE <- function(alphak, betak, sigmak, x) {
   piik <- multinomialLogit(alphak, XAlpha, zeros(n, K), ones(n, 1))$piik
 
   for (i in 1:n) {
-    zik <- stats::rmultinom(n = 1, size = 1, piik[i, ])
+    zik <- stats::rmultinom(n = 1, size = 1, piik[i,])
 
-    mu <- as.numeric(XBeta[i, ] %*% betak[, zik == 1])
+    mu <- as.numeric(XBeta[i,] %*% betak[, zik == 1])
     sigma <- sigmak[zik == 1]
 
     y[i] <- stats::rnorm(n = 1, mean = mu, sd = sigma)
-    z[i,] <- t(zik)
+    z[i, ] <- t(zik)
     zi[i] <- which.max(zik)
 
   }
 
   # Statistics (means, variances)
+
   # E[yi|xi,zi=k]
   Ey_k <- XBeta %*% betak
+
   # E[yi|xi]
   Ey <- rowSums(piik * Ey_k)
 
   # Var[yi|xi,zi=k]
   Vary_k <- sigmak ^ 2
+
   # Var[yi|xi]
   Vary <- rowSums(piik * (Ey_k ^ 2 + ones(n, 1) %*% Vary_k)) - Ey ^ 2
 
