@@ -133,10 +133,10 @@ ParamTMoE <- setRefClass(
 
 
         # update the deltak (the skewness parameter)
-        delta[k] <<- pracma::fzero(f <- function(dlt) {
+        try(delta[k] <<- pracma::fzero(f <- function(dlt) {
           return(-psigamma(dlt/2) + log(dlt/2) + 1 + (1 / sum(statTMoE$tik[, k])) * sum(statTMoE$tik[, k] * (log(statTMoE$Wik[,k]) - statTMoE$Wik[,k]))
                  + psigamma((delta[k] + 1)/2) - log((delta[k] + 1)/2))
-        }, delta[k])$x
+        }, delta[k])$x, silent = TRUE)
 
       }
 
