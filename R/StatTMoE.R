@@ -17,18 +17,18 @@
 #' @field Ey Column matrix of dimension \emph{n}.
 #' @field Var_yk Column matrix of dimension \emph{K}.
 #' @field Vary Column matrix of dimension \emph{n}.
-#' @field log\_lik Numeric. Log-likelihood of the StMoE model.
-#' @field com_loglik Numeric. Complete log-likelihood of the StMoE model.
+#' @field log\_lik Numeric. Log-likelihood of the TMoE model.
+#' @field com_loglik Numeric. Complete log-likelihood of the TMoE model.
 #' @field stored_loglik Numeric vector. Stored values of the log-likelihood at
 #'   each EM iteration.
 #' @field BIC Numeric. Value of the BIC (Bayesian Information Criterion)
 #'   criterion. The formula is \eqn{BIC = log\_lik - nu \times \textrm{log}(n) /
 #'   2}{BIC = log\_lik - nu x log(n) / 2} with \emph{nu} the degree of freedom
-#'   of the StMoE model.
+#'   of the TMoE model.
 #' @field ICL Numeric. Value of the ICL (Integrated Completed Likelihood)
 #'   criterion. The formula is \eqn{ICL = com\_loglik - nu \times
 #'   \textrm{log}(n) / 2}{ICL = com_loglik - nu x log(n) / 2} with \emph{nu} the
-#'   degree of freedom of the StMoE model.
+#'   degree of freedom of the TMoE model.
 #' @field AIC Numeric. Value of the AIC (Akaike Information Criterion)
 #'   criterion. The formula is \eqn{AIC = log\_lik - nu}{AIC = log\_lik - nu}.
 #' @field log_piik_fik Matrix of size \eqn{(n, K)} giving the values of the
@@ -40,7 +40,7 @@
 #' @field tik Matrix of size \eqn{(n, K)} giving the posterior probability that
 #'   \eqn{Y_{i}}{Yi} originates from the \eqn{k}-th regression model \eqn{P(zi =
 #'   k | Y, W, \beta)}.
-#' @seealso [ParamStMoE], [FData]
+#' @seealso [ParamTMoE], [FData]
 #' @export
 StatTMoE <- setRefClass(
   "StatTMoE",

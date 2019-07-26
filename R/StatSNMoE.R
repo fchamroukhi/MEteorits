@@ -129,16 +129,16 @@ StatSNMoE <- setRefClass(
     #######
     computeStats = function(paramSNMoE) {
 
-      # E[yi|zi=k]
+      # E[yi|xi,zi=k]
       Ey_k <<- paramSNMoE$phiBeta$XBeta[1:paramSNMoE$fData$n, ] %*% paramSNMoE$beta + ones(paramSNMoE$fData$n, 1) %*% (sqrt(2 / pi) * paramSNMoE$delta * paramSNMoE$sigma)
 
-      # E[yi]
+      # E[yi|xi]
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
 
-      # Var[yi|zi=k]
+      # Var[yi|xi,zi=k]
       Var_yk <<- (1 - (2 / pi) * (paramSNMoE$delta ^ 2)) * (paramSNMoE$sigma ^ 2)
 
-      # Var[yi]
+      # Var[yi|xi]
       Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramSNMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
 
@@ -172,11 +172,14 @@ StatSNMoE <- setRefClass(
         sigmak <- sqrt(sigma2k)
         dik <- (paramSNMoE$fData$Y - muk) / sigmak
 
-        mu_uk <- (paramSNMoE$delta[k] * abs(paramSNMoE$fData$Y - muk))
+        mu_uk <- paramSNMoE$delta[k] * (paramSNMoE$fData$Y - muk)
         sigma2_uk <- (1 - paramSNMoE$delta[k] ^ 2) * paramSNMoE$sigma[k]
         sigma_uk <- sqrt(sigma2_uk)
 
+        # E1ik = E[Ui|yi,xi,zik=1]
         E1ik[, k] <<- mu_uk + sigma_uk * dnorm(paramSNMoE$lambda[k] * dik, 0, 1) / pnorm(paramSNMoE$lambda[k] * dik, 0, 1)
+
+        # E2ik = E[Ui^2|y,zik=1]
         E2ik[, k] <<- mu_uk ^ 2 + sigma_uk ^ 2 + sigma_uk * mu_uk * dnorm(paramSNMoE$lambda[k] * dik, 0, 1) / pnorm(paramSNMoE$lambda[k] * dik, 0, 1)
 
         # weighted skew normal linear expert likelihood
@@ -187,6 +190,7 @@ StatSNMoE <- setRefClass(
 
       log_sum_piik_fik <<- matrix(log(rowSums(piik_fik)))
 
+      # E[Zik|y,x] and E[U^2|y,zik=1]
       tik <<- piik_fik / (rowSums(piik_fik) %*% ones(1, paramSNMoE$K))
     }
   )

@@ -31,14 +31,37 @@ library(meteorits)
 
 # Introduction
 
-**MEteorit** is a toolbox containg several original and flexible mixtures-of-experts models to model, cluster and classify heteregenous data in many complex situations where the data are distributed according non-normal, possibly skewed distributions, and when they might be corrupted by atypical observations. The toolbox contains in particular sparse mixture-of-experts models for high-dimensional data. 
-It was written in R Markdown, using the [knitr](https://cran.r-project.org/package=knitr) package for production. 
-See `help(package="meteorit")` for further details and references provided by `citation("meteorit")`.
+**MEteorit** is a toolbox containg several original and flexible 
+mixtures-of-experts models to model, cluster and classify heteregenous data in 
+many complex situations where the data are distributed according non-normal, 
+possibly skewed distributions, and when they might be corrupted by atypical
+observations. The toolbox contains in particular sparse mixture-of-experts 
+models for high-dimensional data. 
 
-# Load data
+It was written in R Markdown, using the [knitr](https://cran.r-project.org/package=knitr) 
+package for production.
+
+See `help(package="meteorits")` for further details and references provided by
+`citation("meteorits")`.
+
+# Generate sample
 
 ```{r}
-data("simulatedstructureddata")
+n <- 1000 # Size of the sample
+K <- 2 # Number of regressors/experts
+p <- 1 # Order of the polynomial regression (regressors/experts)
+q <- 1 # Order of the logistic regression (gating network)
+
+alphak <- matrix(c(0, 8), ncol = K - 1) # Parameters of the gating network
+betak <- matrix(c(0, -1, 0, 1), ncol = K) # Regression coefficients of the experts
+sigmak <- c(0.1, 0.1) # Standard deviations of the experts
+lambdak <- c(3, 5) # Skewness parameters of the experts
+nuk <- c(5, 7) # Degrees of freedom of the experts network t densities
+x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
+
+# Generate sample of size n
+sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
+                          lambdak = lambdak, nuk = nuk, x = x)
 ```
 
 # Set up StMoE model parameters
@@ -63,7 +86,8 @@ verbose_IRLS <- FALSE
 # Estimation
 
 ```{r}
-stmoe <- emStMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+stmoe <- emStMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
+                 threshold, verbose, verbose_IRLS)
 ```
 
 # Plots

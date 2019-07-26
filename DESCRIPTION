@@ -35,6 +35,10 @@ Collate:
     RcppExports.R
     logsumexp.R
     utils.R
+    sampleUnivNMoE.R
+    sampleUnivSNMoE.R
+    sampleUnivSTMoE.R
+    sampleUnivTMoE.R
     FData.R
     ParamSNMoE.R
     ParamStMoE.R

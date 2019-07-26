@@ -108,7 +108,7 @@ ParamSNMoE <- setRefClass(
 
       # Initialize the skewness parameter Lambdak (by equivalence delta)
       lambda <<- -1 + 2 * rand(1, K)
-      delta <<- lambda ^ 2 / sqrt(1 + lambda ^ 2)
+      delta <<- lambda / sqrt(1 + lambda ^ 2)
     },
 
     MStep = function(statSNMoE, verbose_IRLS) {
@@ -130,10 +130,12 @@ ParamSNMoE <- setRefClass(
         sigma[k] <<- sum(statSNMoE$tik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2 - 2 * delta[k] * statSNMoE$E1ik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) + statSNMoE$E2ik[, k])) / (2 * (1 - delta[k] ^ 2) * sum(statSNMoE$tik[, k]))
 
         # update the lambdak (the skewness parameter)
-        lambda[k] <<- uniroot(f <- function(lmbda) {
-          sigma[k] * (lmbda / sqrt(1 + lmbda ^ 2)) * (1 - (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statSNMoE$tik[, k]) + (1 + (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statSNMoE$tik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) * statSNMoE$E1ik[, k])
-          - (lmbda / sqrt(1 + (lmbda ^ 2 / (1 + lmbda ^ 2)))) * sum(statSNMoE$tik[, k] * (statSNMoE$E2ik[, k] + (fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2))
-        }, interval = c(-100, 100), extendInt = "yes")$root
+        try(lambda[k] <<- uniroot(f <- function(lmbda) {
+          return(sigma[k] * (lmbda / sqrt(1 + lmbda ^ 2)) * (1 - (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statSNMoE$tik[, k]) + (1 + (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statSNMoE$tik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) * statSNMoE$E1ik[, k])
+          - (lmbda / sqrt(1 + lmbda ^ 2)) * sum(statSNMoE$tik[, k] * (statSNMoE$E2ik[, k] + (fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)))
+        },
+        interval = c(-10, 10),
+        extendInt = "yes")$root, silent = TRUE)
 
         delta[k] <<- lambda[k] / sqrt(1 + lambda[k] ^ 2)
 

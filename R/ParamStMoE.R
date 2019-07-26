@@ -147,27 +147,19 @@ ParamStMoE <- setRefClass(
         sigmak <- sqrt(sigma[k])
 
         # update the deltak (the skewness parameter)
-        lambda[k] <<- tryCatch(expr =
-                           {
-                             uniroot(f <- function(lmbda) {
-                               return((lmbda/sqrt(1+lmbda^2))*(1-(lmbda^2/(1+lmbda^2)))*sum(statStMoE$tik[, k])
-                                      + (1+ (lmbda^2/(1+lmbda^2)))*sum(statStMoE$tik[, k] * statStMoE$dik[,k]*statStMoE$E1ik[,k]/sigmak)
-                                      - (lmbda/sqrt(1+lmbda^2)) * sum(statStMoE$tik[, k] * (statStMoE$wik[,k] * (statStMoE$dik[,k]^2) + statStMoE$E2ik[,k]/(sigmak^2))))
-                             }, c(-100, 100), extendInt = "yes")$root
-                           },
-                         error =  function(x) return(lambda[k]))
+        try(lambda[k] <<- uniroot(f <- function(lmbda) {
+          return((lmbda/sqrt(1+lmbda^2))*(1-(lmbda^2/(1+lmbda^2)))*sum(statStMoE$tik[, k])
+                 + (1+ (lmbda^2/(1+lmbda^2)))*sum(statStMoE$tik[, k] * statStMoE$dik[,k]*statStMoE$E1ik[,k]/sigmak)
+                 - (lmbda/sqrt(1+lmbda^2)) * sum(statStMoE$tik[, k] * (statStMoE$wik[,k] * (statStMoE$dik[,k]^2) + statStMoE$E2ik[,k]/(sigmak^2))))
+        }, c(-100, 100), extendInt = "yes")$root, silent = TRUE)
 
 
         delta[k] <<- lambda[k] / sqrt(1 + lambda[k] ^ 2)
 
 
-        nuk[k] <<- tryCatch(expr =
-                              {
-                                uniroot(f <- function(nnu) {
-                                  return(-psigamma((nnu)/2) + log((nnu)/2) + 1 + sum(statStMoE$tik[,k] * (statStMoE$E3ik[,k] - statStMoE$wik[,k]))/sum(statStMoE$tik[,k]))
-                                }, c(0.1, 200))$root
-                              },
-                            error = function(x) return(nuk[k]))
+        try(nuk[k] <<- uniroot(f <- function(nnu) {
+          return(-psigamma((nnu)/2) + log((nnu)/2) + 1 + sum(statStMoE$tik[,k] * (statStMoE$E3ik[,k] - statStMoE$wik[,k]))/sum(statStMoE$tik[,k]))
+        }, c(0.1, 200))$root, silent = TRUE)
       }
 
       return(reg_irls)

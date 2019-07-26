@@ -19,12 +19,12 @@ for high-dimensional data.
 
 Our (dis-)covered meteorits are for instance the following ones:
 
-  - NMoE
-  - NNMoE
-  - tMoE
-  - StMoE
-  - SNMoE
-  - RMoE
+  - NMoE;
+  - NNMoE;
+  - tMoE;
+  - StMoE;
+  - SNMoE;
+  - RMoE.
 
 The models and algorithms are developped and written in Matlab by Faicel
 Chamroukhi, and translated and designed into R packages by Florian
@@ -58,6 +58,10 @@ browseVignettes("MEteorits")
 
 ## Usage
 
+``` r
+library(meteorits)
+```
+
 <details>
 
 <summary>NMoE</summary>
@@ -65,13 +69,18 @@ browseVignettes("MEteorits")
 ``` r
 # (fyi: NMoE is for  the standard normal mixture-of-experts model)
 
-library(meteorits)
+n <- 500 # Size of the sample
+K <- 2 # Number of regressors/experts
+p <- 1 # Order of the polynomial regression (regressors/experts)
+q <- 1 # Order of the logistic regression (gating network)
 
-data("simulatedstructureddata")
+alphak <- matrix(c(0, 8), ncol = K - 1) # Parameters of the gating network
+betak <- matrix(c(0, -2.5, 0, 2.5), ncol = K) # Regression coefficients of the experts
+sigmak <- c(1, 1) # Standard deviations of the experts
+x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 
-K <- 2 # Number of regimes (mixture components)
-p <- 1 # Dimension of beta (order of the polynomial regressors)
-q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
+# Generate sample of size n
+sample <- sampleUnivNMoE(alphak = alphak, betak = betak, sigmak = sigmak, x = x)
 
 n_tries <- 1
 max_iter <- 1500
@@ -79,37 +88,10 @@ threshold <- 1e-5
 verbose <- TRUE
 verbose_IRLS <- FALSE
 
-nmoe <- emNMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+nmoe <- emNMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
+               threshold, verbose, verbose_IRLS)
 
 nmoe$plot()
-```
-
-<img src="man/figures/README-unnamed-chunk-5-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-5-4.png" style="display: block; margin: auto;" />
-
-</details>
-
-<details>
-
-<summary>TMoE</summary>
-
-``` r
-library(meteorits)
-
-data("simulatedstructureddata")
-
-K <- 2 # Number of regimes (mixture components)
-p <- 1 # Dimension of beta (order of the polynomial regressors)
-q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
-
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-5
-verbose <- TRUE
-verbose_IRLS <- FALSE
-
-tmoe <- emTMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
-
-tmoe$plot()
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-4.png" style="display: block; margin: auto;" />
@@ -118,27 +100,35 @@ tmoe$plot()
 
 <details>
 
-<summary>SNMoE</summary>
+<summary>TMoE</summary>
 
 ``` r
-library(meteorits)
 
-data("simulatedstructureddata")
+n <- 500 # Size of the sample
+K <- 2 # Number of regressors/experts
+p <- 1 # Order of the polynomial regression (regressors/experts)
+q <- 1 # Order of the logistic regression (gating network)
 
-K <- 2 # Number of regimes (mixture components)
-p <- 1 # Dimension of beta (order of the polynomial regressors)
-q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
+alphak <- matrix(c(0, 8), ncol = K - 1) # Parameters of the gating network
+betak <- matrix(c(0, -2.5, 0, 2.5), ncol = K) # Regression coefficients of the experts
+sigmak <- c(0.5, 0.5) # Standard deviations of the experts
+nuk <- c(7, 9) # Degrees of freedom of the experts network t densities
+x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
+
+# Generate sample of size n
+sample <- sampleUnivTMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
+                         nuk = nuk, x = x)
 
 n_tries <- 1
 max_iter <- 1500
-threshold <- 1e-6
+threshold <- 1e-5
 verbose <- TRUE
 verbose_IRLS <- FALSE
 
-snmoe <- emSNMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), 
-                 K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+tmoe <- emTMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
+               threshold, verbose, verbose_IRLS)
 
-snmoe$plot()
+tmoe$plot()
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-4.png" style="display: block; margin: auto;" />
@@ -147,16 +137,62 @@ snmoe$plot()
 
 <details>
 
+<summary>SNMoE</summary>
+
+``` r
+
+n <- 500 # Size of the sample
+K <- 2 # Number of regressors/experts
+p <- 1 # Order of the polynomial regression (regressors/experts)
+q <- 1 # Order of the logistic regression (gating network)
+
+alphak <- matrix(c(0, 8), ncol = K - 1) # Parameters of the gating network
+betak <- matrix(c(0, -2.5, 0, 2.5), ncol = K) # Regression coefficients of the experts
+lambdak <- c(3, 5) # Skewness parameters of the experts
+sigmak <- c(1, 1) # Standard deviations of the experts
+x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
+
+# Generate sample of size n
+sample <- sampleUnivSNMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
+                          lambdak = lambdak, x = x)
+
+n_tries <- 1
+max_iter <- 1500
+threshold <- 1e-6
+verbose <- TRUE
+verbose_IRLS <- FALSE
+
+snmoe <- emSNMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
+                 threshold, verbose, verbose_IRLS)
+
+snmoe$plot()
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-4.png" style="display: block; margin: auto;" />
+
+</details>
+
+<details>
+
 <summary>StMoE</summary>
 
 ``` r
-library(meteorits)
 
-data("simulatedstructureddata")
+n <- 1000 # Size of the sample
+K <- 2 # Number of regressors/experts
+p <- 1 # Order of the polynomial regression (regressors/experts)
+q <- 1 # Order of the logistic regression (gating network)
 
-K <- 2 # Number of regimes (mixture components)
-p <- 1 # Dimension of beta (order of the polynomial regressors)
-q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
+alphak <- matrix(c(0, 8), ncol = K - 1) # Parameters of the gating network
+betak <- matrix(c(0, -1, 0, 1), ncol = K) # Regression coefficients of the experts
+sigmak <- c(0.1, 0.1) # Standard deviations of the experts
+lambdak <- c(3, 5) # Skewness parameters of the experts
+nuk <- c(5, 7) # Degrees of freedom of the experts network t densities
+x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
+
+# Generate sample of size n
+sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
+                          lambdak = lambdak, nuk = nuk, x = x)
 
 n_tries <- 1
 max_iter <- 1500
@@ -164,13 +200,13 @@ threshold <- 1e-5
 verbose <- TRUE
 verbose_IRLS <- FALSE
 
-stmoe <- emStMoE(simulatedstructureddata$X, matrix(simulatedstructureddata$Y), 
-                 K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)
+stmoe <- emStMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
+                 threshold, verbose, verbose_IRLS)
 
 stmoe$plot()
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-8-4.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-9-2.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-9-3.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-9-4.png" style="display: block; margin: auto;" />
 
 </details>
 
