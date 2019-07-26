@@ -126,7 +126,7 @@ StatTMoE <- setRefClass(
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
 
       # Var[yi|xi,zi=k]
-      Var_yk <<- paramTMoE$delta / (paramTMoE$delta - 2) * paramTMoE$sigma
+      Var_yk <<- paramTMoE$nuk / (paramTMoE$nuk - 2) * paramTMoE$sigma
 
       # Var[yi|xi]
       Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramTMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
@@ -157,7 +157,7 @@ StatTMoE <- setRefClass(
         sigmak <- sqrt(sigma2k)
         dik <- (paramTMoE$fData$Y - muk) / sigmak
 
-        nuk <- paramTMoE$delta[k]
+        nuk <- paramTMoE$nuk[k]
         Wik[, k] <<- (nuk + 1) / (nuk + dik ^ 2)
 
         # Weighted t linear expert likelihood

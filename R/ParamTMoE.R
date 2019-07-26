@@ -13,7 +13,7 @@
 #' the updates for each of the expert component parameters consist in analytically solving a weighted
 #' Gaussian linear regression problem.
 #' @field sigma The variances for the \emph{K} mixture component.
-#' @field delta the skewness parameter lambda (by equivalence delta)
+#' @field nuk degrees of freedom
 #' @seealso [FData]
 #' @export
 ParamTMoE <- setRefClass(
@@ -31,7 +31,7 @@ ParamTMoE <- setRefClass(
     alpha = "matrix",
     beta = "matrix",
     sigma = "matrix",
-    delta = "matrix"
+    nuk = "matrix"
   ),
   methods = list(
     initialize = function(fData = FData(numeric(1), matrix(1)), K = 1, p = 3, q = 1) {
@@ -49,7 +49,7 @@ ParamTMoE <- setRefClass(
       alpha <<- matrix(0, q + 1, K - 1)
       beta <<- matrix(NA, p + 1, K)
       sigma <<- matrix(NA, 1, K)
-      delta <<- matrix(NA, K)
+      nuk <<- matrix(NA, K)
     },
 
     initParam = function(try_EM, segmental = FALSE) {
@@ -97,7 +97,7 @@ ParamTMoE <- setRefClass(
       }
 
       # Intitialization of the degrees of freedom
-      delta <<- 50 * rand(1, K)
+      nuk <<- 50 * rand(1, K)
 
     },
 
@@ -124,14 +124,12 @@ ParamTMoE <- setRefClass(
         dik <- (fData$Y - phiBeta$XBeta %*% beta[, k]) / sqrt(sigma[k])
 
         # Update the degrees of freedom
-        try(delta[k] <<- pracma::fzero(f <- function(dlt) {
+        try(nuk[k] <<- pracma::fzero(f <- function(nu) {
           return(
-            -psigamma(dlt / 2) + log(dlt / 2) + 1 + (1 / sum(statTMoE$tik[, k])) * sum(statTMoE$tik[, k] * (log(
-              statTMoE$Wik[, k]
-            ) - statTMoE$Wik[, k]))
-            + psigamma((delta[k] + 1) / 2) - log((delta[k] + 1) / 2)
+            -psigamma(nu / 2) + log(nu / 2) + 1 + (1 / sum(statTMoE$tik[, k])) * sum(statTMoE$tik[, k] * (log(statTMoE$Wik[, k]) - statTMoE$Wik[, k]))
+            + psigamma((nuk[k] + 1) / 2) - log((nuk[k] + 1) / 2)
           )
-        }, delta[k])$x, silent = TRUE)
+        }, nuk[k])$x, silent = TRUE)
 
       }
 

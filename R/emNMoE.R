@@ -46,7 +46,10 @@ emNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
 
   while (try_EM < n_tries) {
     try_EM <- try_EM + 1
-    message("EM try nr ", try_EM)
+
+    if (n_tries > 1 && verbose) {
+      cat(paste0("EM try number: ", try_EM, "\n\n"))
+    }
 
     # Initializations
     param <- ParamNMoE(fData = fData, K = K, p = p, q = q)
@@ -68,11 +71,13 @@ emNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
 
       iter <- iter + 1
       if (verbose) {
-        message("EM : Iteration : ", iter, " log-likelihood : "  , stat$log_lik)
+        cat(paste0("EM: Iteration: ", iter, " || log-likelihood: "  , stat$log_lik, "\n"))
       }
 
       if (prev_loglik - stat$log_lik > 1e-5) {
-        message("!!!!! EM log-likelihood is decreasing from ", prev_loglik, "to ", stat$log_lik)
+        if (verbose) {
+          warning(paste0("EM log-likelihood is decreasing from ", prev_loglik, "to ", stat$log_lik, " !"))
+        }
         top <- top + 1
         if (top > 20)
           break
@@ -96,16 +101,16 @@ emNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
       best_loglik <- stat$log_lik
     }
 
-    if (n_tries > 1) {
-      message("max value: ", stat$log_lik)
+    if (n_tries > 1 && verbose) {
+      cat(paste0("Max value of the log-likelihood: ", stat$log_lik, "\n\n"))
     }
   }
 
   # Computation of c_ig the hard partition of the curves and klas
   statSolution$MAP()
 
-  if (n_tries > 1) {
-    message("max value: ", statSolution$log_lik)
+  if (n_tries > 1 && verbose) {
+    cat(paste0("Max value of the log-likelihood: ", statSolution$log_lik, "\n"))
   }
 
   statSolution$computeStats(paramSolution)

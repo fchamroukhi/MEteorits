@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 [![Travis build status](https://travis-ci.org/fchamroukhi/MEteorits.svg?branch=master)](https://travis-ci.org/fchamroukhi/MEteorits)
 <!-- badges: end -->
 
-## **MEteorits:** Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
+# **MEteorits:** Mixtures-of-ExperTs modEling for cOmplex and non-noRmal dIsTributions
 
 MEteoritS is an open source toolbox (available in R and Matlab) containg 
 several original and flexible mixtures-of-experts models to model, cluster and
@@ -42,7 +42,7 @@ The models and algorithms are developped and written in Matlab by Faicel
 Chamroukhi, and translated and designed into R packages by Florian Lecocq, 
 Marius Bartcus and Faicel Chamroukhi.
 
-## Installation
+# Installation
 
 You can install the development version of MEteorits from [GitHub](https://github.com/fchamroukhi/MEteorits) with:
 
@@ -63,10 +63,10 @@ devtools::install_github("fchamroukhi/MEteorits",
 Use the following command to display vignettes:
 
 ```{r, eval = FALSE}
-browseVignettes("MEteorits")
+browseVignettes("meteorits")
 ```
 
-## Usage
+# Usage
 
 ```{r, message = FALSE}
 library(meteorits)
