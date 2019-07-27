@@ -16,13 +16,15 @@ response/output \eqn{y_{1},\dots,y_{m}}.}
 
 \item{K}{The number of expert components.}
 
-\item{p}{The order of the polynomial regression for the expert regressors network.}
+\item{p}{The order of the polynomial regression for the expert regressors
+network.}
 
-\item{q}{The dimension of the logistic regression for the gating network. For the purpose of
-segmentation, it must be set to 1.}
+\item{q}{The dimension of the logistic regression for the gating network. For
+the purpose of segmentation, it must be set to 1.}
 
-\item{n_tries}{Number of times EM algorithm will be launched with different initializations.
-The solution providing the highest log-likelihood will be returned.}
+\item{n_tries}{Number of times EM algorithm will be launched with different
+initializations. The solution providing the highest log-likelihood will be
+returned.}
 
 \item{max_iter}{The maximum number of iterations for the EM algorithm.}
 
@@ -41,17 +43,17 @@ algorithm.}
 Th EM algorithm returns an object of class \link{ModelNMoE}.
 }
 \description{
-emNMoE implements the maximum-likelihood parameter estimation of a NMoE
-model by the Expectation-Maximization (EM) algorithm.
+emNMoE implements the maximum-likelihood parameter estimation of a NMoE model
+by the Expectation-Maximization (EM) algorithm.
 }
 \details{
-emNMoE function function implements the EM algorithm for the NMoE model. This functions starts
-with an initialization of the parameters done by the method \code{initParam} of
-the class \link{ParamNMoE}, then it alternates between a E-Step
-(method of the class \link{StatNMoE}) and a M-Step (method of the class
-\link{ParamNMoE}) until convergence (until the absolute difference of
-log-likelihood between two steps of the EM algorithm is less than the
-\code{threshold} parameter).
+emNMoE function function implements the EM algorithm for the NMoE
+model. This functions starts with an initialization of the parameters done
+by the method \code{initParam} of the class \link{ParamNMoE}, then it
+alternates between a E-Step (method of the class \link{StatNMoE}) and
+a M-Step (method of the class \link{ParamNMoE}) until convergence
+(until the absolute difference of log-likelihood between two steps of the
+EM algorithm is less than the \code{threshold} parameter).
 }
 \seealso{
 \link{ModelNMoE}, \link{ParamNMoE}, \link{StatNMoE}

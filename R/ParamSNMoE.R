@@ -24,13 +24,10 @@ ParamSNMoE <- setRefClass(
     phiBeta = "list",
     phiAlpha = "list",
 
-    K = "numeric",
-    # number of regimes
-    p = "numeric",
-    # dimension of beta (order of polynomial regression)
-    q = "numeric",
-    # dimension of w (order of logistic regression)
-    nu = "numeric", # degree of freedom
+    K = "numeric", # Number of regimes
+    p = "numeric", # Dimension of beta (order of polynomial regression)
+    q = "numeric", # Dimension of w (order of logistic regression)
+    nu = "numeric", # Degree of freedom
 
     alpha = "matrix",
     beta = "matrix",
@@ -40,7 +37,6 @@ ParamSNMoE <- setRefClass(
   ),
   methods = list(
     initialize = function(fData = FData(numeric(1), matrix(1)), K = 1, p = 3, q = 1) {
-
       fData <<- fData
 
       phiBeta <<- designmatrix(x = fData$X, p = p)
@@ -59,10 +55,12 @@ ParamSNMoE <- setRefClass(
     },
 
     initParam = function(try_EM, segmental = FALSE) {
+
       alpha <<- matrix(runif((q + 1) * (K - 1)), nrow = q + 1, ncol = K - 1) #random initialization of parameter vector of IRLS
 
-      #Initialise the regression parameters (coeffecients and variances):
+      # Initialize the regression parameters (coefficents and variances):
       if (segmental == FALSE) {
+
         Zik <- zeros(fData$n, K)
 
         klas <- floor(K * matrix(runif(fData$n), fData$n)) + 1
@@ -71,11 +69,8 @@ ParamSNMoE <- setRefClass(
 
         Tauik <- Zik
 
-
-        #beta <<- matrix(0, modelRHLP$p + 1, modelRHLP$K)
-        #sigma <<- matrix(0, modelRHLP$K)
-
         for (k in 1:K) {
+
           Xk <- phiBeta$XBeta * (sqrt(Tauik[, k] %*% ones(1, p + 1)))
           yk <- fData$Y * sqrt(Tauik[, k])
 
@@ -83,16 +78,15 @@ ParamSNMoE <- setRefClass(
 
           sigma[k] <<- sum(Tauik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(Tauik[, k])
         }
-      }
-      else{
-        #segmental : segment uniformly the data and estimate the parameters
+      } else {# Segmental : segment uniformly the data and estimate the parameters
+
         nk <- round(fData$n / K) - 1
 
         for (k in 1:K) {
           i <- (k - 1) * nk + 1
           j <- (k * nk)
           yk <- matrix(fData$Y[i:j])
-          Xk <- phiBeta$XBeta[i:j,]
+          Xk <- phiBeta$XBeta[i:j, ]
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% (t(Xk) %*% yk)
 
@@ -108,11 +102,11 @@ ParamSNMoE <- setRefClass(
 
       # Initialize the skewness parameter Lambdak (by equivalence delta)
       lambda <<- -1 + 2 * rand(1, K)
-      delta <<- lambda ^ 2 / sqrt(1 + lambda ^ 2)
+      delta <<- lambda / sqrt(1 + lambda ^ 2)
     },
 
     MStep = function(statSNMoE, verbose_IRLS) {
-      # M-Step
+
       res_irls <- IRLS(phiAlpha$XBeta, statSNMoE$tik, ones(nrow(statSNMoE$tik), 1), alpha, verbose_IRLS)
       statSNMoE$piik <- res_irls$piik
       reg_irls <- res_irls$reg_irls
@@ -120,20 +114,28 @@ ParamSNMoE <- setRefClass(
       alpha <<- res_irls$W
 
       for (k in 1:K) {
-        # update the regression coefficients
 
+        # Update the regression coefficients
         tauik_Xbeta <- (statSNMoE$tik[, k] %*% ones(1, p + 1)) * phiBeta$XBeta
         beta[, k] <<- solve((t(tauik_Xbeta) %*% phiBeta$XBeta)) %*% (t(tauik_Xbeta) %*% (fData$Y - delta[k] * statSNMoE$E1ik[, k]))
 
-        # update the variances sigma2k
-
+        # Update the variances sigma2k
         sigma[k] <<- sum(statSNMoE$tik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2 - 2 * delta[k] * statSNMoE$E1ik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) + statSNMoE$E2ik[, k])) / (2 * (1 - delta[k] ^ 2) * sum(statSNMoE$tik[, k]))
 
-        # update the lambdak (the skewness parameter)
-        lambda[k] <<- uniroot(f <- function(lmbda) {
-          sigma[k] * (lmbda / sqrt(1 + lmbda ^ 2)) * (1 - (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statSNMoE$tik[, k]) + (1 + (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statSNMoE$tik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) * statSNMoE$E1ik[, k])
-          - (lmbda / sqrt(1 + (lmbda ^ 2 / (1 + lmbda ^ 2)))) * sum(statSNMoE$tik[, k] * (statSNMoE$E2ik[, k] + (fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2))
-        }, interval = c(-100, 100), extendInt = "yes")$root
+        # Update the lambdak (the skewness parameter)
+        try(lambda[k] <<- uniroot(f <- function(lmbda) {
+          return(
+            sigma[k] * (lmbda / sqrt(1 + lmbda ^ 2)) * (1 - (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statSNMoE$tik[, k]) + (1 + (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(
+              statSNMoE$tik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) * statSNMoE$E1ik[, k]
+            )
+            - (lmbda / sqrt(1 + lmbda ^ 2)) * sum(statSNMoE$tik[, k] * (
+              statSNMoE$E2ik[, k] + (fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2
+            ))
+          )
+        },
+        interval = c(-10, 10),
+        extendInt = "yes")$root,
+        silent = TRUE)
 
         delta[k] <<- lambda[k] / sqrt(1 + lambda[k] ^ 2)
 

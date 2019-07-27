@@ -49,7 +49,6 @@ StatSNMoE <- setRefClass(
     piik = "matrix",
     z_ik = "matrix",
     klas = "matrix",
-    # Ex = "matrix",
     Ey_k = "matrix",
     Ey = "matrix",
     Var_yk = "matrix",
@@ -114,70 +113,64 @@ StatSNMoE <- setRefClass(
         klas[z_ik[, k] == 1] <<- k
       }
     },
-    #######
-    # compute loglikelihood
-    #######
+
     computeLikelihood = function(reg_irls) {
+
       log_lik <<- sum(log_sum_piik_fik) + reg_irls
 
     },
-    #######
-    #
-    #######
-    #######
-    # compute the final solution stats
-    #######
+
     computeStats = function(paramSNMoE) {
 
-      # E[yi|zi=k]
-      Ey_k <<- paramSNMoE$phiBeta$XBeta[1:paramSNMoE$fData$n, ] %*% paramSNMoE$beta + ones(paramSNMoE$fData$n, 1) %*% (sqrt(2 / pi) * paramSNMoE$delta * paramSNMoE$sigma)
+      # E[yi|xi,zi=k]
+      Ey_k <<- paramSNMoE$phiBeta$XBeta[1:paramSNMoE$fData$n,] %*% paramSNMoE$beta + ones(paramSNMoE$fData$n, 1) %*% (sqrt(2 / pi) * paramSNMoE$delta * paramSNMoE$sigma)
 
-      # E[yi]
+      # E[yi|xi]
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
 
-      # Var[yi|zi=k]
+      # Var[yi|xi,zi=k]
       Var_yk <<- (1 - (2 / pi) * (paramSNMoE$delta ^ 2)) * (paramSNMoE$sigma ^ 2)
 
-      # Var[yi]
+      # Var[yi|xi]
       Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramSNMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
-
-      ### BIC AIC et ICL
+      # BIC, AIC and ICL
 
       BIC <<- log_lik - (paramSNMoE$nu * log(paramSNMoE$fData$n * paramSNMoE$fData$m) / 2)
       AIC <<- log_lik - paramSNMoE$nu
-      ## CL(theta) : complete-data loglikelihood
+
+      # CL(theta) : complete-data loglikelihood
       zik_log_piik_fk <- (repmat(z_ik, paramSNMoE$fData$m, 1)) * log_piik_fik
       sum_zik_log_fik <- apply(zik_log_piik_fk, 1, sum)
       com_loglik <<- sum(sum_zik_log_fik)
 
       ICL <<- com_loglik - (paramSNMoE$nu * log(paramSNMoE$fData$n * paramSNMoE$fData$m) / 2)
-      # solution.XBeta = XBeta(1:m,:);
-      # solution.XAlpha = XAlpha(1:m,:);
+
     },
-    #######
-    # EStep
-    #######
+
     EStep = function(paramSNMoE) {
       "Method used in the EM algorithm to update statistics based on parameters
       provided by \\code{paramSNMoE} (prior and posterior probabilities)."
+
       piik <<- multinomialLogit(paramSNMoE$alpha, paramSNMoE$phiAlpha$XBeta, ones(paramSNMoE$fData$n, paramSNMoE$K), ones(paramSNMoE$fData$n, 1))$piik
 
       piik_fik <- zeros(paramSNMoE$fData$m * paramSNMoE$fData$n, paramSNMoE$K)
 
       for (k in (1:paramSNMoE$K)) {
-        muk <- paramSNMoE$phiBeta$XBeta %*% paramSNMoE$beta[, k]
 
+        muk <- paramSNMoE$phiBeta$XBeta %*% paramSNMoE$beta[, k]
         sigma2k <- paramSNMoE$sigma[k]
         sigmak <- sqrt(sigma2k)
         dik <- (paramSNMoE$fData$Y - muk) / sigmak
 
-        mu_uk <- (paramSNMoE$delta[k] * abs(paramSNMoE$fData$Y - muk))
+        mu_uk <- paramSNMoE$delta[k] * (paramSNMoE$fData$Y - muk)
         sigma2_uk <- (1 - paramSNMoE$delta[k] ^ 2) * paramSNMoE$sigma[k]
         sigma_uk <- sqrt(sigma2_uk)
 
+        # E1ik = E[Ui|yi,xi,zik=1]
         E1ik[, k] <<- mu_uk + sigma_uk * dnorm(paramSNMoE$lambda[k] * dik, 0, 1) / pnorm(paramSNMoE$lambda[k] * dik, 0, 1)
 
+<<<<<<< HEAD
         #######################################################################
         # Handle numerical instability
         #######################################################################
@@ -188,6 +181,9 @@ StatSNMoE <- setRefClass(
         #######################################################################
         #######################################################################
 
+=======
+        # E2ik = E[Ui^2|y,zik=1]
+>>>>>>> master
         E2ik[, k] <<- mu_uk ^ 2 + sigma_uk ^ 2 + sigma_uk * mu_uk * dnorm(paramSNMoE$lambda[k] * dik, 0, 1) / pnorm(paramSNMoE$lambda[k] * dik, 0, 1)
 
         #######################################################################
@@ -208,6 +204,7 @@ StatSNMoE <- setRefClass(
 
       log_sum_piik_fik <<- matrix(log(rowSums(piik_fik)))
 
+      # E[Zik|y,x] and E[U^2|y,zik=1]
       tik <<- piik_fik / (rowSums(piik_fik) %*% ones(1, paramSNMoE$K))
     }
   )

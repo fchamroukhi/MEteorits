@@ -36,6 +36,7 @@
 #' @export
 emStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
 
+<<<<<<< HEAD
   tryCatch(suppressWarnings(fitStMoE(X, Y, K, p, q, n_tries, max_iter, threshold, verbose, verbose_IRLS)),
            error = function(err) {
              message("Numerical instability... Relaunching EM algorithm!\n")
@@ -47,81 +48,85 @@ emStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, thresho
 fitStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
 
     fData <- FData(X, Y)
+=======
+  fData <- FData(X, Y)
+>>>>>>> master
 
-    top <- 0
-    try_EM <- 0
-    best_loglik <- -Inf
+  top <- 0
+  try_EM <- 0
+  best_loglik <- -Inf
 
-    while (try_EM < n_tries) {
-      try_EM <- try_EM + 1
-      message("EM try nr ", try_EM)
+  while (try_EM < n_tries) {
+    try_EM <- try_EM + 1
 
-      # Initialization
-      param <- ParamStMoE$new(fData = fData, K = K, p = p, q = q)
-      param$initParam(try_EM, segmental = FALSE)
+    if (n_tries > 1 && verbose) {
+      cat(paste0("EM try number: ", try_EM, "\n\n"))
+    }
 
+    # Initialization
+    param <- ParamStMoE(fData = fData, K = K, p = p, q = q)
+    param$initParam(try_EM, segmental = FALSE)
 
+    iter <- 0
+    converge <- FALSE
+    prev_loglik <- -Inf
 
-      iter <- 0
-      converge <- FALSE
-      prev_loglik <- -Inf
+    stat <- StatStMoE(paramStMoE = param)
+    stat$univStMoEpdf(param)
 
-      stat <- StatStMoE(paramStMoE = param)
-      stat$univStMoEpdf(param)
+    while (!converge && (iter <= max_iter)) {
+      stat$EStep(param)
 
-      while (!converge && (iter <= max_iter)) {
-        stat$EStep(param)
+      reg_irls <- param$MStep(stat, verbose_IRLS)
 
-        reg_irls <- param$MStep(stat, verbose_IRLS)
+      stat$computeLikelihood(reg_irls)
 
-        stat$computeLikelihood(reg_irls)
-        # End of EM
+      iter <- iter + 1
+      if (verbose) {
+        cat(paste0("EM: Iteration: ", iter, " || log-likelihood: "  , stat$log_lik, "\n"))
+      }
 
-        iter <- iter + 1
+      if (prev_loglik - stat$log_lik > 1e-5) {
         if (verbose) {
-          message("EM : Iteration : ", iter," log-likelihood : "  , stat$log_lik)
+          warning(paste0("EM log-likelihood is decreasing from ", prev_loglik, "to ", stat$log_lik, " !"))
         }
-        if (prev_loglik - stat$log_lik > 1e-5) {
-          message("!!!!! EM log-likelihood is decreasing from ", prev_loglik, "to ", stat$log_lik)
-          top <- top + 1
-          if (top > 20)
-            break
-        }
-
-        # test of convergence
-        converge <- abs((stat$log_lik - prev_loglik) / prev_loglik) <= threshold
-        if (is.na(converge)) {
-          converge <- FALSE
-        } # Basically for the first iteration when prev_loglik is -Inf
-
-        prev_loglik <- stat$log_lik
-        stat$stored_loglik <- c(stat$stored_loglik, stat$log_lik)
-      }# End of and EM loop
-
-      # end of computation of all estimates (param and stat)
-
-      if (stat$log_lik > best_loglik) {
-        statSolution <- stat$copy()
-        paramSolution <- param$copy()
-
-        best_loglik <- stat$log_lik
+        top <- top + 1
+        if (top > 20)
+          break
       }
-      if (n_tries > 1) {
-        message("max value: ", stat$log_lik)
-      }
+
+      # Test of convergence
+      converge <- abs((stat$log_lik - prev_loglik) / prev_loglik) <= threshold
+
+      if (is.na(converge)) {
+        converge <- FALSE
+      } # Basically for the first iteration when prev_loglik is -Inf
+
+      prev_loglik <- stat$log_lik
+      stat$stored_loglik <- c(stat$stored_loglik, stat$log_lik)
+    }# End of and EM loop
+
+    if (stat$log_lik > best_loglik) {
+      statSolution <- stat$copy()
+      paramSolution <- param$copy()
+
+      best_loglik <- stat$log_lik
     }
 
-    # Computation of z_ik the hard partition of the data and the class labels klas
-    statSolution$MAP()
-
-    if (n_tries > 1) {
-      message("max value: ", statSolution$log_lik)
+    if (n_tries > 1 && verbose) {
+      cat(paste0("Max value of the log-likelihood: ", stat$log_lik, "\n\n"))
     }
-
-
-    # End of the computation of statSolution
-    statSolution$computeStats(paramSolution)
-
-    return(ModelStMoE(param = paramSolution, stat = statSolution))
-
   }
+
+  # Computation of z_ik the hard partition of the data and the class labels klas
+  statSolution$MAP()
+
+  if (n_tries > 1 && verbose) {
+    cat(paste0("Max value of the log-likelihood: ", statSolution$log_lik, "\n"))
+  }
+
+  statSolution$computeStats(paramSolution)
+
+  return(ModelStMoE(param = paramSolution, stat = statSolution))
+
+}

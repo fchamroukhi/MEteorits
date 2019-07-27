@@ -13,32 +13,28 @@
 #' the updates for each of the expert component parameters consist in analytically solving a weighted
 #' Gaussian linear regression problem.
 #' @field sigma The variances for the \emph{K} mixture component.
-#' @field delta the skewness parameter lambda (by equivalence delta)
+#' @field nuk degrees of freedom
 #' @seealso [FData]
 #' @export
 ParamTMoE <- setRefClass(
   "ParamTMoE",
   fields = list(
     fData = "FData",
+
     phiBeta = "list",
     phiAlpha = "list",
-
-    K = "numeric",
-    # number of regimes
-    p = "numeric",
-    # dimension of beta (order of polynomial regression)
-    q = "numeric",
-    # dimension of w (order of logistic regression)
-    nu = "numeric", # degree of freedom
+    K = "numeric", # Number of regimes
+    p = "numeric", # Dimension of beta (order of polynomial regression)
+    q = "numeric", # Dimension of w (order of logistic regression)
+    nu = "numeric", # Degree of freedom
 
     alpha = "matrix",
     beta = "matrix",
     sigma = "matrix",
-    delta = "matrix"
+    nuk = "matrix"
   ),
   methods = list(
     initialize = function(fData = FData(numeric(1), matrix(1)), K = 1, p = 3, q = 1) {
-
       fData <<- fData
 
       phiBeta <<- designmatrix(x = fData$X, p = p)
@@ -53,13 +49,14 @@ ParamTMoE <- setRefClass(
       alpha <<- matrix(0, q + 1, K - 1)
       beta <<- matrix(NA, p + 1, K)
       sigma <<- matrix(NA, 1, K)
-      delta <<- matrix(NA, K)
+      nuk <<- matrix(NA, K)
     },
 
     initParam = function(try_EM, segmental = FALSE) {
-      alpha <<- matrix(runif((q + 1) * (K - 1)), nrow = q + 1, ncol = K - 1) #random initialization of parameter vector of IRLS
 
-      #Initialise the regression parameters (coeffecients and variances):
+      alpha <<- matrix(runif((q + 1) * (K - 1)), nrow = q + 1, ncol = K - 1) # Random initialization of parameter vector of gating network
+
+      #Initialize the regression parameters (coefficents and variances):
       if (segmental == FALSE) {
         Zik <- zeros(n, K)
 
@@ -69,9 +66,6 @@ ParamTMoE <- setRefClass(
 
         Tauik <- Zik
 
-        #beta <<- matrix(0, modelRHLP$p + 1, modelRHLP$K)
-        #sigma <<- matrix(0, modelRHLP$K)
-
         for (k in 1:K) {
           Xk <- phiBeta$XBeta * (sqrt(Tauik[, k] %*% ones(1, p + 1)))
           yk <- fData$Y * sqrt(Tauik[, k])
@@ -80,16 +74,15 @@ ParamTMoE <- setRefClass(
 
           sigma[k] <<- sum(Tauik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(Tauik[, k])
         }
-      }
-      else{
-        #segmental : segment uniformly the data and estimate the parameters
+      } else {# Segmental : segment uniformly the data and estimate the parameters
+
         nk <- round(fData$n / K) - 1
 
         for (k in 1:K) {
           i <- (k - 1) * nk + 1
           j <- (k * nk)
           yk <- matrix(fData$Y[i:j])
-          Xk <- phiBeta$XBeta[i:j,]
+          Xk <- phiBeta$XBeta[i:j, ]
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% (t(Xk) %*% yk)
 
@@ -103,13 +96,13 @@ ParamTMoE <- setRefClass(
         alpha <<- zeros(q + 1, K - 1)
       }
 
-      # Initialize the skewness parameter Lambdak (by equivalence delta)
-      delta <<- 50 * rand(1, K)
+      # Intitialization of the degrees of freedom
+      nuk <<- 50 * rand(1, K)
 
     },
 
     MStep = function(statTMoE, verbose_IRLS) {
-      # M-Step
+
       res_irls <- IRLS(phiAlpha$XBeta, statTMoE$tik, ones(nrow(statTMoE$tik), 1), alpha, verbose_IRLS)
       statTMoE$piik <- res_irls$piik
       reg_irls <- res_irls$reg_irls
@@ -117,26 +110,26 @@ ParamTMoE <- setRefClass(
       alpha <<- res_irls$W
 
       for (k in 1:K) {
-        #update the regression coefficients
 
-        Xbeta <- phiBeta$XBeta * (matrix( sqrt(statTMoE$tik[,k] * statTMoE$Wik[,k] )) %*% ones(1, p + 1))
-        yk <- fData$Y * sqrt(statTMoE$tik[,k] * statTMoE$Wik[,k])
+        # Update the regression coefficients
+        Xbeta <- phiBeta$XBeta * (matrix(sqrt(statTMoE$tik[, k] * statTMoE$Wik[, k])) %*% ones(1, p + 1))
+        yk <- fData$Y * sqrt(statTMoE$tik[, k] * statTMoE$Wik[, k])
 
-        #update the regression coefficients
         beta[, k] <<- solve((t(Xbeta) %*% Xbeta)) %*% (t(Xbeta) %*% yk)
 
-        # update the variances sigma2k
-        sigma[k] <<- sum(statTMoE$tik[, k] * statTMoE$Wik[,k] * ((fData$Y - phiBeta$XBeta %*% beta[, k])^2)) / sum(statTMoE$tik[,k])
+        # Update the variances sigma2k
+        sigma[k] <<- sum(statTMoE$tik[, k] * statTMoE$Wik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(statTMoE$tik[, k])
 
-        # if ECM (use an additional E-Step with the updatated betak and sigma2k
+        # If ECM (use an additional E-Step with the updated betak and sigma2k
         dik <- (fData$Y - phiBeta$XBeta %*% beta[, k]) / sqrt(sigma[k])
 
-
-        # update the deltak (the skewness parameter)
-        delta[k] <<- pracma::fzero(f <- function(dlt) {
-          return(-psigamma(dlt/2) + log(dlt/2) + 1 + (1 / sum(statTMoE$tik[, k])) * sum(statTMoE$tik[, k] * (log(statTMoE$Wik[,k]) - statTMoE$Wik[,k]))
-                 + psigamma((delta[k] + 1)/2) - log((delta[k] + 1)/2))
-        }, delta[k])$x
+        # Update the degrees of freedom
+        try(nuk[k] <<- pracma::fzero(f <- function(nu) {
+          return(
+            -psigamma(nu / 2) + log(nu / 2) + 1 + (1 / sum(statTMoE$tik[, k])) * sum(statTMoE$tik[, k] * (log(statTMoE$Wik[, k]) - statTMoE$Wik[, k]))
+            + psigamma((nuk[k] + 1) / 2) - log((nuk[k] + 1) / 2)
+          )
+        }, nuk[k])$x, silent = TRUE)
 
       }
 

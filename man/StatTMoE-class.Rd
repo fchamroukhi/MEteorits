@@ -34,9 +34,9 @@ obtained by the Maximum a posteriori (MAP) rule: \eqn{z_{ik} = 1 \
 
 \item{\code{Vary}}{Column matrix of dimension \emph{n}.}
 
-\item{\code{log\_lik}}{Numeric. Log-likelihood of the StMoE model.}
+\item{\code{log\_lik}}{Numeric. Log-likelihood of the TMoE model.}
 
-\item{\code{com_loglik}}{Numeric. Complete log-likelihood of the StMoE model.}
+\item{\code{com_loglik}}{Numeric. Complete log-likelihood of the TMoE model.}
 
 \item{\code{stored_loglik}}{Numeric vector. Stored values of the log-likelihood at
 each EM iteration.}
@@ -44,12 +44,12 @@ each EM iteration.}
 \item{\code{BIC}}{Numeric. Value of the BIC (Bayesian Information Criterion)
 criterion. The formula is \eqn{BIC = log\_lik - nu \times \textrm{log}(n) /
   2}{BIC = log\_lik - nu x log(n) / 2} with \emph{nu} the degree of freedom
-of the StMoE model.}
+of the TMoE model.}
 
 \item{\code{ICL}}{Numeric. Value of the ICL (Integrated Completed Likelihood)
 criterion. The formula is \eqn{ICL = com\_loglik - nu \times
   \textrm{log}(n) / 2}{ICL = com_loglik - nu x log(n) / 2} with \emph{nu} the
-degree of freedom of the StMoE model.}
+degree of freedom of the TMoE model.}
 
 \item{\code{AIC}}{Numeric. Value of the AIC (Akaike Information Criterion)
 criterion. The formula is \eqn{AIC = log\_lik - nu}{AIC = log\_lik - nu}.}
@@ -86,5 +86,5 @@ appartient ?? la classe k (au sens du MAP) et zero sinon.}
 }}
 
 \seealso{
-\link{ParamStMoE}, \link{FData}
+\link{ParamTMoE}, \link{FData}
 }

@@ -1,6 +1,6 @@
 Type: Package
 Package: meteorits
-Title: Mixtures-of-experts modeling for complex and non-normal distributions ('MEteorits')
+Title: Mixtures-of-Experts Modeling for Complex and Non-Normal Distributions ('MEteorits')
 Version: 0.1.0
 Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
     email = "faicel.chamroukhi@unicaen.fr",
@@ -9,12 +9,12 @@ Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
     email = "marius.bartcus@gmail.com"),
     person("Florian", "Lecocq", role = c("aut", "cre"),
     email = "florian.lecocq@outlook.com"))
-Description: meteorits is an open source toolbox (available in R and in Matlab) 
-    containing several original and flexible mixtures-of-experts models to model, 
-    cluster and classify heterogeneous data in many complex situations where the 
-    data are distributed according to non-normal, possibly skewed distributions, 
-    and when they might be corrupted by atypical observations. The toolbox also contains
-    sparse mixture-of-experts models for high-dimensional data.
+Description: Provides several original and flexible mixtures-of-experts models 
+    to model, cluster and classify heterogeneous data in many complex 
+    situations where the data are distributed according to non-normal, 
+    possibly skewed distributions, and when they might be corrupted by 
+    atypical observations. The toolbox also contains sparse mixture-of-experts 
+    models for high-dimensional data.
 URL: https://github.com/fchamroukhi/MEteorits
 License: GPL (>= 3)
 Depends: 
@@ -35,6 +35,10 @@ Collate:
     RcppExports.R
     logsumexp.R
     utils.R
+    sampleUnivNMoE.R
+    sampleUnivSNMoE.R
+    sampleUnivSTMoE.R
+    sampleUnivTMoE.R
     FData.R
     ParamSNMoE.R
     ParamStMoE.R
@@ -52,7 +56,6 @@ Collate:
     emStMoE.R
     emTMoE.R
     emNMoE.R
-    data-simulatedstructureddata.R
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true

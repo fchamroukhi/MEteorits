@@ -17,18 +17,18 @@
 #' @field Ey Column matrix of dimension \emph{n}.
 #' @field Var_yk Column matrix of dimension \emph{K}.
 #' @field Vary Column matrix of dimension \emph{n}.
-#' @field log\_lik Numeric. Log-likelihood of the StMoE model.
-#' @field com_loglik Numeric. Complete log-likelihood of the StMoE model.
+#' @field log\_lik Numeric. Log-likelihood of the TMoE model.
+#' @field com_loglik Numeric. Complete log-likelihood of the TMoE model.
 #' @field stored_loglik Numeric vector. Stored values of the log-likelihood at
 #'   each EM iteration.
 #' @field BIC Numeric. Value of the BIC (Bayesian Information Criterion)
 #'   criterion. The formula is \eqn{BIC = log\_lik - nu \times \textrm{log}(n) /
 #'   2}{BIC = log\_lik - nu x log(n) / 2} with \emph{nu} the degree of freedom
-#'   of the StMoE model.
+#'   of the TMoE model.
 #' @field ICL Numeric. Value of the ICL (Integrated Completed Likelihood)
 #'   criterion. The formula is \eqn{ICL = com\_loglik - nu \times
 #'   \textrm{log}(n) / 2}{ICL = com_loglik - nu x log(n) / 2} with \emph{nu} the
-#'   degree of freedom of the StMoE model.
+#'   degree of freedom of the TMoE model.
 #' @field AIC Numeric. Value of the AIC (Akaike Information Criterion)
 #'   criterion. The formula is \eqn{AIC = log\_lik - nu}{AIC = log\_lik - nu}.
 #' @field log_piik_fik Matrix of size \eqn{(n, K)} giving the values of the
@@ -40,7 +40,7 @@
 #' @field tik Matrix of size \eqn{(n, K)} giving the posterior probability that
 #'   \eqn{Y_{i}}{Yi} originates from the \eqn{k}-th regression model \eqn{P(zi =
 #'   k | Y, W, \beta)}.
-#' @seealso [ParamStMoE], [FData]
+#' @seealso [ParamTMoE], [FData]
 #' @export
 StatTMoE <- setRefClass(
   "StatTMoE",
@@ -49,7 +49,6 @@ StatTMoE <- setRefClass(
     z_ik = "matrix",
     klas = "matrix",
     Wik = "matrix",
-    # Ex = "matrix",
     Ey_k = "matrix",
     Ey = "matrix",
     Var_yk = "matrix",
@@ -111,69 +110,58 @@ StatTMoE <- setRefClass(
         klas[z_ik[, k] == 1] <<- k
       }
     },
-    #######
-    # compute loglikelihood
-    #######
+
     computeLikelihood = function(reg_irls) {
+
       log_lik <<- sum(log_sum_piik_fik) + reg_irls
 
     },
-    #######
-    #
-    #######
-    #######
-    # compute the final solution stats
-    #######
+
     computeStats = function(paramTMoE) {
 
-      # E[yi|zi=k]
-      Ey_k <<- paramTMoE$phiBeta$XBeta[1:paramTMoE$fData$n, ] %*% paramTMoE$beta
+      # E[yi|xi,zi=k]
+      Ey_k <<- paramTMoE$phiBeta$XBeta[1:paramTMoE$fData$n,] %*% paramTMoE$beta
 
-      # E[yi]
+      # E[yi|xi]
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
 
-      # Var[yi|zi=k]
-      Var_yk <<- paramTMoE$delta/(paramTMoE$delta - 2) * paramTMoE$sigma
+      # Var[yi|xi,zi=k]
+      Var_yk <<- paramTMoE$nuk / (paramTMoE$nuk - 2) * paramTMoE$sigma
 
-      # Var[yi]
+      # Var[yi|xi]
       Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramTMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
-
-      ### BIC AIC et ICL
-
+      # BIC, AIC and ICL
       BIC <<- log_lik - (paramTMoE$nu * log(paramTMoE$fData$n * paramTMoE$fData$m) / 2)
       AIC <<- log_lik - paramTMoE$nu
-      ## CL(theta) : complete-data loglikelihood
+
+      # CL(theta) : complete-data loglikelihood
       zik_log_piik_fk <- (repmat(z_ik, paramTMoE$fData$m, 1)) * log_piik_fik
       sum_zik_log_fik <- apply(zik_log_piik_fk, 1, sum)
       com_loglik <<- sum(sum_zik_log_fik)
 
       ICL <<- com_loglik - (paramTMoE$nu * log(paramTMoE$fData$n * paramTMoE$fData$m) / 2)
-      # solution.XBeta = XBeta(1:m,:);
-      # solution.XAlpha = XAlpha(1:m,:);
+
     },
-    #######
-    # EStep
-    #######
+
     EStep = function(paramTMoE) {
+
       piik <<- multinomialLogit(paramTMoE$alpha, paramTMoE$phiAlpha$XBeta, ones(paramTMoE$fData$n, paramTMoE$K), ones(paramTMoE$fData$n, 1))$piik
+
       piik_fik <- zeros(paramTMoE$fData$m * paramTMoE$fData$n, paramTMoE$K)
 
       for (k in (1:paramTMoE$K)) {
-        muk <- paramTMoE$phiBeta$XBeta %*% paramTMoE$beta[, k]
 
+        muk <- paramTMoE$phiBeta$XBeta %*% paramTMoE$beta[, k]
         sigma2k <- paramTMoE$sigma[k]
         sigmak <- sqrt(sigma2k)
         dik <- (paramTMoE$fData$Y - muk) / sigmak
 
+        nuk <- paramTMoE$nuk[k]
+        Wik[, k] <<- (nuk + 1) / (nuk + dik ^ 2)
 
-        nuk <- paramTMoE$delta[k]
-        Wik[,k] <<- (nuk + 1)/(nuk + dik^2)
-
-
-        # weighted t linear expert likelihood
-
-        piik_fik[, k] <- piik[, k] *  (1/sigmak * dt((paramTMoE$fData$Y - muk)/sigmak, nuk)) #pdf('tlocationscale', y, muk, sigmak, nuk);
+        # Weighted t linear expert likelihood
+        piik_fik[, k] <- piik[, k] *  (1 / sigmak * dt((paramTMoE$fData$Y - muk) / sigmak, nuk)) #pdf('tlocationscale', y, muk, sigmak, nuk);
       }
 
       log_piik_fik <<- log(piik_fik)
