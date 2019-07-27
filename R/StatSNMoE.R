@@ -86,7 +86,7 @@ StatSNMoE <- setRefClass(
       E1ik <<- matrix(0, paramSNMoE$fData$m * paramSNMoE$fData$n, paramSNMoE$K)
       E2ik <<- matrix(0, paramSNMoE$fData$m * paramSNMoE$fData$n, paramSNMoE$K)
     },
-
+    
     MAP = function() {
       "
       calcule une partition d'un echantillon par la regle du Maximum A Posteriori ?? partir des probabilites a posteriori
@@ -113,97 +113,74 @@ StatSNMoE <- setRefClass(
         klas[z_ik[, k] == 1] <<- k
       }
     },
-
+    
     computeLikelihood = function(reg_irls) {
-
+      
       log_lik <<- sum(log_sum_piik_fik) + reg_irls
-
+      
     },
-
+    
     computeStats = function(paramSNMoE) {
-
+      
       # E[yi|xi,zi=k]
       Ey_k <<- paramSNMoE$phiBeta$XBeta[1:paramSNMoE$fData$n,] %*% paramSNMoE$beta + ones(paramSNMoE$fData$n, 1) %*% (sqrt(2 / pi) * paramSNMoE$delta * paramSNMoE$sigma)
-
+      
       # E[yi|xi]
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
-
+      
       # Var[yi|xi,zi=k]
       Var_yk <<- (1 - (2 / pi) * (paramSNMoE$delta ^ 2)) * (paramSNMoE$sigma ^ 2)
-
+      
       # Var[yi|xi]
       Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramSNMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
-
+      
       # BIC, AIC and ICL
-
+      
       BIC <<- log_lik - (paramSNMoE$nu * log(paramSNMoE$fData$n * paramSNMoE$fData$m) / 2)
       AIC <<- log_lik - paramSNMoE$nu
-
+      
       # CL(theta) : complete-data loglikelihood
       zik_log_piik_fk <- (repmat(z_ik, paramSNMoE$fData$m, 1)) * log_piik_fik
       sum_zik_log_fik <- apply(zik_log_piik_fk, 1, sum)
       com_loglik <<- sum(sum_zik_log_fik)
-
+      
       ICL <<- com_loglik - (paramSNMoE$nu * log(paramSNMoE$fData$n * paramSNMoE$fData$m) / 2)
-
+      
     },
-
+    
     EStep = function(paramSNMoE) {
       "Method used in the EM algorithm to update statistics based on parameters
       provided by \\code{paramSNMoE} (prior and posterior probabilities)."
-
+      
       piik <<- multinomialLogit(paramSNMoE$alpha, paramSNMoE$phiAlpha$XBeta, ones(paramSNMoE$fData$n, paramSNMoE$K), ones(paramSNMoE$fData$n, 1))$piik
-
+      
       piik_fik <- zeros(paramSNMoE$fData$m * paramSNMoE$fData$n, paramSNMoE$K)
-
+      
       for (k in (1:paramSNMoE$K)) {
-
+        
         muk <- paramSNMoE$phiBeta$XBeta %*% paramSNMoE$beta[, k]
         sigma2k <- paramSNMoE$sigma[k]
         sigmak <- sqrt(sigma2k)
         dik <- (paramSNMoE$fData$Y - muk) / sigmak
-
+        
         mu_uk <- paramSNMoE$delta[k] * (paramSNMoE$fData$Y - muk)
         sigma2_uk <- (1 - paramSNMoE$delta[k] ^ 2) * paramSNMoE$sigma[k]
         sigma_uk <- sqrt(sigma2_uk)
-
+        
         # E1ik = E[Ui|yi,xi,zik=1]
         E1ik[, k] <<- mu_uk + sigma_uk * dnorm(paramSNMoE$lambda[k] * dik, 0, 1) / pnorm(paramSNMoE$lambda[k] * dik, 0, 1)
-
-<<<<<<< HEAD
-        #######################################################################
-        # Handle numerical instability
-        #######################################################################
-        temp <- E1ik[, k]
-        temp[is.nan(temp)] <- mu_uk[is.nan(temp)] + sigma_uk * paramSNMoE$lambda[k] * dik[is.nan(temp)]
-        temp[is.infinite(temp)] <- mu_uk[is.infinite(temp)] + sigma_uk * paramSNMoE$lambda[k] * dik[is.infinite(temp)]
-        E1ik[, k] <<- temp
-        #######################################################################
-        #######################################################################
-
-=======
+        
         # E2ik = E[Ui^2|y,zik=1]
->>>>>>> master
         E2ik[, k] <<- mu_uk ^ 2 + sigma_uk ^ 2 + sigma_uk * mu_uk * dnorm(paramSNMoE$lambda[k] * dik, 0, 1) / pnorm(paramSNMoE$lambda[k] * dik, 0, 1)
-
-        #######################################################################
-        # Handle numerical instability
-        #######################################################################
-        temp <- E2ik[, k]
-        temp[is.nan(temp)] <- mu_uk[is.nan(temp)] ^ 2 + sigma_uk ^ 2 + sigma_uk * mu_uk[is.nan(temp)] * paramSNMoE$lambda[k] * dik[is.nan(temp)]
-        temp[is.infinite(temp)] <- mu_uk[is.infinite(temp)] ^ 2 + sigma_uk ^ 2 + sigma_uk * mu_uk[is.infinite(temp)] * paramSNMoE$lambda[k] * dik[is.infinite(temp)]
-        E2ik[, k] <<- temp
-        #######################################################################
-        #######################################################################
-
+        
         # weighted skew normal linear expert likelihood
         piik_fik[, k] <- piik[, k] * (2 / sigmak) * dnorm(dik, 0, 1) * pnorm(paramSNMoE$lambda[k] * dik)
       }
-
+      
       log_piik_fik <<- log(piik_fik)
-
+      
       log_sum_piik_fik <<- matrix(log(rowSums(piik_fik)))
-
+      
       # E[Zik|y,x] and E[U^2|y,zik=1]
       tik <<- piik_fik / (rowSums(piik_fik) %*% ones(1, paramSNMoE$K))
     }
