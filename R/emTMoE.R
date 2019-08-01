@@ -70,7 +70,7 @@ emTMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
 
       iter <- iter + 1
       if (verbose) {
-        cat(paste0("EM: Iteration: ", iter, " || log-likelihood: "  , stat$log_lik, "\n"))
+        cat(paste0("EM - tMoE: Iteration: ", iter, " || log-likelihood: "  , stat$log_lik, "\n"))
       }
 
       if (prev_loglik - stat$log_lik > 1e-5) {

@@ -1,3 +1,14 @@
+sampleUnivSN <- function(mu, sigma, lambda, n = 1) {
+
+  delta = lambda / sqrt(1 + lambda ^ 2)
+
+  u <- stats::rnorm(n = n, mean = 0, sd = sigma)
+  e <- stats::rnorm(n = n, mean = 0, sd = sigma)
+  y <- mu + delta * abs(u) + sqrt(1 - delta ^ 2) * e
+
+  return(y)
+}
+
 sampleUnivST <- function(mu, sigma, nu, lambda, n = 1) {
 
   e <- sampleUnivSN(0, 1, lambda, n = 1)
