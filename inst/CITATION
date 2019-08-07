@@ -1,5 +1,22 @@
 citHeader("To cite meteorits in publications use:")
 
+note <- sprintf("R package version %s", meta$Version)
+
+citEntry(
+  entry = "Manual",
+  title = "meteorits: Mixtures-of-Experts Modeling for Complex and Non-Normal Distributions
+  ('MEteorits')",
+  author = personList(person(given="F.", family="Chamroukhi"),
+                      person(given="M.", family="Bartcus"),
+                      person(given="F.", family="Lecocq")),
+  year = "2019",
+  note = note,
+  url = "https://github.com/fchamroukhi/MEteorits",
+  textVersion = paste0("Faicel Chamroukhi, Marius Bartcus and Florian Lecocq (2019).
+  meteorits: Mixtures-of-Experts Modeling for Complex and Non-Normal Distributions
+  ('MEteorits'). ", note, ". https://github.com/fchamroukhi/MEteorits")
+)
+
 citEntry(
   entry    = "Article",
   author = personList(person(given="B-T.", family="Huynh"),
