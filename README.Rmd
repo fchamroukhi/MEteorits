@@ -32,11 +32,9 @@ contains sparse mixture-of-experts models for high-dimensional data.
 Our (dis-)covered meteorits are for instance the following ones:
 
 * NMoE;
-* NNMoE;
 * tMoE;
-* StMoE; 
 * SNMoE;
-* RMoE.
+* StMoE.
 
 The models and algorithms are developped and written in Matlab by Faicel 
 Chamroukhi, and translated and designed into R packages by Florian Lecocq, 
@@ -75,7 +73,7 @@ library(meteorits)
 <details>
   <summary>NMoE</summary>
 
-```{r, message = FALSE}
+```{r, echo = TRUE}
 # (fyi: NMoE is for  the standard normal mixture-of-experts model)
 
 n <- 500 # Size of the sample
@@ -108,7 +106,7 @@ nmoe$plot()
 
   <summary>TMoE</summary>
 
-```{r, message = FALSE}
+```{r, echo = TRUE}
 
 n <- 500 # Size of the sample
 K <- 2 # Number of regressors/experts
@@ -142,7 +140,7 @@ tmoe$plot()
 <details>
   <summary>SNMoE</summary>
 
-```{r, message = FALSE}
+```{r, echo = TRUE}
 
 n <- 500 # Size of the sample
 K <- 2 # Number of regressors/experts
@@ -175,7 +173,7 @@ snmoe$plot()
 <details>
   <summary>StMoE</summary>
 
-```{r, message = FALSE}
+```{r, echo = TRUE}
 
 n <- 500 # Size of the sample
 K <- 2 # Number of regressors/experts
