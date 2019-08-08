@@ -53,7 +53,7 @@ emNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
 
     # Initializations
     param <- ParamNMoE(fData = fData, K = K, p = p, q = q)
-    param$initParam(try_EM, segmental = TRUE)
+    param$initParam(try_EM, segmental = FALSE)
 
     iter <- 0
     converge <- FALSE
