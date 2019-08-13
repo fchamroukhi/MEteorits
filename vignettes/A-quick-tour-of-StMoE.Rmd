@@ -44,17 +44,15 @@ package for production.
 See `help(package="meteorits")` for further details and references provided by
 `citation("meteorits")`.
 
-# Generate sample
+# Application to a simulated dataset
+
+## Generate sample
 
 ```{r}
-n <- 1000 # Size of the sample
-K <- 2 # Number of regressors/experts
-p <- 1 # Order of the polynomial regression (regressors/experts)
-q <- 1 # Order of the logistic regression (gating network)
-
-alphak <- matrix(c(0, 8), ncol = K - 1) # Parameters of the gating network
-betak <- matrix(c(0, -1, 0, 1), ncol = K) # Regression coefficients of the experts
-sigmak <- c(0.1, 0.1) # Standard deviations of the experts
+n <- 500 # Size of the sample
+alphak <- matrix(c(0, 8), ncol = 1) # Parameters of the gating network
+betak <- matrix(c(0, -2.5, 0, 2.5), ncol = 2) # Regression coefficients of the experts
+sigmak <- c(0.5, 0.5) # Standard deviations of the experts
 lambdak <- c(3, 5) # Skewness parameters of the experts
 nuk <- c(5, 7) # Degrees of freedom of the experts network t densities
 x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
@@ -64,16 +62,15 @@ sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, sigmak = sigmak,
                           lambdak = lambdak, nuk = nuk, x = x)
 ```
 
-# Set up StMoE model parameters
+## Set up StMoE model parameters
 
 ```{r}
-K <- 2 # Number of regimes (mixture components)
-p <- 1 # Dimension of beta (order of the polynomial regressors)
-q <- 1 # Dimension of w (order of the logistic regression: to be set to 1 for segmentation)
-
+K <- 2 # Number of regressors/experts
+p <- 1 # Order of the polynomial regression (regressors/experts)
+q <- 1 # Order of the logistic regression (gating network)
 ```
 
-# Set up EM parameters
+## Set up EM parameters
 
 ```{r}
 n_tries <- 1
@@ -83,34 +80,96 @@ verbose <- TRUE
 verbose_IRLS <- FALSE
 ```
 
-# Estimation
+## Estimation
 
 ```{r}
 stmoe <- emStMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
                  threshold, verbose, verbose_IRLS)
 ```
 
-# Plots
+## Plots
 
-## Mean curve
+### Mean curve
 
 ```{r}
 stmoe$plot(what = "meancurve")
 ```
 
-## Confidence regions
+### Confidence regions
 
 ```{r}
 stmoe$plot(what = "confregions")
 ```
 
-## Clusters
+### Clusters
 
 ```{r}
 stmoe$plot(what = "clusters")
 ```
 
-## Log-likelihood
+### Log-likelihood
+
+```{r}
+stmoe$plot(what = "loglikelihood")
+```
+
+# Application to real dataset
+
+## Load data
+
+```{r}
+library(MASS)
+data("mcycle")
+x <- mcycle$times
+y <- as.matrix(mcycle$accel)
+```
+
+## Set up StMoE model parameters
+
+```{r}
+K <- 4 # Number of regressors/experts
+p <- 2 # Order of the polynomial regression (regressors/experts)
+q <- 1 # Order of the logistic regression (gating network)
+```
+
+## Set up EM parameters
+
+```{r}
+n_tries <- 1
+max_iter <- 1500
+threshold <- 1e-5
+verbose <- TRUE
+verbose_IRLS <- FALSE
+```
+
+## Estimation
+
+```{r}
+stmoe <- emStMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
+                 threshold, verbose, verbose_IRLS)
+```
+
+## Plots
+
+### Mean curve
+
+```{r}
+stmoe$plot(what = "meancurve")
+```
+
+### Confidence regions
+
+```{r}
+stmoe$plot(what = "confregions")
+```
+
+### Clusters
+
+```{r}
+stmoe$plot(what = "clusters")
+```
+
+### Log-likelihood
 
 ```{r}
 stmoe$plot(what = "loglikelihood")

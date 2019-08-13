@@ -61,31 +61,25 @@ ParamStMoE <- setRefClass(
       "Method to initialize parameters \\code{alpha}, \\code{beta} and
       \\code{sigma}."
 
-      alpha <<- matrix(runif((q + 1) * (K - 1)), nrow = q + 1, ncol = K - 1)  #random initialization of parameter vector of IRLS
-
       # Initialize the regression parameters (coefficents and variances):
-      if (segmental == FALSE) {
+      if (!segmental) {
 
-        Zik <- zeros(fData$n, K)
-
-        klas <- floor(K * matrix(runif(fData$n), fData$n)) + 1
-
-        Zik[klas %*% ones(1, K) == ones(fData$n, 1) %*% seq(K)] <- 1
-
-        Tauik <- Zik
+        klas <- sample(1:K, fData$n, replace = TRUE)
 
         for (k in 1:K) {
 
-          Xk <- phiBeta$XBeta * (sqrt(Tauik[, k] %*% ones(1, p + 1)))
-          yk <- fData$Y * sqrt(Tauik[, k])
+          Xk <- phiBeta$XBeta[klas == k,]
+          yk <- fData$Y[klas == k]
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% t(Xk) %*% yk
 
-          sigma[k] <<- sum(Tauik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(Tauik[, k])
+          sigma[k] <<- sum((yk - Xk %*% beta[, k]) ^ 2) / length(yk)
         }
       } else {# Segmental : segment uniformly the data and estimate the parameters
 
         nk <- round(fData$n / K) - 1
+
+        klas <- rep.int(0, fData$n)
 
         for (k in 1:K) {
           i <- (k - 1) * nk + 1
@@ -93,74 +87,93 @@ ParamStMoE <- setRefClass(
           yk <- matrix(fData$Y[i:j])
           Xk <- phiBeta$XBeta[i:j, ]
 
-          beta[, k] <<- solve(t(Xk) %*% Xk) %*% (t(Xk) %*% yk)
+          beta[, k] <<- solve(t(Xk) %*% Xk, tol = 0) %*% (t(Xk) %*% yk)
 
-          muk <- Xk %*% beta[, k]
+          muk <- Xk %*% beta[, k, drop = FALSE]
 
           sigma[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
+
+          klas[i:j] <- k
         }
       }
 
-      if (try_EM == 1) {
-        alpha <<- rand(q + 1, K - 1)
-      }
+      # Intialize the softmax parameters
+      Z <- matrix(0, nrow = fData$n, ncol = K)
+      Z[klas %*% ones(1, K) == ones(fData$n, 1) %*% seq(K)] <- 1
+      tau <- Z
+      res <- IRLS(phiAlpha$XBeta, tau, ones(nrow(tau), 1), alpha)
+      alpha <<- res$W
 
       # Initialize the skewness parameter Lambdak (by equivalence delta)
-      lambda <<- -.1 + .2 * rand(1, K)
+      lambda <<- -1 + 2 * rand(1, K)
       delta <<- lambda / sqrt(1 + lambda ^ 2)
 
       # Intitialization of the degrees of freedom
-      nuk <<- 1 + 5 * rand(1, K)
+      nuk <<- 50 * rand(1, K)
     },
 
-    MStep = function(statStMoE, verbose_IRLS) {
+    MStep = function(statStMoE, calcAlpha = FALSE, calcBeta = FALSE, calcSigma2 = FALSE, calcLambda = FALSE, calcNu = FALSE, verbose_IRLS = FALSE) {
       "Method used in the EM algorithm to learn the parameters of the StMoE model
       based on statistics provided by \\code{statStMoE}."
 
-      res_irls <- IRLS(phiAlpha$XBeta, statStMoE$tik, ones(nrow(statStMoE$tik), 1), alpha, verbose_IRLS)
+      reg_irls <- 0
 
-      reg_irls <- res_irls$reg_irls
+      if (calcAlpha) {
 
-      alpha <<- res_irls$W
+        res_irls <- IRLS(phiAlpha$XBeta, statStMoE$tik, ones(nrow(statStMoE$tik), 1), alpha, verbose_IRLS)
+        reg_irls <- res_irls$reg_irls
+        alpha <<- res_irls$W
+      }
 
-      for (k in 1:K) {
+      # Update the regression coefficients
+      if (calcBeta) {
 
-        # Update the regression coefficients
-        TauikWik <- (statStMoE$tik[, k] * statStMoE$wik[, k]) %*% ones(1, p + 1)
-        TauikX <- phiBeta$XBeta * (statStMoE$tik[, k] %*% ones(1, p + 1))
-        betak <- solve((t(TauikWik * phiBeta$XBeta) %*% phiBeta$XBeta)) %*% (t(TauikX) %*% ((statStMoE$wik[, k] * fData$Y) - (delta[k] * statStMoE$E1ik[, k])))
-
-        beta[, k] <<- betak
-
-        # Update the variances sigma2k
-        sigma2 <- sum(statStMoE$tik[, k] * (statStMoE$wik[, k] * ((fData$Y - phiBeta$XBeta %*% betak) ^ 2) - 2 * delta[k] * statStMoE$E1ik[, k] * (fData$Y - phiBeta$XBeta %*% betak) + statStMoE$E2ik[, k])) / (2 * (1 - delta[k] ^ 2) * sum(statStMoE$tik[, k]))
-
-        if (sigma2 > 0) {
-          sigma[k] <<- sigma2
+        for (k in 1:K) {
+          TauikWik <- (statStMoE$tik[, k] * statStMoE$wik[, k]) %*% ones(1, p + 1)
+          TauikX <- phiBeta$XBeta * (statStMoE$tik[, k] %*% ones(1, p + 1))
+          betak <- solve((t(TauikWik * phiBeta$XBeta) %*% phiBeta$XBeta), tol = 0) %*% (t(TauikX) %*% ((statStMoE$wik[, k] * fData$Y) - (delta[k] * statStMoE$E1ik[, k])))
+          beta[, k] <<- betak
         }
 
-        sigmak <- sqrt(sigma[k])
+      }
 
-        # Update the deltak (the skewness parameter)
-        try(lambda[k] <<- uniroot(f <- function(lmbda) {
-          return((lmbda / sqrt(1 + lmbda ^ 2)) * (1 - (lmbda ^ 2 / (1 + lmbda ^ 2))) *
-                   sum(statStMoE$tik[, k])
-                 + (1 + (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statStMoE$tik[, k] * statStMoE$dik[, k] *
-                                                               statStMoE$E1ik[, k] / sigmak)
-                 - (lmbda / sqrt(1 + lmbda ^ 2)) * sum(statStMoE$tik[, k] * (
-                   statStMoE$wik[, k] * (statStMoE$dik[, k] ^ 2) + statStMoE$E2ik[, k] / (sigmak ^
-                                                                                            2)
-                 ))
-          )
-        }, c(-100, 100), extendInt = "yes")$root,
-        silent = TRUE)
+      # Update the variances sigma2k
+      if (calcSigma2) {
 
-        delta[k] <<- lambda[k] / sqrt(1 + lambda[k] ^ 2)
+        for (k in 1:K) {
+          sigma[k] <<- sum(statStMoE$tik[, k] * (statStMoE$wik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2) - 2 * delta[k] * statStMoE$E1ik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) + statStMoE$E2ik[, k])) / (2 * (1 - delta[k] ^ 2) * sum(statStMoE$tik[, k]))
+        }
+      }
 
-        try(nuk[k] <<- uniroot(f <- function(nnu) {
-          return(-psigamma((nnu) / 2) + log((nnu) / 2) + 1 + sum(statStMoE$tik[, k] * (statStMoE$E3ik[, k] - statStMoE$wik[, k])) /
-                   sum(statStMoE$tik[, k]))
-        }, c(0.1, 200))$root, silent = TRUE)
+      # Update the deltak (the skewness parameter)
+      if (calcLambda) {
+
+        for (k in 1:K) {
+          try(lambda[k] <<- uniroot(f <- function(lmbda) {
+            return((lmbda / sqrt(1 + lmbda ^ 2)) * (1 - (lmbda ^ 2 / (1 + lmbda ^ 2))) *
+                     sum(statStMoE$tik[, k])
+                   + (1 + (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statStMoE$tik[, k] * statStMoE$dik[, k] *
+                                                                 statStMoE$E1ik[, k] / sqrt(sigma[k]))
+                   - (lmbda / sqrt(1 + lmbda ^ 2)) * sum(statStMoE$tik[, k] * (
+                     statStMoE$wik[, k] * (statStMoE$dik[, k] ^ 2) + statStMoE$E2ik[, k] / (sqrt(sigma[k]) ^
+                                                                                              2)
+                   ))
+            )
+          }, c(-100, 100), extendInt = "yes")$root,
+          silent = TRUE)
+
+          delta[k] <<- lambda[k] / sqrt(1 + lambda[k] ^ 2)
+        }
+      }
+
+      if (calcNu) {
+
+        for (k in 1:K) {
+          try(nuk[k] <<- suppressWarnings(uniroot(f <- function(nnu) {
+            return(-psigamma((nnu) / 2) + log((nnu) / 2) + 1 + sum(statStMoE$tik[, k] * (statStMoE$E3ik[, k] - statStMoE$wik[, k])) /
+                     sum(statStMoE$tik[, k]))
+          }, c(0, 100))$root), silent = TRUE)
+        }
       }
 
       return(reg_irls)

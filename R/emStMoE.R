@@ -51,19 +51,30 @@ emStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, thresho
 
     # Initialization
     param <- ParamStMoE(fData = fData, K = K, p = p, q = q)
-    param$initParam(try_EM, segmental = FALSE)
+    param$initParam(try_EM, segmental = TRUE)
 
     iter <- 0
     converge <- FALSE
     prev_loglik <- -Inf
 
     stat <- StatStMoE(paramStMoE = param)
-    stat$univStMoEpdf(param)
 
     while (!converge && (iter <= max_iter)) {
-      stat$EStep(param)
 
-      reg_irls <- param$MStep(stat, verbose_IRLS)
+      stat$EStep(param, calcTau = TRUE, calcE1 = TRUE, calcE2 = TRUE, calcE3 = FALSE)
+      reg_irls <- param$MStep(stat, calcAlpha = TRUE, calcBeta = TRUE, verbose_IRLS = verbose_IRLS)
+
+
+      stat$EStep(param, calcTau = FALSE, calcE1 = TRUE, calcE2 = TRUE, calcE3 = FALSE)
+      param$MStep(stat , calcSigma2 = TRUE, verbose_IRLS = verbose_IRLS)
+
+
+      stat$EStep(param, calcTau = FALSE, calcE1 = TRUE, calcE2 = TRUE, calcE3 = FALSE)
+      param$MStep(stat , calcLambda = TRUE, verbose_IRLS = verbose_IRLS)
+
+
+      stat$EStep(param, calcTau = FALSE, calcE1 = TRUE, calcE2 = TRUE, calcE3 = TRUE)
+      param$MStep(stat , calcNu = TRUE, verbose_IRLS = verbose_IRLS)
 
       stat$computeLikelihood(reg_irls)
 
@@ -72,14 +83,14 @@ emStMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, thresho
         message("EM - StMoE: Iteration: ", iter, " | log-likelihood: "  , stat$log_lik)
       }
 
-      if (prev_loglik - stat$log_lik > 1e-5) {
-        if (verbose) {
-          warning("EM log-likelihood is decreasing from ", prev_loglik, "to ", stat$log_lik, "!")
-        }
-        top <- top + 1
-        if (top > 20)
-          break
-      }
+      # if (prev_loglik - stat$log_lik > 1e-5) {
+      #   if (verbose) {
+      #     warning("EM log-likelihood is decreasing from ", prev_loglik, "to ", stat$log_lik, "!")
+      #   }
+      #   top <- top + 1
+      #   if (top > 20)
+      #     break
+      # }
 
       # Test of convergence
       converge <- abs((stat$log_lik - prev_loglik) / prev_loglik) <= threshold

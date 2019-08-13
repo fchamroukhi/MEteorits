@@ -115,9 +115,9 @@ StatStMoE <- setRefClass(
       Z : Matrice de dimension [nxK] de la partition dure : ses elements sont zik, avec zik=1 si xi
       appartient et la classe k (au sens du MAP) et zero sinon.
       "
-      N <- nrow(piik)
-      K <- ncol(piik)
-      ikmax <- max.col(piik)
+      N <- nrow(tik)
+      K <- ncol(tik)
+      ikmax <- max.col(tik)
       ikmax <- matrix(ikmax, ncol = 1)
       z_ik <<-
         ikmax %*% ones(1, K) == ones(N, 1) %*% (1:K) # partition_MAP
@@ -170,65 +170,89 @@ StatStMoE <- setRefClass(
       mik <- zeros(paramStMoE$fData$n, paramStMoE$K)
 
       for (k in (1:paramStMoE$K)) {
-        dik[, k] <<- (paramStMoE$fData$Y - paramStMoE$phiBeta$XBeta %*% paramStMoE$beta[, k]) / paramStMoE$sigma[k]
-        mik[, k] <- paramStMoE$lambda[k] %*% dik[, k] * sqrt(paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^
-                                                                               2)
-        piik_fik[, k] <- piik[, k] * (2 / paramStMoE$sigma[k]) * dt(dik[, k], paramStMoE$nuk[k]) * pt(mik[, k], paramStMoE$nuk[k] + 1)
+        dik[, k] <<- (paramStMoE$fData$Y - paramStMoE$phiBeta$XBeta %*% paramStMoE$beta[, k]) / sqrt(paramStMoE$sigma[k])
+        mik[, k] <- paramStMoE$lambda[k] %*% dik[, k] * sqrt(paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2)
+        piik_fik[, k] <- piik[, k] * (2 / sqrt(paramStMoE$sigma[k])) * dt(dik[, k], paramStMoE$nuk[k]) * pt(mik[, k], paramStMoE$nuk[k] + 1)
       }
 
       stme_pdf <<- matrix(rowSums(piik_fik)) # Skew-t mixture of experts density
     },
 
-    EStep = function(paramStMoE) {
+    EStep = function(paramStMoE, calcTau = FALSE, calcE1 = FALSE, calcE2 = FALSE, calcE3 = FALSE) {
       "Method used in the EM algorithm to update statistics based on parameters
       provided by \\code{paramStMoE} (prior and posterior probabilities)."
 
-      piik <<- multinomialLogit(paramStMoE$alpha, paramStMoE$phiAlpha$XBeta, ones(paramStMoE$fData$n, paramStMoE$K), ones(paramStMoE$fData$n, 1))$piik
+      if (calcTau) {
 
-      piik_fik <- zeros(paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
+        piik <<- multinomialLogit(paramStMoE$alpha, paramStMoE$phiAlpha$XBeta, ones(paramStMoE$fData$n, paramStMoE$K), ones(paramStMoE$fData$n, 1))$piik
+        piik_fik <- zeros(paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
+      }
 
       dik <<- zeros(paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
       mik <- zeros(paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
       wik <<- zeros(paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
+      Integgtx <- zeros(paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
 
       for (k in (1:paramStMoE$K)) {
 
-        muk <- paramStMoE$phiBeta$XBeta %*% paramStMoE$beta[, k]
-        sigma2k <- paramStMoE$sigma[k]
-        sigmak <- sqrt(sigma2k)
-        dik[, k] <<- (paramStMoE$fData$Y - muk) / sigmak
+        fx = function(x) {
+          return((psigamma((paramStMoE$nuk[k] + 2) / 2) - psigamma((paramStMoE$nuk[k] + 1) / 2) + log(1 + (x ^ 2) / (paramStMoE$nuk[k])) + ((paramStMoE$nuk[k] + 1) * x ^ 2 - paramStMoE$nuk[k] - 1) / ((paramStMoE$nuk[k] + 1) * (paramStMoE$nuk[k] + 1 + x ^ 2))) * dt(x, paramStMoE$nuk[k] + 1))
+        }
 
-        mik[, k] <- paramStMoE$lambda[k] %*% dik[, k] * sqrt((paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^
-                                                                                2))
+
+        muk <- paramStMoE$phiBeta$XBeta %*% paramStMoE$beta[, k]
+        sigmak <- sqrt(paramStMoE$sigma[k])
+        deltak <- paramStMoE$delta[k]
+
+
+        dik[, k] <<- (paramStMoE$fData$Y - muk) / sigmak
+        mik[, k] <- paramStMoE$lambda[k] %*% dik[, k] * sqrt((paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2))
 
         # E[Wi|yi,zik=1]
         wik[, k] <<- ((paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2)) * pt(mik[, k] * sqrt((paramStMoE$nuk[k] + 3) / (paramStMoE$nuk[k] + 1)), paramStMoE$nuk[k] + 3) / pt(mik[, k], paramStMoE$nuk[k] + 1)
 
-        # E[Wi Ui |yi,zik=1]
-        deltak <- paramStMoE$delta[k]
 
-        E1ik[, k] <<- deltak * abs(paramStMoE$fData$Y - muk) * wik[, k] +
-          (sqrt(1 - deltak ^ 2) / (pi * stme_pdf)) * ((dik[, k] ^ 2 / (paramStMoE$nuk[k] * (1 - deltak ^ 2)) + 1) ^ (-(paramStMoE$nuk[k] / 2 + 1)))
+        if (calcE1) {
+          univStMoEpdf(paramStMoE)
+          # E[Wi Ui |yi,zik=1]
+          E1ik[, k] <<- deltak * abs(paramStMoE$fData$Y - muk) * wik[, k] +
+            (sqrt(1 - deltak ^ 2) / (pi * stme_pdf)) * ((dik[, k] ^ 2 / (paramStMoE$nuk[k] * (1 - deltak ^ 2)) + 1) ^ (-(paramStMoE$nuk[k] / 2 + 1)))
+        }
 
-        E2ik[, k] <<- deltak ^ 2 * ((paramStMoE$fData$Y - muk) ^ 2) * wik[, k] +
-          (1 - deltak ^ 2) * sigmak ^ 2 + ((deltak * (paramStMoE$fData$Y - muk) * sqrt(1 - deltak ^ 2)) / (pi * stme_pdf)) * (((dik[, k] ^ 2) / (paramStMoE$nuk[k] * (1 - deltak ^ 2)) + 1) ^ (-(paramStMoE$nuk[k] / 2 + 1)))
+        if (calcE2) {
+          E2ik[, k] <<- deltak ^ 2 * ((paramStMoE$fData$Y - muk) ^ 2) * wik[, k] +
+            (1 - deltak ^ 2) * sigmak ^ 2 + ((deltak * (paramStMoE$fData$Y - muk) * sqrt(1 - deltak ^ 2)) / (pi * stme_pdf)) * (((dik[, k] ^ 2) / (paramStMoE$nuk[k] * (1 - deltak ^ 2)) + 1) ^ (-(paramStMoE$nuk[k] / 2 + 1)))
+        }
 
-        Integgtx <- 0
-        E3ik[, k] <<- wik[, k] - log((paramStMoE$nuk[k] + dik[, k] ^ 2) / 2) - (paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2) + psigamma((paramStMoE$nuk[k] + 1) / 2) + ((paramStMoE$lambda[k] * dik[, k] * (dik[, k] ^ 2 - 1)) / sqrt((paramStMoE$nuk[k] + 1) * ((paramStMoE$nuk[k] + dik[, k] ^ 2) ^ 3))) * dt(mik[, k], paramStMoE$nuk[k] + 1) / pt(mik[, k], paramStMoE$nuk[k] + 1) + (1 / pt(mik[, k], paramStMoE$nuk[k] + 1)) * Integgtx
+        if (calcE3) {
+          Integgtx[, k] <- sapply(mik[, k], function(x) integrate(f = fx, lower = -Inf, upper = x)$value)
+          E3ik[, k] <<- wik[, k] - log((paramStMoE$nuk[k] + dik[, k] ^ 2) / 2) - (paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2) + psigamma((paramStMoE$nuk[k] + 1) / 2) + ((paramStMoE$lambda[k] * dik[, k] * (dik[, k] ^ 2 - 1)) / sqrt((paramStMoE$nuk[k] + 1) * ((paramStMoE$nuk[k] + dik[, k] ^ 2) ^ 3))) * dt(mik[, k], paramStMoE$nuk[k] + 1) / pt(mik[, k], paramStMoE$nuk[k] + 1) + (1 / pt(mik[, k], paramStMoE$nuk[k] + 1)) * Integgtx[, k]
+        }
 
-        # Weighted skew normal linear expert likelihood
-        piik_fik[, k] <- piik[, k] * (2 / sigmak) * dt(dik[, k], paramStMoE$nuk[k]) * pt(mik[, k], paramStMoE$nuk[k] + 1)
+        if (calcTau) {
+
+          # Weighted skew normal linear expert likelihood
+          piik_fik[, k] <- piik[, k] * (2 / sigmak) * dt(dik[, k], paramStMoE$nuk[k]) * pt(mik[, k], paramStMoE$nuk[k] + 1)
+
+        }
+
       }
 
-      stme_pdf <<- matrix(rowSums(piik_fik)) # Skew-t mixture of experts density
+      if (calcTau) {
 
-      log_piik_fik <<- log(piik_fik)
+        # univStMoEpdf(paramStMoE)
 
-      log_sum_piik_fik <<- matrix(logsumexp(log_piik_fik, 1))
+        stme_pdf <<- matrix(rowSums(piik_fik)) # Skew-t mixture of experts density
 
-      #E[Zi=k|yi]
-      log_tik <- log_piik_fik - log_sum_piik_fik %*% ones(1, paramStMoE$K)
-      tik <<- exp(log_tik)
+        log_piik_fik <<- log(piik_fik)
+
+        log_sum_piik_fik <<- matrix(logsumexp(log_piik_fik, 1))
+
+        #E[Zi=k|yi]
+        log_tik <- log_piik_fik - log_sum_piik_fik %*% ones(1, paramStMoE$K)
+        tik <<- exp(log_tik)
+      }
+
     }
   )
 )

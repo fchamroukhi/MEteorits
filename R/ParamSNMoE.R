@@ -97,7 +97,7 @@ ParamSNMoE <- setRefClass(
       Z[klas %*% ones(1, K) == ones(fData$n, 1) %*% seq(K)] <- 1
       tau <- Z
       res <- IRLS(phiAlpha$XBeta, tau, ones(nrow(tau), 1), alpha)
-      alpha <- res$W
+      alpha <<- res$W
 
       # Initialize the skewness parameter Lambdak (by equivalence delta)
       lambda <<- -1 + 2 * rand(1, K)

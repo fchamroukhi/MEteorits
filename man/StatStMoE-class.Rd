@@ -80,7 +80,8 @@ logarithm of the joint probability \eqn{P(Y_{i}, \ zi = k)}{P(Yi, zi = k)},
 \section{Methods}{
 
 \describe{
-\item{\code{EStep(paramStMoE)}}{Method used in the EM algorithm to update statistics based on parameters
+\item{\code{EStep(paramStMoE, calcTau = FALSE, calcE1 = FALSE, calcE2 = FALSE,
+  calcE3 = FALSE)}}{Method used in the EM algorithm to update statistics based on parameters
 provided by \code{paramStMoE} (prior and posterior probabilities).}
 
 \item{\code{MAP()}}{calcule une partition d'un echantillon par la regle du Maximum A Posteriori ?? partir des probabilites a posteriori

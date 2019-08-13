@@ -100,9 +100,9 @@ StatTMoE <- setRefClass(
       Z : Matrice de dimension [nxK] de la partition dure : ses elements sont zik, avec zik=1 si xi
       appartient ?? la classe k (au sens du MAP) et zero sinon.
       "
-      N <- nrow(piik)
-      K <- ncol(piik)
-      ikmax <- max.col(piik)
+      N <- nrow(tik)
+      K <- ncol(tik)
+      ikmax <- max.col(tik)
       ikmax <- matrix(ikmax, ncol = 1)
       z_ik <<- ikmax %*% ones(1, K) == ones(N, 1) %*% (1:K) # partition_MAP
       klas <<- ones(N, 1)

@@ -53,30 +53,28 @@ ParamTMoE <- setRefClass(
     },
 
     initParam = function(try_EM, segmental = FALSE) {
+      "Method to initialize parameters \\code{alpha}, \\code{beta} and
+      \\code{sigma}."
 
-      alpha <<- matrix(runif((q + 1) * (K - 1)), nrow = q + 1, ncol = K - 1) # Random initialization of parameter vector of gating network
+      # Initialize the regression parameters (coefficents and variances):
+      if (!segmental) {
 
-      #Initialize the regression parameters (coefficents and variances):
-      if (segmental == FALSE) {
-        Zik <- zeros(n, K)
-
-        klas <- floor(K * matrix(runif(fData$n), fData$n)) + 1
-
-        Zik[klas %*% ones(1, K) == ones(fData$n, 1) %*% seq(K)] <- 1
-
-        Tauik <- Zik
+        klas <- sample(1:K, fData$n, replace = TRUE)
 
         for (k in 1:K) {
-          Xk <- phiBeta$XBeta * (sqrt(Tauik[, k] %*% ones(1, p + 1)))
-          yk <- fData$Y * sqrt(Tauik[, k])
+
+          Xk <- phiBeta$XBeta[klas == k,]
+          yk <- fData$Y[klas == k]
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% t(Xk) %*% yk
 
-          sigma[k] <<- sum(Tauik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(Tauik[, k])
+          sigma[k] <<- sum((yk - Xk %*% beta[, k]) ^ 2) / length(yk)
         }
       } else {# Segmental : segment uniformly the data and estimate the parameters
 
         nk <- round(fData$n / K) - 1
+
+        klas <- rep.int(0, fData$n)
 
         for (k in 1:K) {
           i <- (k - 1) * nk + 1
@@ -84,17 +82,22 @@ ParamTMoE <- setRefClass(
           yk <- matrix(fData$Y[i:j])
           Xk <- phiBeta$XBeta[i:j, ]
 
-          beta[, k] <<- solve(t(Xk) %*% Xk) %*% (t(Xk) %*% yk)
+          beta[, k] <<- solve(t(Xk) %*% Xk, tol = 0) %*% (t(Xk) %*% yk)
 
           muk <- Xk %*% beta[, k, drop = FALSE]
 
           sigma[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
+
+          klas[i:j] <- k
         }
       }
 
-      if (try_EM == 1) {
-        alpha <<- zeros(q + 1, K - 1)
-      }
+      # Intialize the softmax parameters
+      Z <- matrix(0, nrow = fData$n, ncol = K)
+      Z[klas %*% ones(1, K) == ones(fData$n, 1) %*% seq(K)] <- 1
+      tau <- Z
+      res <- IRLS(phiAlpha$XBeta, tau, ones(nrow(tau), 1), alpha)
+      alpha <<- res$W
 
       # Intitialization of the degrees of freedom
       nuk <<- 50 * rand(1, K)

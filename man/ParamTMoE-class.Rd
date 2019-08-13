@@ -33,6 +33,12 @@ Gaussian linear regression problem.}
 \item{\code{nuk}}{degrees of freedom}
 }}
 
+\section{Methods}{
+
+\describe{
+\item{\code{initParam(try_EM, segmental = FALSE)}}{Method to initialize parameters \code{alpha}, \code{beta} and
+\code{sigma}.}
+}}
 
 \seealso{
 \link{FData}

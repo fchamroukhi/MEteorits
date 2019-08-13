@@ -44,7 +44,8 @@ solving a weighted Gaussian linear regression problem.}
 \item{\code{initParam(try_EM, segmental = FALSE)}}{Method to initialize parameters \code{alpha}, \code{beta} and
 \code{sigma}.}
 
-\item{\code{MStep(statStMoE, verbose_IRLS)}}{Method used in the EM algorithm to learn the parameters of the StMoE model
+\item{\code{MStep(statStMoE, calcAlpha = FALSE, calcBeta = FALSE, calcSigma2 = FALSE,
+  calcLambda = FALSE, calcNu = FALSE, verbose_IRLS = FALSE)}}{Method used in the EM algorithm to learn the parameters of the StMoE model
 based on statistics provided by \code{statStMoE}.}
 }}
 
