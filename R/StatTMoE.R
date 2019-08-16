@@ -22,15 +22,15 @@
 #' @field stored_loglik Numeric vector. Stored values of the log-likelihood at
 #'   each EM iteration.
 #' @field BIC Numeric. Value of the BIC (Bayesian Information Criterion)
-#'   criterion. The formula is \eqn{BIC = log\_lik - nu \times \textrm{log}(n) /
-#'   2}{BIC = log\_lik - nu x log(n) / 2} with \emph{nu} the degree of freedom
+#'   criterion. The formula is \eqn{BIC = log\_lik - df \times \textrm{log}(n) /
+#'   2}{BIC = log\_lik - df x log(n) / 2} with \emph{df} the degree of freedom
 #'   of the TMoE model.
 #' @field ICL Numeric. Value of the ICL (Integrated Completed Likelihood)
-#'   criterion. The formula is \eqn{ICL = com\_loglik - nu \times
-#'   \textrm{log}(n) / 2}{ICL = com_loglik - nu x log(n) / 2} with \emph{nu} the
+#'   criterion. The formula is \eqn{ICL = com\_loglik - df \times
+#'   \textrm{log}(n) / 2}{ICL = com_loglik - df x log(n) / 2} with \emph{df} the
 #'   degree of freedom of the TMoE model.
 #' @field AIC Numeric. Value of the AIC (Akaike Information Criterion)
-#'   criterion. The formula is \eqn{AIC = log\_lik - nu}{AIC = log\_lik - nu}.
+#'   criterion. The formula is \eqn{AIC = log\_lik - df}{AIC = log\_lik - df}.
 #' @field log_piik_fik Matrix of size \eqn{(n, K)} giving the values of the
 #'   logarithm of the joint probability \eqn{P(Y_{i}, \ zi = k)}{P(Yi, zi = k)},
 #'   \eqn{i = 1,\dots,n}.
@@ -126,21 +126,21 @@ StatTMoE <- setRefClass(
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
 
       # Var[yi|xi,zi=k]
-      Var_yk <<- paramTMoE$nuk / (paramTMoE$nuk - 2) * paramTMoE$sigma
+      Var_yk <<- paramTMoE$df / (paramTMoE$df - 2) * paramTMoE$sigma2
 
       # Var[yi|xi]
       Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramTMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
       # BIC, AIC and ICL
-      BIC <<- log_lik - (paramTMoE$nu * log(paramTMoE$fData$n * paramTMoE$fData$m) / 2)
-      AIC <<- log_lik - paramTMoE$nu
+      BIC <<- log_lik - (paramTMoE$df * log(paramTMoE$fData$n * paramTMoE$fData$m) / 2)
+      AIC <<- log_lik - paramTMoE$df
 
       # CL(theta) : complete-data loglikelihood
       zik_log_piik_fk <- (repmat(z_ik, paramTMoE$fData$m, 1)) * log_piik_fik
       sum_zik_log_fik <- apply(zik_log_piik_fk, 1, sum)
       com_loglik <<- sum(sum_zik_log_fik)
 
-      ICL <<- com_loglik - (paramTMoE$nu * log(paramTMoE$fData$n * paramTMoE$fData$m) / 2)
+      ICL <<- com_loglik - (paramTMoE$df * log(paramTMoE$fData$n * paramTMoE$fData$m) / 2)
 
     },
 
@@ -153,11 +153,11 @@ StatTMoE <- setRefClass(
       for (k in (1:paramTMoE$K)) {
 
         muk <- paramTMoE$phiBeta$XBeta %*% paramTMoE$beta[, k]
-        sigma2k <- paramTMoE$sigma[k]
+        sigma2k <- paramTMoE$sigma2[k]
         sigmak <- sqrt(sigma2k)
         dik <- (paramTMoE$fData$Y - muk) / sigmak
 
-        nuk <- paramTMoE$nuk[k]
+        nuk <- paramTMoE$nu[k]
         Wik[, k] <<- (nuk + 1) / (nuk + dik ^ 2)
 
         # Weighted t linear expert likelihood

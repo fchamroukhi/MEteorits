@@ -59,6 +59,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 # Generate sample of size n
 sample <- sampleUnivSNMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
                           lambdak = lambdak, x = x)
+y <- matrix(sample$y)
 ```
 
 ## Set up SNMoE model parameters
@@ -82,7 +83,7 @@ verbose_IRLS <- FALSE
 ## Estimation
 
 ```{r}
-snmoe <- emSNMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
+snmoe <- emSNMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
                  threshold, verbose, verbose_IRLS)
 ```
 

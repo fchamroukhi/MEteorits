@@ -7,13 +7,13 @@
 #' @field p The order of the polynomial regression.
 #' @field q The dimension of the logistic regression. For the purpose of
 #' segmentation, it must be set to 1.
-#' @field nu degree of freedom
+#' @field df degree of freedom
 #' @field alpha is the parameter vector of the logistic model with \eqn{alpha_K} being the null vector.
 #' @field beta is the vector of regression coefficients of component k,
 #' the updates for each of the expert component parameters consist in analytically solving a weighted
 #' Gaussian linear regression problem.
-#' @field sigma The variances for the \emph{K} mixture component.
-#' @field nuk degrees of freedom
+#' @field sigma2 The variances for the \emph{K} mixture component.
+#' @field nu degrees of freedom
 #' @seealso [FData]
 #' @export
 ParamTMoE <- setRefClass(
@@ -26,12 +26,12 @@ ParamTMoE <- setRefClass(
     K = "numeric", # Number of regimes
     p = "numeric", # Dimension of beta (order of polynomial regression)
     q = "numeric", # Dimension of w (order of logistic regression)
-    nu = "numeric", # Degree of freedom
+    df = "numeric", # Degree of freedom
 
     alpha = "matrix",
     beta = "matrix",
-    sigma = "matrix",
-    nuk = "matrix"
+    sigma2 = "matrix",
+    nu = "matrix"
   ),
   methods = list(
     initialize = function(fData = FData(numeric(1), matrix(1)), K = 1, p = 3, q = 1) {
@@ -44,17 +44,17 @@ ParamTMoE <- setRefClass(
       p <<- p
       q <<- q
 
-      nu <<- (p + q + 3) * K - (q + 1)
+      df <<- (q + 1) * (K - 1) + (p + 1) * K + K
 
       alpha <<- matrix(0, q + 1, K - 1)
       beta <<- matrix(NA, p + 1, K)
-      sigma <<- matrix(NA, 1, K)
-      nuk <<- matrix(NA, K)
+      sigma2 <<- matrix(NA, 1, K)
+      nu <<- matrix(NA, K)
     },
 
     initParam = function(try_EM, segmental = FALSE) {
       "Method to initialize parameters \\code{alpha}, \\code{beta} and
-      \\code{sigma}."
+      \\code{sigma2}."
 
       # Initialize the regression parameters (coefficents and variances):
       if (!segmental) {
@@ -68,7 +68,7 @@ ParamTMoE <- setRefClass(
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% t(Xk) %*% yk
 
-          sigma[k] <<- sum((yk - Xk %*% beta[, k]) ^ 2) / length(yk)
+          sigma2[k] <<- sum((yk - Xk %*% beta[, k]) ^ 2) / length(yk)
         }
       } else {# Segmental : segment uniformly the data and estimate the parameters
 
@@ -86,7 +86,7 @@ ParamTMoE <- setRefClass(
 
           muk <- Xk %*% beta[, k, drop = FALSE]
 
-          sigma[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
+          sigma2[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
 
           klas[i:j] <- k
         }
@@ -100,7 +100,7 @@ ParamTMoE <- setRefClass(
       alpha <<- res$W
 
       # Intitialization of the degrees of freedom
-      nuk <<- 50 * rand(1, K)
+      nu <<- 50 * rand(1, K)
 
     },
 
@@ -121,18 +121,18 @@ ParamTMoE <- setRefClass(
         beta[, k] <<- solve((t(Xbeta) %*% Xbeta)) %*% (t(Xbeta) %*% yk)
 
         # Update the variances sigma2k
-        sigma[k] <<- sum(statTMoE$tik[, k] * statTMoE$Wik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(statTMoE$tik[, k])
+        sigma2[k] <<- sum(statTMoE$tik[, k] * statTMoE$Wik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(statTMoE$tik[, k])
 
         # If ECM (use an additional E-Step with the updated betak and sigma2k
-        dik <- (fData$Y - phiBeta$XBeta %*% beta[, k]) / sqrt(sigma[k])
+        dik <- (fData$Y - phiBeta$XBeta %*% beta[, k]) / sqrt(sigma2[k])
 
         # Update the degrees of freedom
-        try(nuk[k] <<- pracma::fzero(f <- function(nu) {
+        try(nu[k] <<- pracma::fzero(f <- function(nuk) {
           return(
-            -psigamma(nu / 2) + log(nu / 2) + 1 + (1 / sum(statTMoE$tik[, k])) * sum(statTMoE$tik[, k] * (log(statTMoE$Wik[, k]) - statTMoE$Wik[, k]))
+            -psigamma(nuk / 2) + log(nuk / 2) + 1 + (1 / sum(statTMoE$tik[, k])) * sum(statTMoE$tik[, k] * (log(statTMoE$Wik[, k]) - statTMoE$Wik[, k]))
             + psigamma((nuk[k] + 1) / 2) - log((nuk[k] + 1) / 2)
           )
-        }, nuk[k])$x, silent = TRUE)
+        }, nu[k])$x, silent = TRUE)
 
       }
 

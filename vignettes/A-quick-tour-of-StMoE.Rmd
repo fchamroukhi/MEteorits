@@ -60,6 +60,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 # Generate sample of size n
 sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
                           lambdak = lambdak, nuk = nuk, x = x)
+y <- matrix(sample$y)
 ```
 
 ## Set up StMoE model parameters
@@ -83,7 +84,7 @@ verbose_IRLS <- FALSE
 ## Estimation
 
 ```{r}
-stmoe <- emStMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
+stmoe <- emStMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
                  threshold, verbose, verbose_IRLS)
 ```
 

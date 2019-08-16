@@ -21,15 +21,15 @@
 #' @field stored_loglik Numeric vector. Stored values of the log-likelihood at
 #'   each EM iteration.
 #' @field BIC Numeric. Value of the BIC (Bayesian Information Criterion)
-#'   criterion. The formula is \eqn{BIC = log\_lik - nu \times \textrm{log}(n) /
-#'   2}{BIC = log\_lik - nu x log(n) / 2} with \emph{nu} the degree of freedom
+#'   criterion. The formula is \eqn{BIC = log\_lik - df \times \textrm{log}(n) /
+#'   2}{BIC = log\_lik - df x log(n) / 2} with \emph{df} the degree of freedom
 #'   of the StMoE model.
 #' @field ICL Numeric. Value of the ICL (Integrated Completed Likelihood)
-#'   criterion. The formula is \eqn{ICL = com\_loglik - nu \times
-#'   \textrm{log}(n) / 2}{ICL = com_loglik - nu x log(n) / 2} with \emph{nu} the
+#'   criterion. The formula is \eqn{ICL = com\_loglik - df \times
+#'   \textrm{log}(n) / 2}{ICL = com_loglik - df x log(n) / 2} with \emph{df} the
 #'   degree of freedom of the StMoE model.
 #' @field AIC Numeric. Value of the AIC (Akaike Information Criterion)
-#'   criterion. The formula is \eqn{AIC = log\_lik - nu}{AIC = log\_lik - nu}.
+#'   criterion. The formula is \eqn{AIC = log\_lik - df}{AIC = log\_lik - df}.
 #' @field log_piik_fik Matrix of size \eqn{(n, K)} giving the values of the
 #'   logarithm of the joint probability \eqn{P(Y_{i}, \ zi = k)}{P(Yi, zi = k)},
 #'   \eqn{i = 1,\dots,n}.
@@ -138,27 +138,27 @@ StatStMoE <- setRefClass(
       Xi_nuk = sqrt(paramStMoE$nuk / pi) * (gamma(paramStMoE$nuk / 2 - 1 / 2)) / (gamma(paramStMoE$nuk / 2))
 
       # E[yi|xi,zi=k]
-      Ey_k <<- paramStMoE$phiBeta$XBeta[1:paramStMoE$fData$n,] %*% paramStMoE$beta + ones(paramStMoE$fData$n, 1) %*% (paramStMoE$delta * sqrt(paramStMoE$sigma) * Xi_nuk)
+      Ey_k <<- paramStMoE$phiBeta$XBeta[1:paramStMoE$fData$n,] %*% paramStMoE$beta + ones(paramStMoE$fData$n, 1) %*% (paramStMoE$delta * sqrt(paramStMoE$sigma2) * Xi_nuk)
 
       # E[yi|xi]
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
 
       # Var[yi|xi,zi=k]
-      Var_yk <<- (paramStMoE$nuk / (paramStMoE$nuk - 2) - (paramStMoE$delta ^ 2) * (Xi_nuk ^ 2)) * paramStMoE$sigma
+      Var_yk <<- (paramStMoE$nuk / (paramStMoE$nuk - 2) - (paramStMoE$delta ^ 2) * (Xi_nuk ^ 2)) * paramStMoE$sigma2
 
       # Var[yi|xi]
       Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramStMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
       # BIC, AIC and ICL
-      BIC <<- log_lik - (paramStMoE$nu * log(paramStMoE$fData$n * paramStMoE$fData$m) / 2)
-      AIC <<- log_lik - paramStMoE$nu
+      BIC <<- log_lik - (paramStMoE$df * log(paramStMoE$fData$n * paramStMoE$fData$m) / 2)
+      AIC <<- log_lik - paramStMoE$df
 
       ## CL(theta) : complete-data loglikelihood
       zik_log_piik_fk <- (repmat(z_ik, paramStMoE$fData$m, 1)) * log_piik_fik
       sum_zik_log_fik <- apply(zik_log_piik_fk, 1, sum)
       com_loglik <<- sum(sum_zik_log_fik)
 
-      ICL <<- com_loglik - (paramStMoE$nu * log(paramStMoE$fData$n * paramStMoE$fData$m) / 2)
+      ICL <<- com_loglik - (paramStMoE$df * log(paramStMoE$fData$n * paramStMoE$fData$m) / 2)
 
     },
 
@@ -170,9 +170,9 @@ StatStMoE <- setRefClass(
       mik <- zeros(paramStMoE$fData$n, paramStMoE$K)
 
       for (k in (1:paramStMoE$K)) {
-        dik[, k] <<- (paramStMoE$fData$Y - paramStMoE$phiBeta$XBeta %*% paramStMoE$beta[, k]) / sqrt(paramStMoE$sigma[k])
+        dik[, k] <<- (paramStMoE$fData$Y - paramStMoE$phiBeta$XBeta %*% paramStMoE$beta[, k]) / sqrt(paramStMoE$sigma2[k])
         mik[, k] <- paramStMoE$lambda[k] %*% dik[, k] * sqrt(paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2)
-        piik_fik[, k] <- piik[, k] * (2 / sqrt(paramStMoE$sigma[k])) * dt(dik[, k], paramStMoE$nuk[k]) * pt(mik[, k], paramStMoE$nuk[k] + 1)
+        piik_fik[, k] <- piik[, k] * (2 / sqrt(paramStMoE$sigma2[k])) * dt(dik[, k], paramStMoE$nuk[k]) * pt(mik[, k], paramStMoE$nuk[k] + 1)
       }
 
       stme_pdf <<- matrix(rowSums(piik_fik)) # Skew-t mixture of experts density
@@ -201,7 +201,7 @@ StatStMoE <- setRefClass(
 
 
         muk <- paramStMoE$phiBeta$XBeta %*% paramStMoE$beta[, k]
-        sigmak <- sqrt(paramStMoE$sigma[k])
+        sigmak <- sqrt(paramStMoE$sigma2[k])
         deltak <- paramStMoE$delta[k]
 
 

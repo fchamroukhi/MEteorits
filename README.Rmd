@@ -84,6 +84,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 
 # Generate sample of size n
 sample <- sampleUnivNMoE(alphak = alphak, betak = betak, sigmak = sigmak, x = x)
+y <- matrix(sample$y)
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
@@ -95,7 +96,7 @@ threshold <- 1e-5
 verbose <- TRUE
 verbose_IRLS <- FALSE
 
-nmoe <- emNMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
+nmoe <- emNMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
                threshold, verbose, verbose_IRLS)
 
 nmoe$plot()
@@ -142,6 +143,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 # Generate sample of size n
 sample <- sampleUnivTMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
                          nuk = nuk, x = x)
+y <- matrix(sample$y)
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
@@ -153,7 +155,7 @@ threshold <- 1e-5
 verbose <- TRUE
 verbose_IRLS <- FALSE
 
-tmoe <- emTMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
+tmoe <- emTMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
                threshold, verbose, verbose_IRLS)
 
 tmoe$plot()
@@ -200,6 +202,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 # Generate sample of size n
 sample <- sampleUnivSNMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
                           lambdak = lambdak, x = x)
+y <- matrix(sample$y)
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
@@ -211,7 +214,7 @@ threshold <- 1e-6
 verbose <- TRUE
 verbose_IRLS <- FALSE
 
-snmoe <- emSNMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
+snmoe <- emSNMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
                  threshold, verbose, verbose_IRLS)
 
 snmoe$plot()
@@ -258,6 +261,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 # Generate sample of size n
 sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
                           lambdak = lambdak, nuk = nuk, x = x)
+y <- matrix(sample$y)
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
@@ -269,7 +273,7 @@ threshold <- 1e-5
 verbose <- TRUE
 verbose_IRLS <- FALSE
 
-stmoe <- emStMoE(x, matrix(sample$y), K, p, q, n_tries, max_iter, 
+stmoe <- emStMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
                  threshold, verbose, verbose_IRLS)
 
 stmoe$plot()

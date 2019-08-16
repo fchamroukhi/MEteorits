@@ -7,12 +7,12 @@
 #' @field p The order of the polynomial regression.
 #' @field q The dimension of the logistic regression. For the purpose of
 #' segmentation, it must be set to 1.
-#' @field nu degree of freedom
+#' @field df degree of freedom
 #' @field alpha is the parameter vector of the logistic model with \eqn{alpha_K} being the null vector.
 #' @field beta is the vector of regression coefficients of component k,
 #' the updates for each of the expert component parameters consist in analytically solving a weighted
 #' Gaussian linear regression problem.
-#' @field sigma The variances for the \emph{K} mixture components.
+#' @field sigma2 The variances for the \emph{K} mixture components.
 #' @field delta the skewness parameter lambda (by equivalence delta)
 #' @seealso [FData]
 #' @export
@@ -26,11 +26,11 @@ ParamNMoE <- setRefClass(
     K = "numeric", # Number of regimes
     p = "numeric", # Dimension of beta (order of polynomial regression)
     q = "numeric", # Dimension of w (order of logistic regression)
-    nu = "numeric", # Degree of freedom
+    df = "numeric", # Degree of freedom
 
     alpha = "matrix",
     beta = "matrix",
-    sigma = "matrix"
+    sigma2 = "matrix"
   ),
   methods = list(
     initialize = function(fData = FData(numeric(1), matrix(1)), K = 1, p = 3, q = 1) {
@@ -43,11 +43,11 @@ ParamNMoE <- setRefClass(
       p <<- p
       q <<- q
 
-      nu <<- (p + q + 3) * K - (q + 1)
+      df <<- (q + 1) * (K - 1) + (p + 1) * K + K
 
       alpha <<- matrix(0, q + 1, K - 1)
       beta <<- matrix(NA, p + 1, K)
-      sigma <<- matrix(NA, 1, K)
+      sigma2 <<- matrix(NA, 1, K)
     },
 
     initParam = function(try_EM, segmental = FALSE) {
@@ -64,7 +64,7 @@ ParamNMoE <- setRefClass(
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% t(Xk) %*% yk
 
-          sigma[k] <<- sum((yk - Xk %*% beta[, k]) ^ 2) / length(yk)
+          sigma2[k] <<- sum((yk - Xk %*% beta[, k]) ^ 2) / length(yk)
         }
       } else {# Segmental : segment uniformly the data and estimate the parameters
 
@@ -82,7 +82,7 @@ ParamNMoE <- setRefClass(
 
           muk <- Xk %*% beta[, k, drop = FALSE]
 
-          sigma[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
+          sigma2[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
 
           klas[i:j] <- k
         }
@@ -114,7 +114,7 @@ ParamNMoE <- setRefClass(
         beta[, k] <<- solve((t(Xbeta) %*% Xbeta)) %*% (t(Xbeta) %*% yk)
 
         # Update the variances sigma2k
-        sigma[k] <<- sum(statNMoE$tik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(statNMoE$tik[, k])
+        sigma2[k] <<- sum(statNMoE$tik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(statNMoE$tik[, k])
 
       }
 

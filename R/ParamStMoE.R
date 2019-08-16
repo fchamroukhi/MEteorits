@@ -7,13 +7,13 @@
 #' @field p The order of the polynomial regression.
 #' @field q The dimension of the logistic regression. For the purpose of
 #'   segmentation, it must be set to 1.
-#' @field nu degree of freedom
+#' @field df degree of freedom
 #' @field alpha is the parameter vector of the logistic model with \eqn{alpha_K}
 #'   being the null vector.
 #' @field beta is the vector of regression coefficients of component k, the
 #'   updates for each of the expert component parameters consist in analytically
 #'   solving a weighted Gaussian linear regression problem.
-#' @field sigma The variances for the \emph{K} mixture component.
+#' @field sigma2 The variances for the \emph{K} mixture component.
 #' @field lambda skewness parameter
 #' @field delta the skewness parameter lambda (by equivalence delta)
 #' @field nuk degrees of freedom
@@ -29,11 +29,11 @@ ParamStMoE <- setRefClass(
     K = "numeric", # Number of components
     p = "numeric", # Dimension of beta (order of polynomial regression)
     q = "numeric", # Dimension of w (order of logistic regression)
-    nu = "numeric", # Degree of freedom
+    df = "numeric", # Degree of freedom
 
     alpha = "matrix",
     beta = "matrix",
-    sigma = "matrix",
+    sigma2 = "matrix",
     lambda = "matrix",
     delta = "matrix",
     nuk = "matrix"
@@ -45,21 +45,21 @@ ParamStMoE <- setRefClass(
       phiBeta <<- designmatrix(x = fData$X, p = p)
       phiAlpha <<- designmatrix(x = fData$X, p = q)
 
-      nu <<- (p + q + 3) * K - (q + 1)
+      df <<- (q + 1) * (K - 1) + (p + 1) * K + K + K + K
       K <<- K
       p <<- p
       q <<- q
 
       alpha <<- matrix(0, q + 1, K - 1)
       beta <<- matrix(NA, p + 1, K)
-      sigma <<- matrix(NA, 1, K)
+      sigma2 <<- matrix(NA, 1, K)
       lambda <<- matrix(NA, K)
       delta <<- matrix(NA, K)
     },
 
     initParam = function(try_EM, segmental = FALSE) {
       "Method to initialize parameters \\code{alpha}, \\code{beta} and
-      \\code{sigma}."
+      \\code{sigma2}."
 
       # Initialize the regression parameters (coefficents and variances):
       if (!segmental) {
@@ -73,7 +73,7 @@ ParamStMoE <- setRefClass(
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% t(Xk) %*% yk
 
-          sigma[k] <<- sum((yk - Xk %*% beta[, k]) ^ 2) / length(yk)
+          sigma2[k] <<- sum((yk - Xk %*% beta[, k]) ^ 2) / length(yk)
         }
       } else {# Segmental : segment uniformly the data and estimate the parameters
 
@@ -91,7 +91,7 @@ ParamStMoE <- setRefClass(
 
           muk <- Xk %*% beta[, k, drop = FALSE]
 
-          sigma[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
+          sigma2[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
 
           klas[i:j] <- k
         }
@@ -141,7 +141,7 @@ ParamStMoE <- setRefClass(
       if (calcSigma2) {
 
         for (k in 1:K) {
-          sigma[k] <<- sum(statStMoE$tik[, k] * (statStMoE$wik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2) - 2 * delta[k] * statStMoE$E1ik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) + statStMoE$E2ik[, k])) / (2 * (1 - delta[k] ^ 2) * sum(statStMoE$tik[, k]))
+          sigma2[k] <<- sum(statStMoE$tik[, k] * (statStMoE$wik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2) - 2 * delta[k] * statStMoE$E1ik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) + statStMoE$E2ik[, k])) / (2 * (1 - delta[k] ^ 2) * sum(statStMoE$tik[, k]))
         }
       }
 
@@ -153,10 +153,9 @@ ParamStMoE <- setRefClass(
             return((lmbda / sqrt(1 + lmbda ^ 2)) * (1 - (lmbda ^ 2 / (1 + lmbda ^ 2))) *
                      sum(statStMoE$tik[, k])
                    + (1 + (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statStMoE$tik[, k] * statStMoE$dik[, k] *
-                                                                 statStMoE$E1ik[, k] / sqrt(sigma[k]))
+                                                                 statStMoE$E1ik[, k] / sqrt(sigma2[k]))
                    - (lmbda / sqrt(1 + lmbda ^ 2)) * sum(statStMoE$tik[, k] * (
-                     statStMoE$wik[, k] * (statStMoE$dik[, k] ^ 2) + statStMoE$E2ik[, k] / (sqrt(sigma[k]) ^
-                                                                                              2)
+                     statStMoE$wik[, k] * (statStMoE$dik[, k] ^ 2) + statStMoE$E2ik[, k] / (sqrt(sigma2[k]) ^ 2)
                    ))
             )
           }, c(-100, 100), extendInt = "yes")$root,

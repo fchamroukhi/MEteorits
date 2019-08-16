@@ -21,15 +21,15 @@
 #' @field stored_loglik Numeric vector. Stored values of the log-likelihood at
 #'   each EM iteration.
 #' @field BIC Numeric. Value of the BIC (Bayesian Information Criterion)
-#'   criterion. The formula is \eqn{BIC = log\_lik - nu \times \textrm{log}(n) /
-#'   2}{BIC = log\_lik - nu x log(n) / 2} with \emph{nu} the degree of freedom
+#'   criterion. The formula is \eqn{BIC = log\_lik - df \times \textrm{log}(n) /
+#'   2}{BIC = log\_lik - df x log(n) / 2} with \emph{df} the degree of freedom
 #'   of the SNMoE model.
 #' @field ICL Numeric. Value of the ICL (Integrated Completed Likelihood)
-#'   criterion. The formula is \eqn{ICL = com\_loglik - nu \times
-#'   \textrm{log}(n) / 2}{ICL = com_loglik - nu x log(n) / 2} with \emph{nu} the
+#'   criterion. The formula is \eqn{ICL = com\_loglik - df \times
+#'   \textrm{log}(n) / 2}{ICL = com_loglik - df x log(n) / 2} with \emph{df} the
 #'   degree of freedom of the SNMoE model.
 #' @field AIC Numeric. Value of the AIC (Akaike Information Criterion)
-#'   criterion. The formula is \eqn{AIC = log\_lik - nu}{AIC = log\_lik - nu}.
+#'   criterion. The formula is \eqn{AIC = log\_lik - df}{AIC = log\_lik - df}.
 #' @field log_piik_fik Matrix of size \eqn{(n, K)} giving the values of the
 #'   logarithm of the joint probability \eqn{P(Y_{i}, \ zi = k)}{P(Yi, zi = k)},
 #'   \eqn{i = 1,\dots,n}.
@@ -123,28 +123,28 @@ StatSNMoE <- setRefClass(
     computeStats = function(paramSNMoE) {
 
       # E[yi|xi,zi=k]
-      Ey_k <<- paramSNMoE$phiBeta$XBeta[1:paramSNMoE$fData$n,] %*% paramSNMoE$beta + ones(paramSNMoE$fData$n, 1) %*% (sqrt(2 / pi) * paramSNMoE$delta * sqrt(paramSNMoE$sigma))
+      Ey_k <<- paramSNMoE$phiBeta$XBeta[1:paramSNMoE$fData$n,] %*% paramSNMoE$beta + ones(paramSNMoE$fData$n, 1) %*% (sqrt(2 / pi) * paramSNMoE$delta * sqrt(paramSNMoE$sigma2))
 
       # E[yi|xi]
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
 
       # Var[yi|xi,zi=k]
-      Var_yk <<- (1 - (2 / pi) * (paramSNMoE$delta ^ 2)) * paramSNMoE$sigma
+      Var_yk <<- (1 - (2 / pi) * (paramSNMoE$delta ^ 2)) * paramSNMoE$sigma2
 
       # Var[yi|xi]
       Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramSNMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
       # BIC, AIC and ICL
 
-      BIC <<- log_lik - (paramSNMoE$nu * log(paramSNMoE$fData$n * paramSNMoE$fData$m) / 2)
-      AIC <<- log_lik - paramSNMoE$nu
+      BIC <<- log_lik - (paramSNMoE$df * log(paramSNMoE$fData$n * paramSNMoE$fData$m) / 2)
+      AIC <<- log_lik - paramSNMoE$df
 
       # CL(theta) : complete-data loglikelihood
       zik_log_piik_fk <- (repmat(z_ik, paramSNMoE$fData$m, 1)) * log_piik_fik
       sum_zik_log_fik <- apply(zik_log_piik_fk, 1, sum)
       com_loglik <<- sum(sum_zik_log_fik)
 
-      ICL <<- com_loglik - (paramSNMoE$nu * log(paramSNMoE$fData$n * paramSNMoE$fData$m) / 2)
+      ICL <<- com_loglik - (paramSNMoE$df * log(paramSNMoE$fData$n * paramSNMoE$fData$m) / 2)
 
     },
 
@@ -159,12 +159,12 @@ StatSNMoE <- setRefClass(
       for (k in (1:paramSNMoE$K)) {
 
         muk <- paramSNMoE$phiBeta$XBeta %*% paramSNMoE$beta[, k]
-        sigma2k <- paramSNMoE$sigma[k]
+        sigma2k <- paramSNMoE$sigma2[k]
         sigmak <- sqrt(sigma2k)
         dik <- (paramSNMoE$fData$Y - muk) / sigmak
 
         mu_uk <- paramSNMoE$delta[k] * (paramSNMoE$fData$Y - muk)
-        sigma2_uk <- (1 - paramSNMoE$delta[k] ^ 2) * paramSNMoE$sigma[k]
+        sigma2_uk <- (1 - paramSNMoE$delta[k] ^ 2) * paramSNMoE$sigma2[k]
         sigma_uk <- sqrt(sigma2_uk)
 
         # E1ik = E[Ui|yi,xi,zik=1]

@@ -7,12 +7,12 @@
 #' @field p The order of the polynomial regression.
 #' @field q The dimension of the logistic regression. For the purpose of
 #' segmentation, it must be set to 1.
-#' @field nu degree of freedom
+#' @field df degree of freedom
 #' @field alpha is the parameter vector of the logistic model with \eqn{alpha_K} being the null vector.
 #' @field beta is the vector of regression coefficients of component k,
 #' the updates for each of the expert component parameters consist in analytically solving a weighted
 #' Gaussian linear regression problem.
-#' @field sigma The variances for the \emph{K} mixture component.
+#' @field sigma2 The variances for the \emph{K} mixture component.
 #' @field lambda skewness parameter
 #' @field delta the skewness parameter lambda (by equivalence delta)
 #' @seealso [FData]
@@ -27,11 +27,11 @@ ParamSNMoE <- setRefClass(
     K = "numeric", # Number of regimes
     p = "numeric", # Dimension of beta (order of polynomial regression)
     q = "numeric", # Dimension of w (order of logistic regression)
-    nu = "numeric", # Degree of freedom
+    df = "numeric", # Degree of freedom
 
     alpha = "matrix",
     beta = "matrix",
-    sigma = "matrix",
+    sigma2 = "matrix",
     lambda = "matrix",
     delta = "matrix"
   ),
@@ -42,14 +42,14 @@ ParamSNMoE <- setRefClass(
       phiBeta <<- designmatrix(x = fData$X, p = p)
       phiAlpha <<- designmatrix(x = fData$X, p = q)
 
-      nu <<- (p + q + 3) * K - (q + 1)
+      df <<- (q + 1) * (K - 1) + (p + 1) * K + K + K
       K <<- K
       p <<- p
       q <<- q
 
       alpha <<- matrix(0, q + 1, K - 1)
       beta <<- matrix(NA, p + 1, K)
-      sigma <<- matrix(NA, 1, K)
+      sigma2 <<- matrix(NA, 1, K)
       lambda <<- matrix(NA, K)
       delta <<- matrix(NA, K)
     },
@@ -68,7 +68,7 @@ ParamSNMoE <- setRefClass(
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% t(Xk) %*% yk
 
-          sigma[k] <<- sum((yk - Xk %*% beta[, k]) ^ 2) / length(yk)
+          sigma2[k] <<- sum((yk - Xk %*% beta[, k]) ^ 2) / length(yk)
         }
       } else {# Segmental : segment uniformly the data and estimate the parameters
 
@@ -86,7 +86,7 @@ ParamSNMoE <- setRefClass(
 
           muk <- Xk %*% beta[, k, drop = FALSE]
 
-          sigma[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
+          sigma2[k] <<- t(yk - muk) %*% (yk - muk) / length(yk)
 
           klas[i:j] <- k
         }
@@ -129,12 +129,12 @@ ParamSNMoE <- setRefClass(
         beta[, k] <<- solve((t(tauik_Xbeta) %*% phiBeta$XBeta)) %*% (t(tauik_Xbeta) %*% (fData$Y - delta[k] * statSNMoE$E1ik[, k]))
 
         # Update the variances sigma2k
-        sigma[k] <<- sum(statSNMoE$tik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2 - 2 * delta[k] * statSNMoE$E1ik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) + statSNMoE$E2ik[, k])) / (2 * (1 - delta[k] ^ 2) * sum(statSNMoE$tik[, k]))
+        sigma2[k] <<- sum(statSNMoE$tik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2 - 2 * delta[k] * statSNMoE$E1ik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) + statSNMoE$E2ik[, k])) / (2 * (1 - delta[k] ^ 2) * sum(statSNMoE$tik[, k]))
 
         # Update the lambdak (the skewness parameter)
         try(lambda[k] <<- uniroot(f <- function(lmbda) {
           return(
-            sigma[k] * (lmbda / sqrt(1 + lmbda ^ 2)) * (1 - (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statSNMoE$tik[, k]) + (1 + (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(
+            sigma2[k] * (lmbda / sqrt(1 + lmbda ^ 2)) * (1 - (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(statSNMoE$tik[, k]) + (1 + (lmbda ^ 2 / (1 + lmbda ^ 2))) * sum(
               statSNMoE$tik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) * statSNMoE$E1ik[, k]
             )
             - (lmbda / sqrt(1 + lmbda ^ 2)) * sum(statSNMoE$tik[, k] * (
