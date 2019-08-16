@@ -20,7 +20,7 @@ ParamNMoE contains all the parameters of a NMoE model.
 \item{\code{q}}{The dimension of the logistic regression. For the purpose of
 segmentation, it must be set to 1.}
 
-\item{\code{nu}}{degree of freedom}
+\item{\code{df}}{degree of freedom}
 
 \item{\code{alpha}}{is the parameter vector of the logistic model with \eqn{alpha_K} being the null vector.}
 
@@ -28,7 +28,7 @@ segmentation, it must be set to 1.}
 the updates for each of the expert component parameters consist in analytically solving a weighted
 Gaussian linear regression problem.}
 
-\item{\code{sigma}}{The variances for the \emph{K} mixture components.}
+\item{\code{sigma2}}{The variances for the \emph{K} mixture components.}
 
 \item{\code{delta}}{the skewness parameter lambda (by equivalence delta)}
 }}

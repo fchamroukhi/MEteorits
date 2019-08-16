@@ -3,18 +3,27 @@ Package: meteorits
 Title: Mixtures-of-Experts Modeling for Complex and Non-Normal Distributions ('MEteorits')
 Version: 0.1.0
 Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
-    email = "faicel.chamroukhi@unicaen.fr",
-    comment = c(ORCID = "0000-0002-5894-3103")),
-    person("Marius", "Bartcus", role = c("aut"), 
-    email = "marius.bartcus@gmail.com"),
-    person("Florian", "Lecocq", role = c("aut", "cre"),
-    email = "florian.lecocq@outlook.com"))
+    comment = c(ORCID = "0000-0002-5894-3103"),
+    email = "faicel.chamroukhi@unicaen.fr"),
+    person("Florian", "Lecocq", role = c("aut","trl","cre"), comment = "R port",
+    email = "florian.lecocq@outlook.com"),
+    person("Marius", "Bartcus", role = c("aut","trl"), comment = "R port",
+    email = "marius.bartcus@gmail.com"))
 Description: Provides several original and flexible mixtures-of-experts models 
     to model, cluster and classify heterogeneous data in many complex 
     situations where the data are distributed according to non-normal, 
     possibly skewed distributions, and when they might be corrupted by 
-    atypical observations. The toolbox also contains sparse mixture-of-experts 
-    models for high-dimensional data.
+    atypical observations. Mixtures-of-Experts Models for Complex and 
+    Non-Normal Distributions ('MEteorits') are originally introduced and 
+    written in 'Matlab' by Faicel Chamroukhi. The references are mainly the 
+    following ones.
+    Chamroukhi F., Same A., Govaert, G. and Aknin P. (2009) <doi:10.1016/j.neunet.2009.06.040>.
+    Chamroukhi F. (2010) <https://chamroukhi.com/FChamroukhi-PhD.pdf>.
+    Chamroukhi F. (2015) <arXiv:1506.06707>.
+    Chamroukhi F. (2015) <https://chamroukhi.com/FChamroukhi-HDR.pdf>.
+    Chamroukhi F. (2016) <doi:10.1109/IJCNN.2016.7727580>.
+    Chamroukhi F. (2016) <doi:10.1016/j.neunet.2016.03.002>.
+    Chamroukhi F. (2017) <doi:10.1016/j.neucom.2017.05.044>.
 URL: https://github.com/fchamroukhi/MEteorits
 BugReports: https://github.com/fchamroukhi/MEteorits/issues
 License: GPL (>= 3)

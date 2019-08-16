@@ -42,17 +42,17 @@ obtained by the Maximum a posteriori (MAP) rule: \eqn{z_{ik} = 1 \
 each EM iteration.}
 
 \item{\code{BIC}}{Numeric. Value of the BIC (Bayesian Information Criterion)
-criterion. The formula is \eqn{BIC = log\_lik - nu \times \textrm{log}(n) /
-  2}{BIC = log\_lik - nu x log(n) / 2} with \emph{nu} the degree of freedom
+criterion. The formula is \eqn{BIC = log\_lik - df \times \textrm{log}(n) /
+  2}{BIC = log\_lik - df x log(n) / 2} with \emph{df} the degree of freedom
 of the TMoE model.}
 
 \item{\code{ICL}}{Numeric. Value of the ICL (Integrated Completed Likelihood)
-criterion. The formula is \eqn{ICL = com\_loglik - nu \times
-  \textrm{log}(n) / 2}{ICL = com_loglik - nu x log(n) / 2} with \emph{nu} the
+criterion. The formula is \eqn{ICL = com\_loglik - df \times
+  \textrm{log}(n) / 2}{ICL = com_loglik - df x log(n) / 2} with \emph{df} the
 degree of freedom of the TMoE model.}
 
 \item{\code{AIC}}{Numeric. Value of the AIC (Akaike Information Criterion)
-criterion. The formula is \eqn{AIC = log\_lik - nu}{AIC = log\_lik - nu}.}
+criterion. The formula is \eqn{AIC = log\_lik - df}{AIC = log\_lik - df}.}
 
 \item{\code{log_piik_fik}}{Matrix of size \eqn{(n, K)} giving the values of the
 logarithm of the joint probability \eqn{P(Y_{i}, \ zi = k)}{P(Yi, zi = k)},

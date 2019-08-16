@@ -20,7 +20,7 @@ ParamTMoE contains all the parameters of a TMoE model.
 \item{\code{q}}{The dimension of the logistic regression. For the purpose of
 segmentation, it must be set to 1.}
 
-\item{\code{nu}}{degree of freedom}
+\item{\code{df}}{degree of freedom}
 
 \item{\code{alpha}}{is the parameter vector of the logistic model with \eqn{alpha_K} being the null vector.}
 
@@ -28,16 +28,16 @@ segmentation, it must be set to 1.}
 the updates for each of the expert component parameters consist in analytically solving a weighted
 Gaussian linear regression problem.}
 
-\item{\code{sigma}}{The variances for the \emph{K} mixture component.}
+\item{\code{sigma2}}{The variances for the \emph{K} mixture component.}
 
-\item{\code{nuk}}{degrees of freedom}
+\item{\code{nu}}{degrees of freedom}
 }}
 
 \section{Methods}{
 
 \describe{
 \item{\code{initParam(try_EM, segmental = FALSE)}}{Method to initialize parameters \code{alpha}, \code{beta} and
-\code{sigma}.}
+\code{sigma2}.}
 }}
 
 \seealso{
