@@ -86,5 +86,5 @@ appartient ?? la classe k (au sens du MAP) et zero sinon.}
 }}
 
 \seealso{
-\link{ParamNMoE}, \link{FData}
+\link{ParamNMoE}
 }

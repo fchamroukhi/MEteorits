@@ -40,7 +40,7 @@
 #' @field tik Matrix of size \eqn{(n, K)} giving the posterior probability that
 #'   \eqn{Y_{i}}{Yi} originates from the \eqn{k}-th regression model \eqn{P(zi =
 #'   k | Y, W, \beta)}.
-#' @seealso [ParamNMoE], [FData]
+#' @seealso [ParamNMoE]
 #' @export
 StatNMoE <- setRefClass(
   "StatNMoE",
@@ -65,23 +65,23 @@ StatNMoE <- setRefClass(
   ),
   methods = list(
     initialize = function(paramNMoE = ParamNMoE()) {
-      piik <<- matrix(NA, paramNMoE$fData$n, paramNMoE$K)
-      z_ik <<- matrix(NA, paramNMoE$fData$n, paramNMoE$K)
-      klas <<- matrix(NA, paramNMoE$fData$n, 1)
-      Wik <<- matrix(0, paramNMoE$fData$n * paramNMoE$fData$m, paramNMoE$K)
-      Ey_k <<- matrix(NA, paramNMoE$fData$n, paramNMoE$K)
-      Ey <<- matrix(NA, paramNMoE$fData$n, 1)
+      piik <<- matrix(NA, paramNMoE$n, paramNMoE$K)
+      z_ik <<- matrix(NA, paramNMoE$n, paramNMoE$K)
+      klas <<- matrix(NA, paramNMoE$n, 1)
+      Wik <<- matrix(0, paramNMoE$n, paramNMoE$K)
+      Ey_k <<- matrix(NA, paramNMoE$n, paramNMoE$K)
+      Ey <<- matrix(NA, paramNMoE$n, 1)
       Var_yk <<- matrix(NA, 1, paramNMoE$K)
-      Vary <<- matrix(NA, paramNMoE$fData$n, 1)
+      Vary <<- matrix(NA, paramNMoE$n, 1)
       log_lik <<- -Inf
       com_loglik <<- -Inf
       stored_loglik <<- numeric()
       BIC <<- -Inf
       ICL <<- -Inf
       AIC <<- -Inf
-      log_piik_fik <<- matrix(0, paramNMoE$fData$n, paramNMoE$K)
-      log_sum_piik_fik <<- matrix(NA, paramNMoE$fData$n, 1)
-      tik <<- matrix(0, paramNMoE$fData$n, paramNMoE$K)
+      log_piik_fik <<- matrix(0, paramNMoE$n, paramNMoE$K)
+      log_sum_piik_fik <<- matrix(NA, paramNMoE$n, 1)
+      tik <<- matrix(0, paramNMoE$n, paramNMoE$K)
     },
 
     MAP = function() {
@@ -120,7 +120,7 @@ StatNMoE <- setRefClass(
     computeStats = function(paramNMoE) {
 
       # E[yi|xi,zi=k]
-      Ey_k <<- paramNMoE$phiBeta$XBeta[1:paramNMoE$fData$n,] %*% paramNMoE$beta
+      Ey_k <<- paramNMoE$phiBeta$XBeta[1:paramNMoE$n,] %*% paramNMoE$beta
 
       # E[yi|xi]
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
@@ -129,32 +129,32 @@ StatNMoE <- setRefClass(
       Var_yk <<- paramNMoE$sigma2
 
       # Var[yi|xi]
-      Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramNMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
+      Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramNMoE$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
       # BIC, AIC and ICL
-      BIC <<- log_lik - (paramNMoE$df * log(paramNMoE$fData$n * paramNMoE$fData$m) / 2)
+      BIC <<- log_lik - (paramNMoE$df * log(paramNMoE$n) / 2)
       AIC <<- log_lik - paramNMoE$df
 
       # CL(theta) : complete-data loglikelihood
-      zik_log_piik_fk <- (repmat(z_ik, paramNMoE$fData$m, 1)) * log_piik_fik
+      zik_log_piik_fk <- z_ik * log_piik_fik
       sum_zik_log_fik <- apply(zik_log_piik_fk, 1, sum)
       com_loglik <<- sum(sum_zik_log_fik)
 
-      ICL <<- com_loglik - (paramNMoE$df * log(paramNMoE$fData$n * paramNMoE$fData$m) / 2)
+      ICL <<- com_loglik - (paramNMoE$df * log(paramNMoE$n) / 2)
 
     },
 
     EStep = function(paramNMoE) {
 
-      piik <<- multinomialLogit(paramNMoE$alpha, paramNMoE$phiAlpha$XBeta, ones(paramNMoE$fData$n, paramNMoE$K), ones(paramNMoE$fData$n, 1))$piik
-      piik_fik <- zeros(paramNMoE$fData$m * paramNMoE$fData$n, paramNMoE$K)
+      piik <<- multinomialLogit(paramNMoE$alpha, paramNMoE$phiAlpha$XBeta, ones(paramNMoE$n, paramNMoE$K), ones(paramNMoE$n, 1))$piik
+      piik_fik <- zeros(paramNMoE$n, paramNMoE$K)
 
       for (k in (1:paramNMoE$K)) {
 
         muk <- paramNMoE$phiBeta$XBeta %*% paramNMoE$beta[, k]
         sigma2k <- paramNMoE$sigma2[k]
 
-        log_piik_fik[, k] <<- log(piik[, k]) - 0.5 * log(2 * pi) - 0.5 * log(sigma2k) - 0.5 * ((paramNMoE$fData$Y - muk) ^ 2) / sigma2k
+        log_piik_fik[, k] <<- log(piik[, k]) - 0.5 * log(2 * pi) - 0.5 * log(sigma2k) - 0.5 * ((paramNMoE$Y - muk) ^ 2) / sigma2k
       }
 
       log_sum_piik_fik <<- matrix(log(rowSums(exp(log_piik_fik))))

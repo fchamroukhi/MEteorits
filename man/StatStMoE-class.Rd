@@ -100,5 +100,5 @@ appartient et la classe k (au sens du MAP) et zero sinon.}
 }}
 
 \seealso{
-\link{ParamStMoE}, \link{FData}
+\link{ParamStMoE}
 }

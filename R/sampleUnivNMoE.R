@@ -46,9 +46,9 @@ sampleUnivNMoE <- function(alphak, betak, sigmak, x) {
   XBeta <- designmatrix(x, p, q)$XBeta # For the polynomial regression
   XAlpha <- designmatrix(x, p, q)$Xw # For the logistic regression
 
-  y <- zeros(n, 1)
+  y <- rep.int(x = 0, times = n)
   z <- zeros(n, K)
-  zi <- rep.int(x = 0, times = K)
+  zi <- rep.int(x = 0, times = n)
 
   # Calculate the mixing proportions piik:
   piik <- multinomialLogit(alphak, XAlpha, zeros(n, K), ones(n, 1))$piik

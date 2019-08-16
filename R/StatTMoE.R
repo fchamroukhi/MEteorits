@@ -40,7 +40,7 @@
 #' @field tik Matrix of size \eqn{(n, K)} giving the posterior probability that
 #'   \eqn{Y_{i}}{Yi} originates from the \eqn{k}-th regression model \eqn{P(zi =
 #'   k | Y, W, \beta)}.
-#' @seealso [ParamTMoE], [FData]
+#' @seealso [ParamTMoE]
 #' @export
 StatTMoE <- setRefClass(
   "StatTMoE",
@@ -65,23 +65,23 @@ StatTMoE <- setRefClass(
   ),
   methods = list(
     initialize = function(paramTMoE = ParamTMoE()) {
-      piik <<- matrix(NA, paramTMoE$fData$n, paramTMoE$K)
-      z_ik <<- matrix(NA, paramTMoE$fData$n, paramTMoE$K)
-      klas <<- matrix(NA, paramTMoE$fData$n, 1)
-      Wik <<- matrix(0, paramTMoE$fData$n * paramTMoE$fData$m, paramTMoE$K)
-      Ey_k <<- matrix(NA, paramTMoE$fData$n, paramTMoE$K)
-      Ey <<- matrix(NA, paramTMoE$fData$n, 1)
+      piik <<- matrix(NA, paramTMoE$n, paramTMoE$K)
+      z_ik <<- matrix(NA, paramTMoE$n, paramTMoE$K)
+      klas <<- matrix(NA, paramTMoE$n, 1)
+      Wik <<- matrix(0, paramTMoE$n, paramTMoE$K)
+      Ey_k <<- matrix(NA, paramTMoE$n, paramTMoE$K)
+      Ey <<- matrix(NA, paramTMoE$n, 1)
       Var_yk <<- matrix(NA, 1, paramTMoE$K)
-      Vary <<- matrix(NA, paramTMoE$fData$n, 1)
+      Vary <<- matrix(NA, paramTMoE$n, 1)
       log_lik <<- -Inf
       com_loglik <<- -Inf
       stored_loglik <<- numeric()
       BIC <<- -Inf
       ICL <<- -Inf
       AIC <<- -Inf
-      log_piik_fik <<- matrix(0, paramTMoE$fData$n, paramTMoE$K)
-      log_sum_piik_fik <<- matrix(NA, paramTMoE$fData$n, 1)
-      tik <<- matrix(0, paramTMoE$fData$n, paramTMoE$K)
+      log_piik_fik <<- matrix(0, paramTMoE$n, paramTMoE$K)
+      log_sum_piik_fik <<- matrix(NA, paramTMoE$n, 1)
+      tik <<- matrix(0, paramTMoE$n, paramTMoE$K)
     },
 
     MAP = function() {
@@ -120,7 +120,7 @@ StatTMoE <- setRefClass(
     computeStats = function(paramTMoE) {
 
       # E[yi|xi,zi=k]
-      Ey_k <<- paramTMoE$phiBeta$XBeta[1:paramTMoE$fData$n,] %*% paramTMoE$beta
+      Ey_k <<- paramTMoE$phiBeta$XBeta[1:paramTMoE$n,] %*% paramTMoE$beta
 
       # E[yi|xi]
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
@@ -129,39 +129,39 @@ StatTMoE <- setRefClass(
       Var_yk <<- paramTMoE$df / (paramTMoE$df - 2) * paramTMoE$sigma2
 
       # Var[yi|xi]
-      Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramTMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
+      Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramTMoE$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
       # BIC, AIC and ICL
-      BIC <<- log_lik - (paramTMoE$df * log(paramTMoE$fData$n * paramTMoE$fData$m) / 2)
+      BIC <<- log_lik - (paramTMoE$df * log(paramTMoE$n) / 2)
       AIC <<- log_lik - paramTMoE$df
 
       # CL(theta) : complete-data loglikelihood
-      zik_log_piik_fk <- (repmat(z_ik, paramTMoE$fData$m, 1)) * log_piik_fik
+      zik_log_piik_fk <- z_ik * log_piik_fik
       sum_zik_log_fik <- apply(zik_log_piik_fk, 1, sum)
       com_loglik <<- sum(sum_zik_log_fik)
 
-      ICL <<- com_loglik - (paramTMoE$df * log(paramTMoE$fData$n * paramTMoE$fData$m) / 2)
+      ICL <<- com_loglik - (paramTMoE$df * log(paramTMoE$n) / 2)
 
     },
 
     EStep = function(paramTMoE) {
 
-      piik <<- multinomialLogit(paramTMoE$alpha, paramTMoE$phiAlpha$XBeta, ones(paramTMoE$fData$n, paramTMoE$K), ones(paramTMoE$fData$n, 1))$piik
+      piik <<- multinomialLogit(paramTMoE$alpha, paramTMoE$phiAlpha$XBeta, ones(paramTMoE$n, paramTMoE$K), ones(paramTMoE$n, 1))$piik
 
-      piik_fik <- zeros(paramTMoE$fData$m * paramTMoE$fData$n, paramTMoE$K)
+      piik_fik <- zeros(paramTMoE$n, paramTMoE$K)
 
       for (k in (1:paramTMoE$K)) {
 
         muk <- paramTMoE$phiBeta$XBeta %*% paramTMoE$beta[, k]
         sigma2k <- paramTMoE$sigma2[k]
         sigmak <- sqrt(sigma2k)
-        dik <- (paramTMoE$fData$Y - muk) / sigmak
+        dik <- (paramTMoE$Y - muk) / sigmak
 
         nuk <- paramTMoE$nu[k]
         Wik[, k] <<- (nuk + 1) / (nuk + dik ^ 2)
 
         # Weighted t linear expert likelihood
-        piik_fik[, k] <- piik[, k] *  (1 / sigmak * dt((paramTMoE$fData$Y - muk) / sigmak, nuk)) #pdf('tlocationscale', y, muk, sigmak, nuk);
+        piik_fik[, k] <- piik[, k] *  (1 / sigmak * dt((paramTMoE$Y - muk) / sigmak, nuk)) #pdf('tlocationscale', y, muk, sigmak, nuk);
       }
 
       log_piik_fik <<- log(piik_fik)

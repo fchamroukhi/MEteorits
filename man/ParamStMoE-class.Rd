@@ -11,7 +11,13 @@ ParamMRHLP contains all the parameters of a MRHLP model.
 \section{Fields}{
 
 \describe{
-\item{\code{fData}}{\link{FData} object representing the sample.}
+\item{\code{X}}{Numeric vector of length \emph{n} representing the covariates/inputs
+\eqn{x_{1},\dots,x_{n}}.}
+
+\item{\code{Y}}{Numeric vector of length \emph{n} representing the observed
+response/output \eqn{y_{1},\dots,y_{n}}.}
+
+\item{\code{n}}{Numeric. Length of the response/output vector \code{Y}.}
 
 \item{\code{K}}{The number of mixture components.}
 
@@ -49,6 +55,3 @@ solving a weighted Gaussian linear regression problem.}
 based on statistics provided by \code{statStMoE}.}
 }}
 
-\seealso{
-\link{FData}
-}

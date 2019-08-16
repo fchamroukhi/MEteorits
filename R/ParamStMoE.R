@@ -2,7 +2,11 @@
 #'
 #' ParamMRHLP contains all the parameters of a MRHLP model.
 #'
-#' @field fData [FData][FData] object representing the sample.
+#' @field X Numeric vector of length \emph{n} representing the covariates/inputs
+#'   \eqn{x_{1},\dots,x_{n}}.
+#' @field Y Numeric vector of length \emph{n} representing the observed
+#'   response/output \eqn{y_{1},\dots,y_{n}}.
+#' @field n Numeric. Length of the response/output vector `Y`.
 #' @field K The number of mixture components.
 #' @field p The order of the polynomial regression.
 #' @field q The dimension of the logistic regression. For the purpose of
@@ -17,12 +21,14 @@
 #' @field lambda skewness parameter
 #' @field delta the skewness parameter lambda (by equivalence delta)
 #' @field nuk degrees of freedom
-#' @seealso [FData]
 #' @export
 ParamStMoE <- setRefClass(
   "ParamStMoE",
   fields = list(
-    fData = "FData",
+
+    X = "numeric",
+    Y = "numeric",
+    n = "numeric",
     phiBeta = "list",
     phiAlpha = "list",
 
@@ -39,11 +45,13 @@ ParamStMoE <- setRefClass(
     nuk = "matrix"
   ),
   methods = list(
-    initialize = function(fData = FData(numeric(1), matrix(1)), K = 1, p = 3, q = 1) {
-      fData <<- fData
+    initialize = function(X = numeric(), Y = numeric(1), K = 1, p = 3, q = 1) {
 
-      phiBeta <<- designmatrix(x = fData$X, p = p)
-      phiAlpha <<- designmatrix(x = fData$X, p = q)
+      X <<- X
+      Y <<- Y
+      n <<- length(Y)
+      phiBeta <<- designmatrix(x = X, p = p)
+      phiAlpha <<- designmatrix(x = X, p = q)
 
       df <<- (q + 1) * (K - 1) + (p + 1) * K + K + K + K
       K <<- K
@@ -64,12 +72,12 @@ ParamStMoE <- setRefClass(
       # Initialize the regression parameters (coefficents and variances):
       if (!segmental) {
 
-        klas <- sample(1:K, fData$n, replace = TRUE)
+        klas <- sample(1:K, n, replace = TRUE)
 
         for (k in 1:K) {
 
           Xk <- phiBeta$XBeta[klas == k,]
-          yk <- fData$Y[klas == k]
+          yk <- Y[klas == k]
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% t(Xk) %*% yk
 
@@ -77,14 +85,14 @@ ParamStMoE <- setRefClass(
         }
       } else {# Segmental : segment uniformly the data and estimate the parameters
 
-        nk <- round(fData$n / K) - 1
+        nk <- round(n / K) - 1
 
-        klas <- rep.int(0, fData$n)
+        klas <- rep.int(0, n)
 
         for (k in 1:K) {
           i <- (k - 1) * nk + 1
           j <- (k * nk)
-          yk <- matrix(fData$Y[i:j])
+          yk <- matrix(Y[i:j])
           Xk <- phiBeta$XBeta[i:j, ]
 
           beta[, k] <<- solve(t(Xk) %*% Xk, tol = 0) %*% (t(Xk) %*% yk)
@@ -98,8 +106,8 @@ ParamStMoE <- setRefClass(
       }
 
       # Intialize the softmax parameters
-      Z <- matrix(0, nrow = fData$n, ncol = K)
-      Z[klas %*% ones(1, K) == ones(fData$n, 1) %*% seq(K)] <- 1
+      Z <- matrix(0, nrow = n, ncol = K)
+      Z[klas %*% ones(1, K) == ones(n, 1) %*% seq(K)] <- 1
       tau <- Z
       res <- IRLS(phiAlpha$XBeta, tau, ones(nrow(tau), 1), alpha)
       alpha <<- res$W
@@ -131,7 +139,7 @@ ParamStMoE <- setRefClass(
         for (k in 1:K) {
           TauikWik <- (statStMoE$tik[, k] * statStMoE$wik[, k]) %*% ones(1, p + 1)
           TauikX <- phiBeta$XBeta * (statStMoE$tik[, k] %*% ones(1, p + 1))
-          betak <- solve((t(TauikWik * phiBeta$XBeta) %*% phiBeta$XBeta), tol = 0) %*% (t(TauikX) %*% ((statStMoE$wik[, k] * fData$Y) - (delta[k] * statStMoE$E1ik[, k])))
+          betak <- solve((t(TauikWik * phiBeta$XBeta) %*% phiBeta$XBeta), tol = 0) %*% (t(TauikX) %*% ((statStMoE$wik[, k] * Y) - (delta[k] * statStMoE$E1ik[, k])))
           beta[, k] <<- betak
         }
 
@@ -141,7 +149,7 @@ ParamStMoE <- setRefClass(
       if (calcSigma2) {
 
         for (k in 1:K) {
-          sigma2[k] <<- sum(statStMoE$tik[, k] * (statStMoE$wik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2) - 2 * delta[k] * statStMoE$E1ik[, k] * (fData$Y - phiBeta$XBeta %*% beta[, k]) + statStMoE$E2ik[, k])) / (2 * (1 - delta[k] ^ 2) * sum(statStMoE$tik[, k]))
+          sigma2[k] <<- sum(statStMoE$tik[, k] * (statStMoE$wik[, k] * ((Y - phiBeta$XBeta %*% beta[, k]) ^ 2) - 2 * delta[k] * statStMoE$E1ik[, k] * (Y - phiBeta$XBeta %*% beta[, k]) + statStMoE$E2ik[, k])) / (2 * (1 - delta[k] ^ 2) * sum(statStMoE$tik[, k]))
         }
       }
 

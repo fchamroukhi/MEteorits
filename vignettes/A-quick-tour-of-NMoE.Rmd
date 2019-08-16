@@ -57,7 +57,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 
 # Generate sample of size n
 sample <- sampleUnivNMoE(alphak = alphak, betak = betak, sigmak = sigmak, x = x)
-y <- matrix(sample$y)
+y <- sample$y
 ```
 
 ## Set up tMoE model parameters
@@ -118,7 +118,7 @@ nmoe$plot(what = "loglikelihood")
 ```{r}
 data("tempanomalies")
 x <- tempanomalies$Year
-y <- as.matrix(tempanomalies$AnnualAnomaly)
+y <- tempanomalies$AnnualAnomaly
 ```
 
 ## Set up tMoE model parameters

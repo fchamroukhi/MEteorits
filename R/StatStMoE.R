@@ -45,7 +45,7 @@
 #' @field E1ik To define.
 #' @field E2ik To define.
 #' @field E3ik To define.
-#' @seealso [ParamStMoE], [FData]
+#' @seealso [ParamStMoE]
 #' @export
 StatStMoE <- setRefClass(
   "StatStMoE",
@@ -75,28 +75,28 @@ StatStMoE <- setRefClass(
   ),
   methods = list(
     initialize = function(paramStMoE = ParamStMoE()) {
-      piik <<- matrix(NA, paramStMoE$fData$n, paramStMoE$K)
-      z_ik <<- matrix(NA, paramStMoE$fData$n, paramStMoE$K)
-      klas <<- matrix(NA, paramStMoE$fData$n, 1)
-      Ey_k <<- matrix(NA, paramStMoE$fData$n, paramStMoE$K)
-      Ey <<- matrix(NA, paramStMoE$fData$n, 1)
+      piik <<- matrix(NA, paramStMoE$n, paramStMoE$K)
+      z_ik <<- matrix(NA, paramStMoE$n, paramStMoE$K)
+      klas <<- matrix(NA, paramStMoE$n, 1)
+      Ey_k <<- matrix(NA, paramStMoE$n, paramStMoE$K)
+      Ey <<- matrix(NA, paramStMoE$n, 1)
       Var_yk <<- matrix(NA, 1, paramStMoE$K)
-      Vary <<- matrix(NA, paramStMoE$fData$n, 1)
+      Vary <<- matrix(NA, paramStMoE$n, 1)
       log_lik <<- -Inf
       com_loglik <<- -Inf
       stored_loglik <<- numeric()
       BIC <<- -Inf
       ICL <<- -Inf
       AIC <<- -Inf
-      log_piik_fik <<- matrix(0, paramStMoE$fData$n, paramStMoE$K)
-      log_sum_piik_fik <<- matrix(NA, paramStMoE$fData$n, 1)
-      tik <<- matrix(0, paramStMoE$fData$n, paramStMoE$K)
-      wik <<- matrix(0, paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
-      dik <<- matrix(0, paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
-      stme_pdf <<- matrix(0, paramStMoE$fData$n, 1)
-      E1ik <<- matrix(0, paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
-      E2ik <<- matrix(0, paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
-      E3ik <<- matrix(0, paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
+      log_piik_fik <<- matrix(0, paramStMoE$n, paramStMoE$K)
+      log_sum_piik_fik <<- matrix(NA, paramStMoE$n, 1)
+      tik <<- matrix(0, paramStMoE$n, paramStMoE$K)
+      wik <<- matrix(0, paramStMoE$n, paramStMoE$K)
+      dik <<- matrix(0, paramStMoE$n, paramStMoE$K)
+      stme_pdf <<- matrix(0, paramStMoE$n, 1)
+      E1ik <<- matrix(0, paramStMoE$n, paramStMoE$K)
+      E2ik <<- matrix(0, paramStMoE$n, paramStMoE$K)
+      E3ik <<- matrix(0, paramStMoE$n, paramStMoE$K)
     },
 
     MAP = function() {
@@ -138,7 +138,7 @@ StatStMoE <- setRefClass(
       Xi_nuk = sqrt(paramStMoE$nuk / pi) * (gamma(paramStMoE$nuk / 2 - 1 / 2)) / (gamma(paramStMoE$nuk / 2))
 
       # E[yi|xi,zi=k]
-      Ey_k <<- paramStMoE$phiBeta$XBeta[1:paramStMoE$fData$n,] %*% paramStMoE$beta + ones(paramStMoE$fData$n, 1) %*% (paramStMoE$delta * sqrt(paramStMoE$sigma2) * Xi_nuk)
+      Ey_k <<- paramStMoE$phiBeta$XBeta[1:paramStMoE$n,] %*% paramStMoE$beta + ones(paramStMoE$n, 1) %*% (paramStMoE$delta * sqrt(paramStMoE$sigma2) * Xi_nuk)
 
       # E[yi|xi]
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
@@ -147,30 +147,30 @@ StatStMoE <- setRefClass(
       Var_yk <<- (paramStMoE$nuk / (paramStMoE$nuk - 2) - (paramStMoE$delta ^ 2) * (Xi_nuk ^ 2)) * paramStMoE$sigma2
 
       # Var[yi|xi]
-      Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramStMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
+      Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramStMoE$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
       # BIC, AIC and ICL
-      BIC <<- log_lik - (paramStMoE$df * log(paramStMoE$fData$n * paramStMoE$fData$m) / 2)
+      BIC <<- log_lik - (paramStMoE$df * log(paramStMoE$n) / 2)
       AIC <<- log_lik - paramStMoE$df
 
       ## CL(theta) : complete-data loglikelihood
-      zik_log_piik_fk <- (repmat(z_ik, paramStMoE$fData$m, 1)) * log_piik_fik
+      zik_log_piik_fk <- z_ik * log_piik_fik
       sum_zik_log_fik <- apply(zik_log_piik_fk, 1, sum)
       com_loglik <<- sum(sum_zik_log_fik)
 
-      ICL <<- com_loglik - (paramStMoE$df * log(paramStMoE$fData$n * paramStMoE$fData$m) / 2)
+      ICL <<- com_loglik - (paramStMoE$df * log(paramStMoE$n) / 2)
 
     },
 
     univStMoEpdf = function(paramStMoE) {
-      piik <<- multinomialLogit(paramStMoE$alpha, paramStMoE$phiAlpha$XBeta, ones(paramStMoE$fData$n, paramStMoE$K), ones(paramStMoE$fData$n, 1))$piik
+      piik <<- multinomialLogit(paramStMoE$alpha, paramStMoE$phiAlpha$XBeta, ones(paramStMoE$n, paramStMoE$K), ones(paramStMoE$n, 1))$piik
 
-      piik_fik <- zeros(paramStMoE$fData$n, paramStMoE$K)
-      dik <<- zeros(paramStMoE$fData$n, paramStMoE$K)
-      mik <- zeros(paramStMoE$fData$n, paramStMoE$K)
+      piik_fik <- zeros(paramStMoE$n, paramStMoE$K)
+      dik <<- zeros(paramStMoE$n, paramStMoE$K)
+      mik <- zeros(paramStMoE$n, paramStMoE$K)
 
       for (k in (1:paramStMoE$K)) {
-        dik[, k] <<- (paramStMoE$fData$Y - paramStMoE$phiBeta$XBeta %*% paramStMoE$beta[, k]) / sqrt(paramStMoE$sigma2[k])
+        dik[, k] <<- (paramStMoE$Y - paramStMoE$phiBeta$XBeta %*% paramStMoE$beta[, k]) / sqrt(paramStMoE$sigma2[k])
         mik[, k] <- paramStMoE$lambda[k] %*% dik[, k] * sqrt(paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2)
         piik_fik[, k] <- piik[, k] * (2 / sqrt(paramStMoE$sigma2[k])) * dt(dik[, k], paramStMoE$nuk[k]) * pt(mik[, k], paramStMoE$nuk[k] + 1)
       }
@@ -184,14 +184,14 @@ StatStMoE <- setRefClass(
 
       if (calcTau) {
 
-        piik <<- multinomialLogit(paramStMoE$alpha, paramStMoE$phiAlpha$XBeta, ones(paramStMoE$fData$n, paramStMoE$K), ones(paramStMoE$fData$n, 1))$piik
-        piik_fik <- zeros(paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
+        piik <<- multinomialLogit(paramStMoE$alpha, paramStMoE$phiAlpha$XBeta, ones(paramStMoE$n, paramStMoE$K), ones(paramStMoE$n, 1))$piik
+        piik_fik <- zeros(paramStMoE$n, paramStMoE$K)
       }
 
-      dik <<- zeros(paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
-      mik <- zeros(paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
-      wik <<- zeros(paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
-      Integgtx <- zeros(paramStMoE$fData$m * paramStMoE$fData$n, paramStMoE$K)
+      dik <<- zeros(paramStMoE$n, paramStMoE$K)
+      mik <- zeros(paramStMoE$n, paramStMoE$K)
+      wik <<- zeros(paramStMoE$n, paramStMoE$K)
+      Integgtx <- zeros(paramStMoE$n, paramStMoE$K)
 
       for (k in (1:paramStMoE$K)) {
 
@@ -205,7 +205,7 @@ StatStMoE <- setRefClass(
         deltak <- paramStMoE$delta[k]
 
 
-        dik[, k] <<- (paramStMoE$fData$Y - muk) / sigmak
+        dik[, k] <<- (paramStMoE$Y - muk) / sigmak
         mik[, k] <- paramStMoE$lambda[k] %*% dik[, k] * sqrt((paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2))
 
         # E[Wi|yi,zik=1]
@@ -215,13 +215,13 @@ StatStMoE <- setRefClass(
         if (calcE1) {
           univStMoEpdf(paramStMoE)
           # E[Wi Ui |yi,zik=1]
-          E1ik[, k] <<- deltak * abs(paramStMoE$fData$Y - muk) * wik[, k] +
+          E1ik[, k] <<- deltak * abs(paramStMoE$Y - muk) * wik[, k] +
             (sqrt(1 - deltak ^ 2) / (pi * stme_pdf)) * ((dik[, k] ^ 2 / (paramStMoE$nuk[k] * (1 - deltak ^ 2)) + 1) ^ (-(paramStMoE$nuk[k] / 2 + 1)))
         }
 
         if (calcE2) {
-          E2ik[, k] <<- deltak ^ 2 * ((paramStMoE$fData$Y - muk) ^ 2) * wik[, k] +
-            (1 - deltak ^ 2) * sigmak ^ 2 + ((deltak * (paramStMoE$fData$Y - muk) * sqrt(1 - deltak ^ 2)) / (pi * stme_pdf)) * (((dik[, k] ^ 2) / (paramStMoE$nuk[k] * (1 - deltak ^ 2)) + 1) ^ (-(paramStMoE$nuk[k] / 2 + 1)))
+          E2ik[, k] <<- deltak ^ 2 * ((paramStMoE$Y - muk) ^ 2) * wik[, k] +
+            (1 - deltak ^ 2) * sigmak ^ 2 + ((deltak * (paramStMoE$Y - muk) * sqrt(1 - deltak ^ 2)) / (pi * stme_pdf)) * (((dik[, k] ^ 2) / (paramStMoE$nuk[k] * (1 - deltak ^ 2)) + 1) ^ (-(paramStMoE$nuk[k] / 2 + 1)))
         }
 
         if (calcE3) {

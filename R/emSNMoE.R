@@ -36,8 +36,6 @@
 #' @export
 emSNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
 
-  fData <- FData(X, Y)
-
   top <- 0
   try_EM <- 0
   best_loglik <- -Inf
@@ -51,7 +49,7 @@ emSNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, thresho
     }
 
     # Initialization
-    param <- ParamSNMoE(fData = fData, K = K, p = p, q = q)
+    param <- ParamSNMoE(X = X, Y = Y, K = K, p = p, q = q)
     param$initParam(try_EM, segmental = TRUE)
 
     iter <- 0

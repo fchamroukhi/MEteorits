@@ -50,7 +50,6 @@ Collate:
     sampleUnivSNMoE.R
     sampleUnivSTMoE.R
     sampleUnivTMoE.R
-    FData.R
     ParamSNMoE.R
     ParamStMoE.R
     ParamTMoE.R

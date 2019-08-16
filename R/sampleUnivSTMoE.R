@@ -75,9 +75,9 @@ sampleUnivSTMoE <-
     XBeta <- designmatrix(x, p, q)$XBeta # For the polynomial regression
     XAlpha <- designmatrix(x, p, q)$Xw # For the logistic regression
 
-    y <- zeros(n, 1)
+    y <- rep.int(x = 0, times = n)
     z <- zeros(n, K)
-    zi <- rep.int(x = 0, times = K)
+    zi <- rep.int(x = 0, times = n)
 
     deltak <- lambdak / sqrt(1 + lambdak ^ 2)
 

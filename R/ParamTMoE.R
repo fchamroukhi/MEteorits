@@ -2,7 +2,11 @@
 #'
 #' ParamTMoE contains all the parameters of a TMoE model.
 #'
-#' @field fData [FData][FData] object representing the sample.
+#' @field X Numeric vector of length \emph{n} representing the covariates/inputs
+#'   \eqn{x_{1},\dots,x_{n}}.
+#' @field Y Numeric vector of length \emph{n} representing the observed
+#'   response/output \eqn{y_{1},\dots,y_{n}}.
+#' @field n Numeric. Length of the response/output vector `Y`.
 #' @field K The number of mixture components.
 #' @field p The order of the polynomial regression.
 #' @field q The dimension of the logistic regression. For the purpose of
@@ -14,15 +18,17 @@
 #' Gaussian linear regression problem.
 #' @field sigma2 The variances for the \emph{K} mixture component.
 #' @field nu degrees of freedom
-#' @seealso [FData]
 #' @export
 ParamTMoE <- setRefClass(
   "ParamTMoE",
   fields = list(
-    fData = "FData",
 
+    X = "numeric",
+    Y = "numeric",
+    n = "numeric",
     phiBeta = "list",
     phiAlpha = "list",
+
     K = "numeric", # Number of regimes
     p = "numeric", # Dimension of beta (order of polynomial regression)
     q = "numeric", # Dimension of w (order of logistic regression)
@@ -34,11 +40,13 @@ ParamTMoE <- setRefClass(
     nu = "matrix"
   ),
   methods = list(
-    initialize = function(fData = FData(numeric(1), matrix(1)), K = 1, p = 3, q = 1) {
-      fData <<- fData
+    initialize = function(X = numeric(), Y = numeric(1), K = 1, p = 3, q = 1) {
 
-      phiBeta <<- designmatrix(x = fData$X, p = p)
-      phiAlpha <<- designmatrix(x = fData$X, p = q)
+      X <<- X
+      Y <<- Y
+      n <<- length(Y)
+      phiBeta <<- designmatrix(x = X, p = p)
+      phiAlpha <<- designmatrix(x = X, p = q)
 
       K <<- K
       p <<- p
@@ -59,12 +67,12 @@ ParamTMoE <- setRefClass(
       # Initialize the regression parameters (coefficents and variances):
       if (!segmental) {
 
-        klas <- sample(1:K, fData$n, replace = TRUE)
+        klas <- sample(1:K, n, replace = TRUE)
 
         for (k in 1:K) {
 
           Xk <- phiBeta$XBeta[klas == k,]
-          yk <- fData$Y[klas == k]
+          yk <- Y[klas == k]
 
           beta[, k] <<- solve(t(Xk) %*% Xk) %*% t(Xk) %*% yk
 
@@ -72,14 +80,14 @@ ParamTMoE <- setRefClass(
         }
       } else {# Segmental : segment uniformly the data and estimate the parameters
 
-        nk <- round(fData$n / K) - 1
+        nk <- round(n / K) - 1
 
-        klas <- rep.int(0, fData$n)
+        klas <- rep.int(0, n)
 
         for (k in 1:K) {
           i <- (k - 1) * nk + 1
           j <- (k * nk)
-          yk <- matrix(fData$Y[i:j])
+          yk <- matrix(Y[i:j])
           Xk <- phiBeta$XBeta[i:j, ]
 
           beta[, k] <<- solve(t(Xk) %*% Xk, tol = 0) %*% (t(Xk) %*% yk)
@@ -93,8 +101,8 @@ ParamTMoE <- setRefClass(
       }
 
       # Intialize the softmax parameters
-      Z <- matrix(0, nrow = fData$n, ncol = K)
-      Z[klas %*% ones(1, K) == ones(fData$n, 1) %*% seq(K)] <- 1
+      Z <- matrix(0, nrow = n, ncol = K)
+      Z[klas %*% ones(1, K) == ones(n, 1) %*% seq(K)] <- 1
       tau <- Z
       res <- IRLS(phiAlpha$XBeta, tau, ones(nrow(tau), 1), alpha)
       alpha <<- res$W
@@ -116,15 +124,15 @@ ParamTMoE <- setRefClass(
 
         # Update the regression coefficients
         Xbeta <- phiBeta$XBeta * (matrix(sqrt(statTMoE$tik[, k] * statTMoE$Wik[, k])) %*% ones(1, p + 1))
-        yk <- fData$Y * sqrt(statTMoE$tik[, k] * statTMoE$Wik[, k])
+        yk <- Y * sqrt(statTMoE$tik[, k] * statTMoE$Wik[, k])
 
         beta[, k] <<- solve((t(Xbeta) %*% Xbeta)) %*% (t(Xbeta) %*% yk)
 
         # Update the variances sigma2k
-        sigma2[k] <<- sum(statTMoE$tik[, k] * statTMoE$Wik[, k] * ((fData$Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(statTMoE$tik[, k])
+        sigma2[k] <<- sum(statTMoE$tik[, k] * statTMoE$Wik[, k] * ((Y - phiBeta$XBeta %*% beta[, k]) ^ 2)) / sum(statTMoE$tik[, k])
 
         # If ECM (use an additional E-Step with the updated betak and sigma2k
-        dik <- (fData$Y - phiBeta$XBeta %*% beta[, k]) / sqrt(sigma2[k])
+        dik <- (Y - phiBeta$XBeta %*% beta[, k]) / sqrt(sigma2[k])
 
         # Update the degrees of freedom
         try(nu[k] <<- pracma::fzero(f <- function(nuk) {

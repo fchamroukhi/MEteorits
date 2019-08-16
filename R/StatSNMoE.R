@@ -41,7 +41,7 @@
 #'   k | Y, W, \beta)}.
 #' @field E1ik To define.
 #' @field E2ik To define.
-#' @seealso [ParamSNMoE], [FData]
+#' @seealso [ParamSNMoE]
 #' @export
 StatSNMoE <- setRefClass(
   "StatSNMoE",
@@ -67,24 +67,24 @@ StatSNMoE <- setRefClass(
   ),
   methods = list(
     initialize = function(paramSNMoE = ParamSNMoE()) {
-      piik <<- matrix(NA, paramSNMoE$fData$n, paramSNMoE$K)
-      z_ik <<- matrix(NA, paramSNMoE$fData$n, paramSNMoE$K)
-      klas <<- matrix(NA, paramSNMoE$fData$n, 1)
-      Ey_k <<- matrix(NA, paramSNMoE$fData$n, paramSNMoE$K)
-      Ey <<- matrix(NA, paramSNMoE$fData$n, 1)
+      piik <<- matrix(NA, paramSNMoE$n, paramSNMoE$K)
+      z_ik <<- matrix(NA, paramSNMoE$n, paramSNMoE$K)
+      klas <<- matrix(NA, paramSNMoE$n, 1)
+      Ey_k <<- matrix(NA, paramSNMoE$n, paramSNMoE$K)
+      Ey <<- matrix(NA, paramSNMoE$n, 1)
       Var_yk <<- matrix(NA, 1, paramSNMoE$K)
-      Vary <<- matrix(NA, paramSNMoE$fData$n, 1)
+      Vary <<- matrix(NA, paramSNMoE$n, 1)
       log_lik <<- -Inf
       com_loglik <<- -Inf
       stored_loglik <<- numeric()
       BIC <<- -Inf
       ICL <<- -Inf
       AIC <<- -Inf
-      log_piik_fik <<- matrix(0, paramSNMoE$fData$n, paramSNMoE$K)
-      log_sum_piik_fik <<- matrix(NA, paramSNMoE$fData$n, 1)
-      tik <<- matrix(0, paramSNMoE$fData$n, paramSNMoE$K)
-      E1ik <<- matrix(0, paramSNMoE$fData$m * paramSNMoE$fData$n, paramSNMoE$K)
-      E2ik <<- matrix(0, paramSNMoE$fData$m * paramSNMoE$fData$n, paramSNMoE$K)
+      log_piik_fik <<- matrix(0, paramSNMoE$n, paramSNMoE$K)
+      log_sum_piik_fik <<- matrix(NA, paramSNMoE$n, 1)
+      tik <<- matrix(0, paramSNMoE$n, paramSNMoE$K)
+      E1ik <<- matrix(0, paramSNMoE$n, paramSNMoE$K)
+      E2ik <<- matrix(0, paramSNMoE$n, paramSNMoE$K)
     },
 
     MAP = function() {
@@ -123,7 +123,7 @@ StatSNMoE <- setRefClass(
     computeStats = function(paramSNMoE) {
 
       # E[yi|xi,zi=k]
-      Ey_k <<- paramSNMoE$phiBeta$XBeta[1:paramSNMoE$fData$n,] %*% paramSNMoE$beta + ones(paramSNMoE$fData$n, 1) %*% (sqrt(2 / pi) * paramSNMoE$delta * sqrt(paramSNMoE$sigma2))
+      Ey_k <<- paramSNMoE$phiBeta$XBeta[1:paramSNMoE$n,] %*% paramSNMoE$beta + ones(paramSNMoE$n, 1) %*% (sqrt(2 / pi) * paramSNMoE$delta * sqrt(paramSNMoE$sigma2))
 
       # E[yi|xi]
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
@@ -132,19 +132,19 @@ StatSNMoE <- setRefClass(
       Var_yk <<- (1 - (2 / pi) * (paramSNMoE$delta ^ 2)) * paramSNMoE$sigma2
 
       # Var[yi|xi]
-      Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramSNMoE$fData$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
+      Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramSNMoE$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
       # BIC, AIC and ICL
 
-      BIC <<- log_lik - (paramSNMoE$df * log(paramSNMoE$fData$n * paramSNMoE$fData$m) / 2)
+      BIC <<- log_lik - (paramSNMoE$df * log(paramSNMoE$n) / 2)
       AIC <<- log_lik - paramSNMoE$df
 
       # CL(theta) : complete-data loglikelihood
-      zik_log_piik_fk <- (repmat(z_ik, paramSNMoE$fData$m, 1)) * log_piik_fik
+      zik_log_piik_fk <- z_ik * log_piik_fik
       sum_zik_log_fik <- apply(zik_log_piik_fk, 1, sum)
       com_loglik <<- sum(sum_zik_log_fik)
 
-      ICL <<- com_loglik - (paramSNMoE$df * log(paramSNMoE$fData$n * paramSNMoE$fData$m) / 2)
+      ICL <<- com_loglik - (paramSNMoE$df * log(paramSNMoE$n) / 2)
 
     },
 
@@ -152,18 +152,18 @@ StatSNMoE <- setRefClass(
       "Method used in the EM algorithm to update statistics based on parameters
       provided by \\code{paramSNMoE} (prior and posterior probabilities)."
 
-      piik <<- multinomialLogit(paramSNMoE$alpha, paramSNMoE$phiAlpha$XBeta, ones(paramSNMoE$fData$n, paramSNMoE$K), ones(paramSNMoE$fData$n, 1))$piik
+      piik <<- multinomialLogit(paramSNMoE$alpha, paramSNMoE$phiAlpha$XBeta, ones(paramSNMoE$n, paramSNMoE$K), ones(paramSNMoE$n, 1))$piik
 
-      piik_fik <- zeros(paramSNMoE$fData$m * paramSNMoE$fData$n, paramSNMoE$K)
+      piik_fik <- zeros(paramSNMoE$n, paramSNMoE$K)
 
       for (k in (1:paramSNMoE$K)) {
 
         muk <- paramSNMoE$phiBeta$XBeta %*% paramSNMoE$beta[, k]
         sigma2k <- paramSNMoE$sigma2[k]
         sigmak <- sqrt(sigma2k)
-        dik <- (paramSNMoE$fData$Y - muk) / sigmak
+        dik <- (paramSNMoE$Y - muk) / sigmak
 
-        mu_uk <- paramSNMoE$delta[k] * (paramSNMoE$fData$Y - muk)
+        mu_uk <- paramSNMoE$delta[k] * (paramSNMoE$Y - muk)
         sigma2_uk <- (1 - paramSNMoE$delta[k] ^ 2) * paramSNMoE$sigma2[k]
         sigma_uk <- sqrt(sigma2_uk)
 

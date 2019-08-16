@@ -59,7 +59,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 # Generate sample of size n
 sample <- sampleUnivTMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
                          nuk = nuk, x = x)
-y <- matrix(sample$y)
+y <- sample$y
 ```
 
 ## Set up tMoE model parameters
@@ -121,7 +121,7 @@ tmoe$plot(what = "loglikelihood")
 library(MASS)
 data("mcycle")
 x <- mcycle$times
-y <- as.matrix(mcycle$accel)
+y <- mcycle$accel
 ```
 
 ## Set up tMoE model parameters

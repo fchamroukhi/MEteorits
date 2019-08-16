@@ -84,7 +84,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 
 # Generate sample of size n
 sample <- sampleUnivNMoE(alphak = alphak, betak = betak, sigmak = sigmak, x = x)
-y <- matrix(sample$y)
+y <- sample$y
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
@@ -107,7 +107,7 @@ nmoe$plot()
 
 data("tempanomalies")
 x <- tempanomalies$Year
-y <- as.matrix(tempanomalies$AnnualAnomaly)
+y <- tempanomalies$AnnualAnomaly
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
@@ -143,7 +143,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 # Generate sample of size n
 sample <- sampleUnivTMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
                          nuk = nuk, x = x)
-y <- matrix(sample$y)
+y <- sample$y
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
@@ -167,7 +167,7 @@ tmoe$plot()
 library(MASS)
 data("mcycle")
 x <- mcycle$times
-y <- as.matrix(mcycle$accel)
+y <- mcycle$accel
 
 K <- 4 # Number of regressors/experts
 p <- 2 # Order of the polynomial regression (regressors/experts)
@@ -202,7 +202,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 # Generate sample of size n
 sample <- sampleUnivSNMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
                           lambdak = lambdak, x = x)
-y <- matrix(sample$y)
+y <- sample$y
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
@@ -225,7 +225,7 @@ snmoe$plot()
 
 data("tempanomalies")
 x <- tempanomalies$Year
-y <- as.matrix(tempanomalies$AnnualAnomaly)
+y <- tempanomalies$AnnualAnomaly
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
@@ -261,7 +261,7 @@ x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 # Generate sample of size n
 sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
                           lambdak = lambdak, nuk = nuk, x = x)
-y <- matrix(sample$y)
+y <- sample$y
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
@@ -285,7 +285,7 @@ stmoe$plot()
 library(MASS)
 data("mcycle")
 x <- mcycle$times
-y <- as.matrix(mcycle$accel)
+y <- mcycle$accel
 
 K <- 4 # Number of regressors/experts
 p <- 2 # Order of the polynomial regression (regressors/experts)
