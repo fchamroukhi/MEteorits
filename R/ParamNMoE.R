@@ -7,17 +7,24 @@
 #' @field Y Numeric vector of length \emph{n} representing the observed
 #'   response/output \eqn{y_{1},\dots,y_{n}}.
 #' @field n Numeric. Length of the response/output vector `Y`.
-#' @field K The number of mixture components.
-#' @field p The order of the polynomial regression.
-#' @field q The dimension of the logistic regression. For the purpose of
-#' segmentation, it must be set to 1.
-#' @field df degree of freedom
-#' @field alpha is the parameter vector of the logistic model with \eqn{alpha_K} being the null vector.
-#' @field beta is the vector of regression coefficients of component k,
-#' the updates for each of the expert component parameters consist in analytically solving a weighted
-#' Gaussian linear regression problem.
-#' @field sigma2 The variances for the \emph{K} mixture components.
-#' @field delta the skewness parameter lambda (by equivalence delta)
+#' @field K The number of experts.
+#' @field p The order of the polynomial regression for the experts.
+#' @field q The order of the logistic regression for the gating network.
+#' @field alpha Parameters of the gating network. \eqn{\boldsymbol{\alpha} =
+#'   (\boldsymbol{\alpha}_{1},\dots,\boldsymbol{\alpha}_{K-1})}{\alpha =
+#'   (\alpha_{1},\dots,\alpha_{K-1})} is a matrix of dimension \eqn{(q + 1, K -
+#'   1)}, with `q` the order of the logistic regression for the gating network.
+#'   `q` is fixed to 1 by default.
+#' @field beta Polynomial regressions coefficients for each expert.
+#'   \eqn{\boldsymbol{\beta} =
+#'   (\boldsymbol{\beta}_{1},\dots,\boldsymbol{\beta}_{K})}{\beta =
+#'   (\beta_{1},\dots,\beta_{K})} is a matrix of dimension \eqn{(p + 1, K)},
+#'   with `p` the order of the polynomial regression. `p` is fixed to 3 by
+#'   default.
+#' @field sigma2 The variances for the `K` mixture components (matrix of size
+#'   \eqn{(1, K)}).
+#' @field df The degree of freedom of the NMoE model representing the complexity
+#'   of the model.
 #' @export
 ParamNMoE <- setRefClass(
   "ParamNMoE",
@@ -58,7 +65,15 @@ ParamNMoE <- setRefClass(
       sigma2 <<- matrix(NA, 1, K)
     },
 
-    initParam = function(try_EM, segmental = FALSE) {
+    initParam = function(segmental = FALSE) {
+      "Method to initialize parameters \\code{alpha}, \\code{beta} and
+      \\code{sigma2}.
+
+      If \\code{segmental = TRUE} then \\code{alpha}, \\code{beta} and
+      \\code{sigma2} are initialized by clustering the response \\code{Y}
+      uniformly into \\code{K} contiguous segments. Otherwise, \\code{alpha},
+      \\code{beta} and \\code{sigma2} are initialized by clustering randomly
+      the response \\code{Y} into \\code{K} segments."
 
       # Initialize the regression parameters (coefficents and variances):
       if (!segmental) {

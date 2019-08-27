@@ -7,18 +7,29 @@
 #' @field Y Numeric vector of length \emph{n} representing the observed
 #'   response/output \eqn{y_{1},\dots,y_{n}}.
 #' @field n Numeric. Length of the response/output vector `Y`.
-#' @field K The number of mixture components.
-#' @field p The order of the polynomial regression.
-#' @field q The dimension of the logistic regression. For the purpose of
-#' segmentation, it must be set to 1.
-#' @field df degree of freedom
-#' @field alpha is the parameter vector of the logistic model with \eqn{alpha_K} being the null vector.
-#' @field beta is the vector of regression coefficients of component k,
-#' the updates for each of the expert component parameters consist in analytically solving a weighted
-#' Gaussian linear regression problem.
-#' @field sigma2 The variances for the \emph{K} mixture component.
-#' @field lambda skewness parameter
-#' @field delta the skewness parameter lambda (by equivalence delta)
+#' @field K The number of experts.
+#' @field p The order of the polynomial regression for the experts.
+#' @field q The order of the logistic regression for the gating network.
+#' @field alpha Parameters of the gating network. \eqn{\boldsymbol{\alpha} =
+#'   (\boldsymbol{\alpha}_{1},\dots,\boldsymbol{\alpha}_{K-1})}{\alpha =
+#'   (\alpha_{1},\dots,\alpha_{K-1})} is a matrix of dimension \eqn{(q + 1, K -
+#'   1)}, with `q` the order of the logistic regression for the gating network.
+#'   `q` is fixed to 1 by default.
+#' @field beta Polynomial regressions coefficients for each expert.
+#'   \eqn{\boldsymbol{\beta} =
+#'   (\boldsymbol{\beta}_{1},\dots,\boldsymbol{\beta}_{K})}{\beta =
+#'   (\beta_{1},\dots,\beta_{K})} is a matrix of dimension \eqn{(p + 1, K)},
+#'   with `p` the order of the polynomial regression. `p` is fixed to 3 by
+#'   default.
+#' @field sigma2 The variances for the `K` mixture components (matrix of size
+#'   \eqn{(1, K)}).
+#' @field lambda The skewness parameters for each experts (matrix of size
+#'   \eqn{(1, K)}).
+#' @field delta delta is equal \eqn{\delta =
+#'   \frac{\lambda}{\sqrt{1+\lambda^2}}}{\delta = \lambda /
+#'   (1+\lambda^2)^(1/2)}.
+#' @field df The degree of freedom of the SNMoE model representing the
+#'   complexity of the model.
 #' @export
 ParamSNMoE <- setRefClass(
   "ParamSNMoE",
@@ -58,11 +69,19 @@ ParamSNMoE <- setRefClass(
       alpha <<- matrix(0, q + 1, K - 1)
       beta <<- matrix(NA, p + 1, K)
       sigma2 <<- matrix(NA, 1, K)
-      lambda <<- matrix(NA, K)
-      delta <<- matrix(NA, K)
+      lambda <<- matrix(NA, ncol = K)
+      delta <<- matrix(NA, ncol = K)
     },
 
-    initParam = function(try_EM, segmental = FALSE) {
+    initParam = function(segmental = FALSE) {
+      "Method to initialize parameters \\code{alpha}, \\code{beta} and
+      \\code{sigma2}.
+
+      If \\code{segmental = TRUE} then \\code{alpha}, \\code{beta} and
+      \\code{sigma2} are initialized by clustering the response \\code{Y}
+      uniformly into \\code{K} contiguous segments. Otherwise, \\code{alpha},
+      \\code{beta} and \\code{sigma2} are initialized by clustering randomly
+      the response \\code{Y} into \\code{K} segments."
 
       # Initialize the regression parameters (coefficents and variances):
       if (!segmental) {
@@ -123,6 +142,9 @@ ParamSNMoE <- setRefClass(
     },
 
     MStep = function(statSNMoE, verbose_IRLS) {
+      "Method which implements the M-step of the EM algorithm to learn the
+      parameters of the SNMoE model based on statistics provided by the object
+      \\code{statSNMoE} of class \\link{StatSNMoE} (which contains the E-step)."
 
       res_irls <- IRLS(phiAlpha$XBeta, statSNMoE$tik, ones(nrow(statSNMoE$tik), 1), alpha, verbose_IRLS)
       statSNMoE$piik <- res_irls$piik

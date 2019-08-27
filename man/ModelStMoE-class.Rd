@@ -6,17 +6,44 @@
 \alias{ModelStMoE}
 \title{A Reference Class which represents a fitted StMoE model.}
 \description{
-ModelStMoE represents a \link[=ModelStMoE]{StMoE} model for which parameters have
-been estimated.
+ModelStMoE represents an estimated StMoE model.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{param}}{A \link{ParamStMoE} object. It contains the estimated values of the parameters.}
+\item{\code{param}}{A \link{ParamStMoE} object. It contains the estimated
+values of the parameters.}
 
-\item{\code{stat}}{A \link{StatStMoE} object. It contains all the statistics associated to the StMoE model.}
+\item{\code{stat}}{A \link{StatStMoE} object. It contains all the statistics
+associated to the StMoE model.}
 }}
 
+\section{Methods}{
+
+\describe{
+\item{\code{plot(what = c("meancurve", "confregions", "clusters", "loglikelihood"), ...)}}{Plot method.
+\describe{
+  \item{\code{what}}{The type of graph requested:
+    \itemize{
+      \item \code{"meancurve" = } Estimated mean and estimated
+        experts means given the input \code{X} (fields \code{Ey} and
+        \code{Ey_k} of class \link{StatStMoE}).
+      \item \code{"confregions" = } Estimated mean and confidence
+        regions. Confidence regions are computed as plus and minus twice
+        the estimated standard deviation (the squarre root of the field
+        \code{Vary} of class \link{StatStMoE}).
+      \item \code{"clusters" = } Estimated experts means (field
+        \code{Ey_k}) and hard partition (field \code{klas} of class
+        \link{StatStMoE}).
+      \item \code{"loglikelihood" = } Value of the log-likelihood for
+        each iteration (field \code{stored_loglik} of class
+        \link{StatStMoE}).
+    }
+  }
+  \item{\code{\dots}}{Other graphics parameters.}
+}
+By default, all the graphs mentioned above are produced.}
+}}
 
 \seealso{
 \link{ParamStMoE}, \link{StatStMoE}

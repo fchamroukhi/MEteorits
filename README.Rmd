@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![Travis build status](https://travis-ci.org/fchamroukhi/MEteorits.svg?branch=master)](https://travis-ci.org/fchamroukhi/MEteorits)
 <!-- badges: end -->
 
-MEteoritS is an open source toolbox (available in R and Matlab) containg 
+MEteorits is an open source toolbox (available in R and Matlab) containing 
 several original and flexible mixtures-of-experts models to model, cluster and
 classify heteregenous data in many complex situations where the data are 
 distributed according to non-normal and possibly skewed distributions, and 

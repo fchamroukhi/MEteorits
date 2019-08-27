@@ -2,58 +2,58 @@
 % Please edit documentation in R/emTMoE.R
 \name{emTMoE}
 \alias{emTMoE}
-\title{emTMoE implements the ECM algorithm to fit a tMoE model.}
+\title{emTMoE implements the ECM algorithm to fit a t Mixture of Experts (TMoE).}
 \usage{
 emTMoE(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500,
   threshold = 1e-06, verbose = FALSE, verbose_IRLS = FALSE)
 }
 \arguments{
 \item{X}{Numeric vector of length \emph{n} representing the covariates/inputs
-\eqn{x_{1},\dots,x_{m}}.}
+\eqn{x_{1},\dots,x_{n}}.}
 
 \item{Y}{Numeric vector of length \emph{n} representing the observed
-response/output \eqn{y_{1},\dots,y_{m}}.}
+response/output \eqn{y_{1},\dots,y_{n}}.}
 
-\item{K}{The number of expert components.}
+\item{K}{The number of experts.}
 
-\item{p}{The order of the polynomial regression for the expert regressors
+\item{p}{Optional. The order of the polynomial regression for the experts.}
+
+\item{q}{Optional. The order of the logistic regression for the gating
 network.}
 
-\item{q}{The dimension of the logistic regression for the gating network. For
-the purpose of segmentation, it must be set to 1.}
+\item{n_tries}{Optional. Number of runs of the ECM algorithm. The solution
+providing the highest log-likelihood will be returned.}
 
-\item{n_tries}{Number of times ECM algorithm will be launched with different
-initializations. The solution providing the highest log-likelihood will be
-returned.}
-
-\item{max_iter}{The maximum number of iterations for the ECM algorithm.}
-
-\item{threshold}{A numeric value specifying the threshold for the relative
-difference of log-likelihood between two steps  of the ECM as stopping
-criteria.}
-
-\item{verbose}{A logical value indicating whether values of the
-log-likelihood should be printed during ECM iterations.}
-
-\item{verbose_IRLS}{A logical value indicating whether values of the
-criterion optimized by IRLS should be printed at each step of the ECM
+\item{max_iter}{Optional. The maximum number of iterations for the ECM
 algorithm.}
+
+\item{threshold}{Optional. A numeric value specifying the threshold for the
+relative difference of log-likelihood between two steps of the ECM as
+stopping criteria.}
+
+\item{verbose}{Optional. A logical value indicating whether or not values of
+the log-likelihood should be printed during ECM iterations.}
+
+\item{verbose_IRLS}{Optional. A logical value indicating whether or not
+values of the criterion optimized by IRLS should be printed at each step of
+the ECM algorithm.}
 }
 \value{
-Th ECM algorithm returns an object of class \link{ModelTMoE}.
+ECM returns an object of class \link{ModelTMoE}.
 }
 \description{
-emTMoE implements the maximum-likelihood parameter estimation of a tMoE model
-by the Expectation Conditional Maximization (ECM) algorithm.
+emTMoE implements the maximum-likelihood parameter estimation of a Student
+Mixture of Experts (TMoE) model by the Conditional Expectation Maximization
+(ECM) algorithm.
 }
 \details{
-emTMoE function function implements the ECM algorithm for the tMoE
-model. This functions starts with an initialization of the parameters done
-by the method \code{initParam} of the class \link{ParamTMoE}, then it
-alternates between a E-Step (method of the class \link{StatTMoE}) and
-a CM-Step (method of the class \link{ParamTMoE}) until convergence
-(until the absolute difference of log-likelihood between two steps of the
-ECM algorithm is less than the \code{threshold} parameter).
+emTMoE function implements the ECM algorithm for the TMoE model. This
+function starts with an initialization of the parameters done by the method
+\code{initParam} of the class \link{ParamTMoE}, then it alternates between
+the E-Step (method of the class \link{StatTMoE}) and the M-Step
+(method of the class \link{ParamTMoE}) until convergence (until the
+relative variation of log-likelihood between two steps of the ECM algorithm
+is less than the \code{threshold} parameter).
 }
 \seealso{
 \link{ModelTMoE}, \link{ParamTMoE}, \link{StatTMoE}

@@ -1,11 +1,11 @@
 #' A Reference Class which represents a fitted TMoE model.
 #'
-#' ModelTMoE represents a [TMoE][ModelTMoE] model for which parameters have
-#' been estimated.
+#' ModelTMoE represents an estimated TMoE model.
 #'
-#' @usage NULL
-#' @field param A [ParamTMoE][ParamTMoE] object. It contains the estimated values of the parameters.
-#' @field stat A [StatTMoE][StatTMoE] object. It contains all the statistics associated to the TMoE model.
+#' @field param A [ParamTMoE][ParamTMoE] object. It contains the estimated
+#'   values of the parameters.
+#' @field stat A [StatTMoE][StatTMoE] object. It contains all the statistics
+#'   associated to the TMoE model.
 #' @seealso [ParamTMoE], [StatTMoE]
 #' @export
 ModelTMoE <- setRefClass(
@@ -16,6 +16,28 @@ ModelTMoE <- setRefClass(
   ),
   methods = list(
     plot = function(what = c("meancurve", "confregions", "clusters", "loglikelihood"), ...) {
+      "Plot method.
+      \\describe{
+        \\item{\\code{what}}{The type of graph requested:
+          \\itemize{
+            \\item \\code{\"meancurve\" = } Estimated mean and estimated
+              experts means given the input \\code{X} (fields \\code{Ey} and
+              \\code{Ey_k} of class \\link{StatTMoE}).
+            \\item \\code{\"confregions\" = } Estimated mean and confidence
+              regions. Confidence regions are computed as plus and minus twice
+              the estimated standard deviation (the squarre root of the field
+              \\code{Vary} of class \\link{StatTMoE}).
+            \\item \\code{\"clusters\" = } Estimated experts means (field
+              \\code{Ey_k}) and hard partition (field \\code{klas} of class
+              \\link{StatTMoE}).
+            \\item \\code{\"loglikelihood\" = } Value of the log-likelihood for
+              each iteration (field \\code{stored_loglik} of class
+              \\link{StatTMoE}).
+          }
+        }
+        \\item{\\code{\\dots}}{Other graphics parameters.}
+      }
+      By default, all the graphs mentioned above are produced."
 
       what <- match.arg(what, several.ok = TRUE)
 

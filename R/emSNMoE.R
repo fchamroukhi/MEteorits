@@ -1,37 +1,39 @@
-#' emSNMoE implements the ECM algorithm to fit a SNMoE model.
+#' emSNMoE implements the ECM algorithm to fit a Skew-Normal Mixture of Experts
+#' (SNMoE).
 #'
-#' emSNMoE implements the maximum-likelihood parameter estimation of a SNMoE
-#' model by the Expectation Conditional Maximization (ECM) algorithm.
+#' emSNMoE implements the maximum-likelihood parameter estimation of a
+#' Skew-Normal Mixture of Experts (SNMoE) model by the Expectation Conditional
+#' Maximization (ECM) algorithm.
 #'
-#' @details emSNMoE function function implements the ECM algorithm for the SNMoE model. This functions starts
-#' with an initialization of the parameters done by the method `initParam` of
-#' the class [ParamSNMoE][ParamSNMoE], then it alternates between a E-Step
-#' (method of the class [StatSNMoE][StatSNMoE]) and a CM-Step (method of the class
-#' [ParamSNMoE][ParamSNMoE]) until convergence (until the absolute difference of
-#' log-likelihood between two steps of the ECM algorithm is less than the
-#' `threshold` parameter).
+#' @details emSNMoE function implements the ECM algorithm for the SNMoE model.
+#'   This function starts with an initialization of the parameters done by the
+#'   method `initParam` of the class [ParamSNMoE][ParamSNMoE], then it
+#'   alternates between the E-Step (method of the class [StatSNMoE][StatSNMoE])
+#'   and the M-Step (method of the class [ParamSNMoE][ParamSNMoE]) until
+#'   convergence (until the relative variation of log-likelihood between two
+#'   steps of the ECM algorithm is less than the `threshold` parameter).
 #'
 #' @param X Numeric vector of length \emph{n} representing the covariates/inputs
-#'   \eqn{x_{1},\dots,x_{m}}.
+#'   \eqn{x_{1},\dots,x_{n}}.
 #' @param Y Numeric vector of length \emph{n} representing the observed
-#'   response/output \eqn{y_{1},\dots,y_{m}}.
-#' @param K The number of expert components.
-#' @param p The order of the polynomial regression for the expert regressors network.
-#' @param q The dimension of the logistic regression for the gating network. For the purpose of
-#' segmentation, it must be set to 1.
-#' @param n_tries Number of times ECM algorithm will be launched with different initializations.
-#' The solution providing the highest log-likelihood will be returned.
-#'
-#' @param max_iter The maximum number of iterations for the ECM algorithm.
-#' @param threshold A numeric value specifying the threshold for the relative
-#'  difference of log-likelihood between two steps  of the ECM as stopping
-#'  criteria.
-#' @param verbose A logical value indicating whether values of the
-#' log-likelihood should be printed during ECM iterations.
-#' @param verbose_IRLS A logical value indicating whether values of the
-#' criterion optimized by IRLS should be printed at each step of the ECM
-#' algorithm.
-#' @return Th ECM algorithm returns an object of class [ModelSNMoE][ModelSNMoE].
+#'   response/output \eqn{y_{1},\dots,y_{n}}.
+#' @param K The number of experts.
+#' @param p Optional. The order of the polynomial regression for the experts.
+#' @param q Optional. The order of the logistic regression for the gating
+#'   network.
+#' @param n_tries Optional. Number of runs of the ECM algorithm. The solution
+#'   providing the highest log-likelihood will be returned.
+#' @param max_iter Optional. The maximum number of iterations for the ECM
+#'   algorithm.
+#' @param threshold Optional. A numeric value specifying the threshold for the
+#'   relative difference of log-likelihood between two steps of the ECM as
+#'   stopping criteria.
+#' @param verbose Optional. A logical value indicating whether or not values of
+#'   the log-likelihood should be printed during ECM iterations.
+#' @param verbose_IRLS Optional. A logical value indicating whether or not
+#'   values of the criterion optimized by IRLS should be printed at each step of
+#'   the ECM algorithm.
+#' @return ECM returns an object of class [ModelSNMoE][ModelSNMoE].
 #' @seealso [ModelSNMoE], [ParamSNMoE], [StatSNMoE]
 #' @export
 emSNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
@@ -50,7 +52,7 @@ emSNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, thresho
 
     # Initialization
     param <- ParamSNMoE(X = X, Y = Y, K = K, p = p, q = q)
-    param$initParam(try_EM, segmental = TRUE)
+    param$initParam(segmental = TRUE)
 
     iter <- 0
     converge <- FALSE

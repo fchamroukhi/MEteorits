@@ -19,24 +19,42 @@ response/output \eqn{y_{1},\dots,y_{n}}.}
 
 \item{\code{n}}{Numeric. Length of the response/output vector \code{Y}.}
 
-\item{\code{K}}{The number of mixture components.}
+\item{\code{K}}{The number of experts.}
 
-\item{\code{p}}{The order of the polynomial regression.}
+\item{\code{p}}{The order of the polynomial regression for the experts.}
 
-\item{\code{q}}{The dimension of the logistic regression. For the purpose of
-segmentation, it must be set to 1.}
+\item{\code{q}}{The order of the logistic regression for the gating network.}
 
-\item{\code{df}}{degree of freedom}
+\item{\code{alpha}}{Parameters of the gating network. \eqn{\boldsymbol{\alpha} =
+  (\boldsymbol{\alpha}_{1},\dots,\boldsymbol{\alpha}_{K-1})}{\alpha =
+  (\alpha_{1},\dots,\alpha_{K-1})} is a matrix of dimension \eqn{(q + 1, K -
+  1)}, with \code{q} the order of the logistic regression for the gating network.
+\code{q} is fixed to 1 by default.}
 
-\item{\code{alpha}}{is the parameter vector of the logistic model with \eqn{alpha_K} being the null vector.}
+\item{\code{beta}}{Polynomial regressions coefficients for each expert.
+\eqn{\boldsymbol{\beta} =
+  (\boldsymbol{\beta}_{1},\dots,\boldsymbol{\beta}_{K})}{\beta =
+  (\beta_{1},\dots,\beta_{K})} is a matrix of dimension \eqn{(p + 1, K)},
+with \code{p} the order of the polynomial regression. \code{p} is fixed to 3 by
+default.}
 
-\item{\code{beta}}{is the vector of regression coefficients of component k,
-the updates for each of the expert component parameters consist in analytically solving a weighted
-Gaussian linear regression problem.}
+\item{\code{sigma2}}{The variances for the \code{K} mixture components (matrix of size
+\eqn{(1, K)}).}
 
-\item{\code{sigma2}}{The variances for the \emph{K} mixture components.}
-
-\item{\code{delta}}{the skewness parameter lambda (by equivalence delta)}
+\item{\code{df}}{The degree of freedom of the NMoE model representing the complexity
+of the model.}
 }}
 
+\section{Methods}{
+
+\describe{
+\item{\code{initParam(segmental = FALSE)}}{Method to initialize parameters \code{alpha}, \code{beta} and
+      \code{sigma2}.
+
+      If \code{segmental = TRUE} then \code{alpha}, \code{beta} and
+      \code{sigma2} are initialized by clustering the response \code{Y}
+      uniformly into \code{K} contiguous segments. Otherwise, \code{alpha},
+      \code{beta} and \code{sigma2} are initialized by clustering randomly
+      the response \code{Y} into \code{K} segments.}
+}}
 

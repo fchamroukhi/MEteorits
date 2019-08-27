@@ -2,56 +2,59 @@
 % Please edit documentation in R/emStMoE.R
 \name{emStMoE}
 \alias{emStMoE}
-\title{emStMoE implements the ECM algorithm to fit a StMoE model.}
+\title{emStMoE implements the ECM algorithm to fit a Skew-t Mixture of Experts
+(StMoE).}
 \usage{
 emStMoE(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500,
   threshold = 1e-06, verbose = FALSE, verbose_IRLS = FALSE)
 }
 \arguments{
 \item{X}{Numeric vector of length \emph{n} representing the covariates/inputs
-\eqn{x_{1},\dots,x_{m}}.}
+\eqn{x_{1},\dots,x_{n}}.}
 
 \item{Y}{Numeric vector of length \emph{n} representing the observed
-response/output \eqn{y_{1},\dots,y_{m}}.}
+response/output \eqn{y_{1},\dots,y_{n}}.}
 
-\item{K}{The number of expert components.}
+\item{K}{The number of experts.}
 
-\item{p}{The order of the polynomial regression for the expert regressors network.}
+\item{p}{Optional. The order of the polynomial regression for the experts.}
 
-\item{q}{The dimension of the logistic regression for the gating network. For the purpose of
-segmentation, it must be set to 1.}
+\item{q}{Optional. The order of the logistic regression for the gating
+network.}
 
-\item{n_tries}{Number of times ECM algorithm will be launched with different initializations.
-The solution providing the highest log-likelihood will be returned.}
+\item{n_tries}{Optional. Number of runs of the ECM algorithm. The solution
+providing the highest log-likelihood will be returned.}
 
-\item{max_iter}{The maximum number of iterations for the ECM algorithm.}
-
-\item{threshold}{A numeric value specifying the threshold for the relative
-difference of log-likelihood between two steps  of the ECM as stopping
-criteria.}
-
-\item{verbose}{A logical value indicating whether values of the
-log-likelihood should be printed during ECM iterations.}
-
-\item{verbose_IRLS}{A logical value indicating whether values of the
-criterion optimized by IRLS should be printed at each step of the ECM
+\item{max_iter}{Optional. The maximum number of iterations for the ECM
 algorithm.}
+
+\item{threshold}{Optional. A numeric value specifying the threshold for the
+relative difference of log-likelihood between two steps of the ECM as
+stopping criteria.}
+
+\item{verbose}{Optional. A logical value indicating whether or not values of
+the log-likelihood should be printed during ECM iterations.}
+
+\item{verbose_IRLS}{Optional. A logical value indicating whether or not
+values of the criterion optimized by IRLS should be printed at each step of
+the ECM algorithm.}
 }
 \value{
-Th ECM algorithm returns an object of class \link{ModelStMoE}.
+ECM returns an object of class \link{ModelStMoE}.
 }
 \description{
-emStMoE implements the maximum-likelihood parameter estimation of a StMoE
-model by the Expectation Conditional Maximization (ECM) algorithm.
+emStMoE implements the maximum-likelihood parameter estimation of a
+Skew-t Mixture of Experts (StMoE) model by the Expectation Conditional
+Maximization (ECM) algorithm.
 }
 \details{
-emStMoE function function implements the ECM algorithm for the StMoE model. This functions starts
-with an initialization of the parameters done by the method \code{initParam} of
-the class \link{ParamStMoE}, then it alternates between a E-Step
-(method of the class \link{StatStMoE}) and a CM-Step (method of the class
-\link{ParamStMoE}) until convergence (until the absolute difference of
-log-likelihood between two steps of the ECM algorithm is less than the
-\code{threshold} parameter).
+emStMoE function implements the ECM algorithm for the StMoE model.
+This function starts with an initialization of the parameters done by the
+method \code{initParam} of the class \link{ParamStMoE}, then it
+alternates between the E-Step (method of the class \link{StatStMoE})
+and the M-Step (method of the class \link{ParamStMoE}) until
+convergence (until the relative variation of log-likelihood between two
+steps of the ECM algorithm is less than the \code{threshold} parameter).
 }
 \seealso{
 \link{ModelStMoE}, \link{ParamStMoE}, \link{StatStMoE}

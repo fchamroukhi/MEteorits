@@ -1,11 +1,11 @@
 #' A Reference Class which represents a fitted SNMoE model.
 #'
-#' ModelSNMoE represents a [SNMoE][ModelSNMoE] model for which parameters have
-#' been estimated.
+#' ModelSNMoE represents an estimated SNMoE model.
 #'
-#' @usage NULL
-#' @field param A [ParamSNMoE][ParamSNMoE] object. It contains the estimated values of the parameters.
-#' @field stat A [StatSNMoE][StatSNMoE] object. It contains all the statistics associated to the SNMoE model.
+#' @field param A [ParamSNMoE][ParamSNMoE] object. It contains the estimated
+#'   values of the parameters.
+#' @field stat A [StatSNMoE][StatSNMoE] object. It contains all the statistics
+#'   associated to the SNMoE model.
 #' @seealso [ParamSNMoE], [StatSNMoE]
 #' @export
 ModelSNMoE <- setRefClass(
@@ -16,6 +16,28 @@ ModelSNMoE <- setRefClass(
   ),
   methods = list(
     plot = function(what = c("meancurve", "confregions", "clusters", "loglikelihood"), ...) {
+      "Plot method.
+      \\describe{
+        \\item{\\code{what}}{The type of graph requested:
+          \\itemize{
+            \\item \\code{\"meancurve\" = } Estimated mean and estimated
+              experts means given the input \\code{X} (fields \\code{Ey} and
+              \\code{Ey_k} of class \\link{StatSNMoE}).
+            \\item \\code{\"confregions\" = } Estimated mean and confidence
+              regions. Confidence regions are computed as plus and minus twice
+              the estimated standard deviation (the squarre root of the field
+              \\code{Vary} of class \\link{StatSNMoE}).
+            \\item \\code{\"clusters\" = } Estimated experts means (field
+              \\code{Ey_k}) and hard partition (field \\code{klas} of class
+              \\link{StatSNMoE}).
+            \\item \\code{\"loglikelihood\" = } Value of the log-likelihood for
+              each iteration (field \\code{stored_loglik} of class
+              \\link{StatSNMoE}).
+          }
+        }
+        \\item{\\code{\\dots}}{Other graphics parameters.}
+      }
+      By default, all the graphs mentioned above are produced."
 
       what <- match.arg(what, several.ok = TRUE)
 

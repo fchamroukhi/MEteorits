@@ -1,45 +1,44 @@
 #' A Reference Class which contains statistics of a TMoE model.
 #'
-#' StatTMoE contains all the parameters of a [TMoE][ParamTMoE] model.
+#' StatTMoE contains all the statistics associated to a [TMoE][ParamTMoE] model.
+#' It mainly includes the E-Step of the ECM algorithm calculating the posterior
+#' distribution of the hidden variables, as well as the calculation of the
+#' log-likelhood.
 #'
 #' @field piik Matrix of size \eqn{(n, K)} representing the probabilities
-#'   \eqn{P(zi = k; W) = P(z_{ik} = 1; W)}{P(zi = k; W) = P(z_ik = 1; W)} of the
-#'   latent variable \eqn{zi,\ i = 1,\dots,m}{zi, i = 1,\dots,n}.
+#'   \eqn{\pi_{k}(x_{i}; \boldsymbol{\Psi}) = P(z_{i} = k |
+#'   \boldsymbol{x}; \Psi)}{\pi_{k}(x_{i}; \Psi) = P(z_{i} = k | x; \Psi)} of
+#'   the latent variable \eqn{z_{i}, i = 1,\dots,n}.
 #' @field z_ik Hard segmentation logical matrix of dimension \eqn{(n, K)}
-#'   obtained by the Maximum a posteriori (MAP) rule: \eqn{z_{ik} = 1 \
-#'   \textrm{if} \ z_{ik} = \textrm{arg} \ \textrm{max}_{k} \ P(z_i = k | Y, W,
-#'   \beta);\ 0 \ \textrm{otherwise}}{z_ik = 1 if z_ik = arg max_k P(z_i = k |
-#'   Y, W, \beta); 0 otherwise}, \eqn{k = 1,\dots,K}.
+#'   obtained by the Maximum a posteriori (MAP) rule: \eqn{z\_ik = 1 \
+#'   \textrm{if} \ z\_ik = \textrm{arg} \ \textrm{max}_{s} \ \tau_{is};\ 0 \
+#'   \textrm{otherwise}}{z_ik = 1 if z_ik = arg max_s \tau_{is}; 0 otherwise},
+#'   \eqn{k = 1,\dots,K}.
 #' @field klas Column matrix of the labels issued from `z_ik`. Its elements are
 #'   \eqn{klas(i) = k}, \eqn{k = 1,\dots,K}.
-#' @field Wik Matrix of dimension \emph{(nm,K)}.
-#' @field Ey_k Matrix of dimension \emph{(n,K)}.
+#' @field tik Matrix of size \eqn{(n, K)} giving the posterior probability
+#'   \eqn{\tau_{ik}}{\tauik} that the observation \eqn{y_{i}}{yi} originates
+#'   from the \eqn{k}-th expert.
+#' @field Ey_k Matrix of dimension \emph{(n, K)} giving the estimated means of the experts.
 #' @field Ey Column matrix of dimension \emph{n}.
-#' @field Var_yk Column matrix of dimension \emph{K}.
-#' @field Vary Column matrix of dimension \emph{n}.
-#' @field log\_lik Numeric. Log-likelihood of the TMoE model.
-#' @field com_loglik Numeric. Complete log-likelihood of the TMoE model.
+#' @field Var_yk Column matrix of dimension \emph{K} giving the estimated means of the experts.
+#' @field Vary Column matrix of dimension \emph{n} giving the estimated variance of the response.
+#' @field loglik Numeric. Observed-data log-likelihood of the TMoE model.
+#' @field com_loglik Numeric. Complete-data log-likelihood of the TMoE model.
 #' @field stored_loglik Numeric vector. Stored values of the log-likelihood at
-#'   each EM iteration.
-#' @field BIC Numeric. Value of the BIC (Bayesian Information Criterion)
-#'   criterion. The formula is \eqn{BIC = log\_lik - df \times \textrm{log}(n) /
-#'   2}{BIC = log\_lik - df x log(n) / 2} with \emph{df} the degree of freedom
-#'   of the TMoE model.
-#' @field ICL Numeric. Value of the ICL (Integrated Completed Likelihood)
-#'   criterion. The formula is \eqn{ICL = com\_loglik - df \times
-#'   \textrm{log}(n) / 2}{ICL = com_loglik - df x log(n) / 2} with \emph{df} the
-#'   degree of freedom of the TMoE model.
-#' @field AIC Numeric. Value of the AIC (Akaike Information Criterion)
-#'   criterion. The formula is \eqn{AIC = log\_lik - df}{AIC = log\_lik - df}.
+#'   each ECM iteration.
+#' @field BIC Numeric. Value of BIC (Bayesian Information Criterion).
+#' @field ICL Numeric. Value of ICL (Integrated Completed Likelihood).
+#' @field AIC Numeric. Value of AIC (Akaike Information Criterion).
 #' @field log_piik_fik Matrix of size \eqn{(n, K)} giving the values of the
-#'   logarithm of the joint probability \eqn{P(Y_{i}, \ zi = k)}{P(Yi, zi = k)},
+#'   logarithm of the joint probability \eqn{P(y_{i}, \ z_{i} = k |
+#'   \boldsymbol{x}, \boldsymbol{\Psi})}{P(y_{i}, z_{i} = k | x, \Psi)}, \eqn{i
+#'   = 1,\dots,n}.
+#' @field log_sum_piik_fik Column matrix of size \emph{m} giving the values of
+#'   \eqn{\textrm{log} \sum_{k = 1}^{K} P(y_{i}, \ z_{i} = k | \boldsymbol{x},
+#'   \boldsymbol{\Psi})}{log \sum_{k = 1}^{K} P(y_{i}, z_{i} = k | x, \Psi)},
 #'   \eqn{i = 1,\dots,n}.
-#' @field log_sum_piik_fik Column matrix of size \emph{n} giving the values of
-#'   \eqn{\sum_{k = 1}^{K} \textrm{log} P(Y_{i}, \ zi = k)}{\sum_{k = 1}^{K} log
-#'   P(Yi, zi = k)}, \eqn{i = 1,\dots,n}.
-#' @field tik Matrix of size \eqn{(n, K)} giving the posterior probability that
-#'   \eqn{Y_{i}}{Yi} originates from the \eqn{k}-th regression model \eqn{P(zi =
-#'   k | Y, W, \beta)}.
+#' @field Wik Conditional expectations \eqn{w_{ik}}{wik}.
 #' @seealso [ParamTMoE]
 #' @export
 StatTMoE <- setRefClass(
@@ -85,21 +84,13 @@ StatTMoE <- setRefClass(
     },
 
     MAP = function() {
-      "
-      calcule une partition d'un echantillon par la regle du Maximum A Posteriori ?? partir des probabilites a posteriori
-      Entrees : post_probas , Matrice de dimensions [n x K] des probabibiltes a posteriori (matrice de la partition floue)
-      n : taille de l'echantillon
-      K : nombres de classes
-      klas(i) = arg   max (post_probas(i,k)) , for all i=1,...,n
-      1<=k<=K
-      = arg   max  p(zi=k|xi;theta)
-      1<=k<=K
-      = arg   max  p(zi=k;theta)p(xi|zi=k;theta)/sum{l=1}^{K}p(zi=l;theta) p(xi|zi=l;theta)
-      1<=k<=K
-      Sorties : classes : vecteur collones contenant les classe (1:K)
-      Z : Matrice de dimension [nxK] de la partition dure : ses elements sont zik, avec zik=1 si xi
-      appartient ?? la classe k (au sens du MAP) et zero sinon.
-      "
+      "MAP calculates values of the fields \\code{z_ik} and \\code{klas}
+      by applying the Maximum A Posteriori Bayes allocation rule.
+
+      \\eqn{z_{ik} = 1 \\ \\textrm{if} \\ k = \\textrm{arg} \\ \\textrm{max}_{s}
+      \\ \\tau_{is};\\ 0 \\ \\textrm{otherwise}}{
+      z_{ik} = 1 if z_ik = arg max_{s} \\tau_{is}; 0 otherwise}"
+
       N <- nrow(tik)
       K <- ncol(tik)
       ikmax <- max.col(tik)
@@ -112,12 +103,17 @@ StatTMoE <- setRefClass(
     },
 
     computeLikelihood = function(reg_irls) {
+      "Method to compute the log-likelihood. \\code{reg_irls} is the value of
+      the regularization part in the IRLS algorithm."
 
       log_lik <<- sum(log_sum_piik_fik) + reg_irls
 
     },
 
     computeStats = function(paramTMoE) {
+      "Method used in the ECM algorithm to compute statistics based on
+      parameters provided by the object \\code{paramTMoE} of class
+      \\link{ParamTMoE}."
 
       # E[yi|xi,zi=k]
       Ey_k <<- paramTMoE$phiBeta$XBeta[1:paramTMoE$n,] %*% paramTMoE$beta
@@ -145,6 +141,9 @@ StatTMoE <- setRefClass(
     },
 
     EStep = function(paramTMoE) {
+      "Method used in the ECM algorithm to update statistics based on parameters
+      provided by the object \\code{paramTMoE} of class \\link{ParamTMoE}
+      (prior and posterior probabilities)."
 
       piik <<- multinomialLogit(paramTMoE$alpha, paramTMoE$phiAlpha$XBeta, ones(paramTMoE$n, paramTMoE$K), ones(paramTMoE$n, 1))$piik
 

@@ -2,58 +2,58 @@
 % Please edit documentation in R/emNMoE.R
 \name{emNMoE}
 \alias{emNMoE}
-\title{emNMoE implements the EM algorithm to fit a NMoE model.}
+\title{emNMoE implements the EM algorithm to fit a Normal Mixture of Experts (NMoE).}
 \usage{
 emNMoE(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500,
   threshold = 1e-06, verbose = FALSE, verbose_IRLS = FALSE)
 }
 \arguments{
 \item{X}{Numeric vector of length \emph{n} representing the covariates/inputs
-\eqn{x_{1},\dots,x_{m}}.}
+\eqn{x_{1},\dots,x_{n}}.}
 
 \item{Y}{Numeric vector of length \emph{n} representing the observed
-response/output \eqn{y_{1},\dots,y_{m}}.}
+response/output \eqn{y_{1},\dots,y_{n}}.}
 
-\item{K}{The number of expert components.}
+\item{K}{The number of experts.}
 
-\item{p}{The order of the polynomial regression for the expert regressors
+\item{p}{Optional. The order of the polynomial regression for the experts.}
+
+\item{q}{Optional. The order of the logistic regression for the gating
 network.}
 
-\item{q}{The dimension of the logistic regression for the gating network. For
-the purpose of segmentation, it must be set to 1.}
+\item{n_tries}{Optional. Number of runs of the EM algorithm. The solution
+providing the highest log-likelihood will be returned.}
 
-\item{n_tries}{Number of times EM algorithm will be launched with different
-initializations. The solution providing the highest log-likelihood will be
-returned.}
-
-\item{max_iter}{The maximum number of iterations for the EM algorithm.}
-
-\item{threshold}{A numeric value specifying the threshold for the relative
-difference of log-likelihood between two steps  of the EM as stopping
-criteria.}
-
-\item{verbose}{A logical value indicating whether values of the
-log-likelihood should be printed during EM iterations.}
-
-\item{verbose_IRLS}{A logical value indicating whether values of the
-criterion optimized by IRLS should be printed at each step of the EM
+\item{max_iter}{Optional. The maximum number of iterations for the EM
 algorithm.}
+
+\item{threshold}{Optional. A numeric value specifying the threshold for the
+relative difference of log-likelihood between two steps of the EM as
+stopping criteria.}
+
+\item{verbose}{Optional. A logical value indicating whether or not values of
+the log-likelihood should be printed during EM iterations.}
+
+\item{verbose_IRLS}{Optional. A logical value indicating whether or not
+values of the criterion optimized by IRLS should be printed at each step of
+the EM algorithm.}
 }
 \value{
-Th EM algorithm returns an object of class \link{ModelNMoE}.
+EM returns an object of class \link{ModelNMoE}.
 }
 \description{
-emNMoE implements the maximum-likelihood parameter estimation of a NMoE model
-by the Expectation-Maximization (EM) algorithm.
+emNMoE implements the maximum-likelihood parameter estimation of a Normal
+Mixture of Experts (NMoE) model by the Expectation-Maximization (EM)
+algorithm.
 }
 \details{
-emNMoE function function implements the EM algorithm for the NMoE
-model. This functions starts with an initialization of the parameters done
-by the method \code{initParam} of the class \link{ParamNMoE}, then it
-alternates between a E-Step (method of the class \link{StatNMoE}) and
-a M-Step (method of the class \link{ParamNMoE}) until convergence
-(until the absolute difference of log-likelihood between two steps of the
-EM algorithm is less than the \code{threshold} parameter).
+emNMoE function implements the EM algorithm for the NMoE model. This
+function starts with an initialization of the parameters done by the method
+\code{initParam} of the class \link{ParamNMoE}, then it alternates between
+the E-Step (method of the class \link{StatNMoE}) and the M-Step
+(method of the class \link{ParamNMoE}) until convergence (until the
+relative variation of log-likelihood between two steps of the EM algorithm
+is less than the \code{threshold} parameter).
 }
 \seealso{
 \link{ModelNMoE}, \link{ParamNMoE}, \link{StatNMoE}
