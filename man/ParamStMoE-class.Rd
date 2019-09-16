@@ -48,7 +48,7 @@ default.}
 \frac{\lambda}{\sqrt{1+\lambda^2}}}{\delta = \lambda /
 (1+\lambda^2)^(1/2)}.}
 
-\item{\code{nuk}}{The degree of freedom for the Student distribution for each
+\item{\code{nu}}{The degree of freedom for the Student distribution for each
 experts (matrix of size \eqn{(1, K)}).}
 
 \item{\code{df}}{The degree of freedom of the StMoE model representing the

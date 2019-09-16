@@ -134,7 +134,7 @@ StatStMoE <- setRefClass(
       parameters provided by the object \\code{paramStMoE} of class
       \\link{ParamStMoE}."
 
-      Xi_nuk = sqrt(paramStMoE$nuk / pi) * (gamma(paramStMoE$nuk / 2 - 1 / 2)) / (gamma(paramStMoE$nuk / 2))
+      Xi_nuk = sqrt(paramStMoE$nu / pi) * (gamma(paramStMoE$nu / 2 - 1 / 2)) / (gamma(paramStMoE$nu / 2))
 
       # E[yi|xi,zi=k]
       Ey_k <<- paramStMoE$phiBeta$XBeta[1:paramStMoE$n,] %*% paramStMoE$beta + ones(paramStMoE$n, 1) %*% (paramStMoE$delta * sqrt(paramStMoE$sigma2) * Xi_nuk)
@@ -143,7 +143,7 @@ StatStMoE <- setRefClass(
       Ey <<- matrix(apply(piik * Ey_k, 1, sum))
 
       # Var[yi|xi,zi=k]
-      Var_yk <<- (paramStMoE$nuk / (paramStMoE$nuk - 2) - (paramStMoE$delta ^ 2) * (Xi_nuk ^ 2)) * paramStMoE$sigma2
+      Var_yk <<- (paramStMoE$nu / (paramStMoE$nu - 2) - (paramStMoE$delta ^ 2) * (Xi_nuk ^ 2)) * paramStMoE$sigma2
 
       # Var[yi|xi]
       Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramStMoE$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
@@ -170,8 +170,8 @@ StatStMoE <- setRefClass(
 
       for (k in (1:paramStMoE$K)) {
         dik[, k] <<- (paramStMoE$Y - paramStMoE$phiBeta$XBeta %*% paramStMoE$beta[, k]) / sqrt(paramStMoE$sigma2[k])
-        mik[, k] <- paramStMoE$lambda[k] %*% dik[, k] * sqrt(paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2)
-        piik_fik[, k] <- piik[, k] * (2 / sqrt(paramStMoE$sigma2[k])) * dt(dik[, k], paramStMoE$nuk[k]) * pt(mik[, k], paramStMoE$nuk[k] + 1)
+        mik[, k] <- paramStMoE$lambda[k] %*% dik[, k] * sqrt(paramStMoE$nu[k] + 1) / (paramStMoE$nu[k] + dik[, k] ^ 2)
+        piik_fik[, k] <- piik[, k] * (2 / sqrt(paramStMoE$sigma2[k])) * dt(dik[, k], paramStMoE$nu[k]) * pt(mik[, k], paramStMoE$nu[k] + 1)
       }
 
       stme_pdf <<- matrix(rowSums(piik_fik)) # Skew-t mixture of experts density
@@ -196,7 +196,7 @@ StatStMoE <- setRefClass(
       for (k in (1:paramStMoE$K)) {
 
         fx = function(x) {
-          return((psigamma((paramStMoE$nuk[k] + 2) / 2) - psigamma((paramStMoE$nuk[k] + 1) / 2) + log(1 + (x ^ 2) / (paramStMoE$nuk[k])) + ((paramStMoE$nuk[k] + 1) * x ^ 2 - paramStMoE$nuk[k] - 1) / ((paramStMoE$nuk[k] + 1) * (paramStMoE$nuk[k] + 1 + x ^ 2))) * dt(x, paramStMoE$nuk[k] + 1))
+          return((psigamma((paramStMoE$nu[k] + 2) / 2) - psigamma((paramStMoE$nu[k] + 1) / 2) + log(1 + (x ^ 2) / (paramStMoE$nu[k])) + ((paramStMoE$nu[k] + 1) * x ^ 2 - paramStMoE$nu[k] - 1) / ((paramStMoE$nu[k] + 1) * (paramStMoE$nu[k] + 1 + x ^ 2))) * dt(x, paramStMoE$nu[k] + 1))
         }
 
 
@@ -206,10 +206,10 @@ StatStMoE <- setRefClass(
 
 
         dik[, k] <<- (paramStMoE$Y - muk) / sigmak
-        mik[, k] <- paramStMoE$lambda[k] %*% dik[, k] * sqrt((paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2))
+        mik[, k] <- paramStMoE$lambda[k] %*% dik[, k] * sqrt((paramStMoE$nu[k] + 1) / (paramStMoE$nu[k] + dik[, k] ^ 2))
 
         # E[Wi|yi,zik=1]
-        wik[, k] <<- ((paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2)) * pt(mik[, k] * sqrt((paramStMoE$nuk[k] + 3) / (paramStMoE$nuk[k] + 1)), paramStMoE$nuk[k] + 3) / pt(mik[, k], paramStMoE$nuk[k] + 1)
+        wik[, k] <<- ((paramStMoE$nu[k] + 1) / (paramStMoE$nu[k] + dik[, k] ^ 2)) * pt(mik[, k] * sqrt((paramStMoE$nu[k] + 3) / (paramStMoE$nu[k] + 1)), paramStMoE$nu[k] + 3) / pt(mik[, k], paramStMoE$nu[k] + 1)
 
 
         if (calcE1) {
@@ -217,25 +217,25 @@ StatStMoE <- setRefClass(
           univStMoEpdf(paramStMoE)
           # E[Wi Ui |yi,zik=1]
           E1ik[, k] <<- deltak * abs(paramStMoE$Y - muk) * wik[, k] +
-            (sqrt(1 - deltak ^ 2) / (pi * stme_pdf)) * ((dik[, k] ^ 2 / (paramStMoE$nuk[k] * (1 - deltak ^ 2)) + 1) ^ (-(paramStMoE$nuk[k] / 2 + 1)))
+            (sqrt(1 - deltak ^ 2) / (pi * stme_pdf)) * ((dik[, k] ^ 2 / (paramStMoE$nu[k] * (1 - deltak ^ 2)) + 1) ^ (-(paramStMoE$nu[k] / 2 + 1)))
         }
 
         if (calcE2) {
 
           E2ik[, k] <<- deltak ^ 2 * ((paramStMoE$Y - muk) ^ 2) * wik[, k] +
-            (1 - deltak ^ 2) * sigmak ^ 2 + ((deltak * (paramStMoE$Y - muk) * sqrt(1 - deltak ^ 2)) / (pi * stme_pdf)) * (((dik[, k] ^ 2) / (paramStMoE$nuk[k] * (1 - deltak ^ 2)) + 1) ^ (-(paramStMoE$nuk[k] / 2 + 1)))
+            (1 - deltak ^ 2) * sigmak ^ 2 + ((deltak * (paramStMoE$Y - muk) * sqrt(1 - deltak ^ 2)) / (pi * stme_pdf)) * (((dik[, k] ^ 2) / (paramStMoE$nu[k] * (1 - deltak ^ 2)) + 1) ^ (-(paramStMoE$nu[k] / 2 + 1)))
         }
 
         if (calcE3) {
 
           Integgtx[, k] <- sapply(mik[, k], function(x) try(integrate(f = fx, lower = -Inf, upper = x)$value, silent = TRUE))
-          E3ik[, k] <<- wik[, k] - log((paramStMoE$nuk[k] + dik[, k] ^ 2) / 2) - (paramStMoE$nuk[k] + 1) / (paramStMoE$nuk[k] + dik[, k] ^ 2) + psigamma((paramStMoE$nuk[k] + 1) / 2) + ((paramStMoE$lambda[k] * dik[, k] * (dik[, k] ^ 2 - 1)) / sqrt((paramStMoE$nuk[k] + 1) * ((paramStMoE$nuk[k] + dik[, k] ^ 2) ^ 3))) * dt(mik[, k], paramStMoE$nuk[k] + 1) / pt(mik[, k], paramStMoE$nuk[k] + 1) + (1 / pt(mik[, k], paramStMoE$nuk[k] + 1)) * Integgtx[, k]
+          E3ik[, k] <<- wik[, k] - log((paramStMoE$nu[k] + dik[, k] ^ 2) / 2) - (paramStMoE$nu[k] + 1) / (paramStMoE$nu[k] + dik[, k] ^ 2) + psigamma((paramStMoE$nu[k] + 1) / 2) + ((paramStMoE$lambda[k] * dik[, k] * (dik[, k] ^ 2 - 1)) / sqrt((paramStMoE$nu[k] + 1) * ((paramStMoE$nu[k] + dik[, k] ^ 2) ^ 3))) * dt(mik[, k], paramStMoE$nu[k] + 1) / pt(mik[, k], paramStMoE$nu[k] + 1) + (1 / pt(mik[, k], paramStMoE$nu[k] + 1)) * Integgtx[, k]
         }
 
         if (calcTau) {
 
           # Weighted skew normal linear expert likelihood
-          piik_fik[, k] <- piik[, k] * (2 / sigmak) * dt(dik[, k], paramStMoE$nuk[k]) * pt(mik[, k], paramStMoE$nuk[k] + 1)
+          piik_fik[, k] <- piik[, k] * (2 / sigmak) * dt(dik[, k], paramStMoE$nu[k]) * pt(mik[, k], paramStMoE$nu[k] + 1)
 
         }
 

@@ -31,12 +31,14 @@ library(meteorits)
 
 # Introduction
 
-**MEteorit** is a toolbox containg several original and flexible 
-mixtures-of-experts models to model, cluster and classify heteregenous data in 
-many complex situations where the data are distributed according non-normal, 
-possibly skewed distributions, and when they might be corrupted by atypical
-observations. The toolbox contains in particular sparse mixture-of-experts 
-models for high-dimensional data. 
+**NMoE** (Normal Mixtures-of-Experts) provides a flexible modelling framework 
+for heterogenous data with Gaussian distributions. **NMoE** consists of a 
+mixture of *K* Normal expert regressors network (of degree *p*) gated by a 
+softmax gating network (of degree *q*) and is represented by:
+
+* The gating network parameters `alpha`'s of the softmax net.
+* The experts network parameters: The location parameters (regression 
+coefficients) `beta`'s and variances `sigma2`'s.
 
 It was written in R Markdown, using the [knitr](https://cran.r-project.org/package=knitr) 
 package for production.

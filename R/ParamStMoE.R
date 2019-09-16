@@ -28,7 +28,7 @@
 #' @field delta delta is equal \eqn{\delta =
 #'   \frac{\lambda}{\sqrt{1+\lambda^2}}}{\delta = \lambda /
 #'   (1+\lambda^2)^(1/2)}.
-#' @field nuk The degree of freedom for the Student distribution for each
+#' @field nu The degree of freedom for the Student distribution for each
 #'   experts (matrix of size \eqn{(1, K)}).
 #' @field df The degree of freedom of the StMoE model representing the
 #'   complexity of the model.
@@ -53,7 +53,7 @@ ParamStMoE <- setRefClass(
     sigma2 = "matrix",
     lambda = "matrix",
     delta = "matrix",
-    nuk = "matrix"
+    nu = "matrix"
   ),
   methods = list(
     initialize = function(X = numeric(), Y = numeric(1), K = 1, p = 3, q = 1) {
@@ -74,7 +74,7 @@ ParamStMoE <- setRefClass(
       sigma2 <<- matrix(NA, 1, K)
       lambda <<- matrix(NA, ncol = K)
       delta <<- matrix(NA, ncol = K)
-      nuk <<- matrix(NA, ncol = K)
+      nu <<- matrix(NA, ncol = K)
     },
 
     initParam = function(segmental = FALSE) {
@@ -135,7 +135,7 @@ ParamStMoE <- setRefClass(
       delta <<- lambda / sqrt(1 + lambda ^ 2)
 
       # Intitialization of the degrees of freedom
-      nuk <<- 50 * rand(1, K)
+      nu <<- 50 * rand(1, K)
     },
 
     MStep = function(statStMoE, calcAlpha = FALSE, calcBeta = FALSE, calcSigma2 = FALSE, calcLambda = FALSE, calcNu = FALSE, verbose_IRLS = FALSE) {
@@ -195,7 +195,7 @@ ParamStMoE <- setRefClass(
       if (calcNu) {
 
         for (k in 1:K) {
-          try(nuk[k] <<- suppressWarnings(uniroot(f <- function(nnu) {
+          try(nu[k] <<- suppressWarnings(uniroot(f <- function(nnu) {
             return(-psigamma((nnu) / 2) + log((nnu) / 2) + 1 + sum(statStMoE$tik[, k] * (statStMoE$E3ik[, k] - statStMoE$wik[, k])) /
                      sum(statStMoE$tik[, k]))
           }, c(0, 100))$root), silent = TRUE)

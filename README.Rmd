@@ -31,10 +31,10 @@ contains sparse mixture-of-experts models for high-dimensional data.
 
 Our (dis-)covered meteorits are for instance the following ones:
 
-* NMoE;
-* tMoE;
-* SNMoE;
-* StMoE.
+* NMoE (Normal Mixtures-of-Experts);
+* tMoE (t Mixtures-of-Experts);
+* SNMoE (Skew-Normal Mixtures-of-Experts);
+* StMoE (Skew t Mixtures-of-Experts).
 
 The models and algorithms are developped and written in Matlab by Faicel 
 Chamroukhi, and translated and designed into R packages by Florian Lecocq, 
@@ -74,7 +74,7 @@ library(meteorits)
   <summary>NMoE</summary>
 
 ```{r, echo = TRUE}
-# Application to a simuated data set
+# Application to a simulated data set
 
 n <- 500 # Size of the sample
 alphak <- matrix(c(0, 8), ncol = 1) # Parameters of the gating network
@@ -131,7 +131,7 @@ nmoe$plot()
   <summary>TMoE</summary>
 
 ```{r, echo = TRUE}
-# Application to a simuated data set
+# Application to a simulated data set
 
 n <- 500 # Size of the sample
 alphak <- matrix(c(0, 8), ncol = 1) # Parameters of the gating network

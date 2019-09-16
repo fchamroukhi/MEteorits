@@ -31,15 +31,30 @@ library(meteorits)
 
 # Introduction
 
-**MEteorit** is a toolbox containg several original and flexible 
-mixtures-of-experts models to model, cluster and classify heteregenous data in 
-many complex situations where the data are distributed according non-normal, 
-possibly skewed distributions, and when they might be corrupted by atypical
-observations. The toolbox contains in particular sparse mixture-of-experts 
-models for high-dimensional data. 
+**SNMoE** (Skew-Normal Mixtures-of-Experts) provides a flexible modelling 
+framework for heterogenous data with possibly skewed distributions to 
+generalize the standard Normal mixture of expert model. **SNMoE** consists of 
+a mixture of *K* skew-Normal expert regressors network (of degree *p*) gated by
+a softmax gating network (of degree *q*) and is represented by:
+
+* The gating network parameters `alpha`'s of the softmax net.
+* The experts network parameters: The location parameters (regression 
+coefficients) `beta`'s, scale parameters `sigma`'s, and the skewness 
+parameters `lambda`'s. **SNMoE** thus generalises mixtures of (normal, 
+skew-normal) distributions and mixtures of regressions with these 
+distributions. For example, when $q=0$, we retrieve mixtures of (skew-normal, 
+or normal) regressions, and when both $p=0$ and $q=0$, it is a mixture of 
+(skew-normal, or normal) distributions. It also reduces to the standard 
+(normal, skew-normal) distribution when we only use a single expert ($K=1$).
+
+Model estimation/learning is performed by a dedicated expectation conditional 
+maximization (ECM) algorithm by maximizing the observed data log-likelihood. 
+We provide simulated examples to illustrate the use of the model in 
+model-based clustering of heterogeneous regression data and in fitting 
+non-linear regression functions.
 
 It was written in R Markdown, using the [knitr](https://cran.r-project.org/package=knitr) 
-package for production. 
+package for production.
 
 See `help(package="meteorits")` for further details and references provided by
 `citation("meteorits")`.
