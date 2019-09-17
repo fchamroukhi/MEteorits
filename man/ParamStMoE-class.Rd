@@ -44,7 +44,7 @@ default.}
 \item{\code{lambda}}{The skewness parameters for each experts (matrix of size
 \eqn{(1, K)}).}
 
-\item{\code{delta}}{delta is equal \eqn{\delta =
+\item{\code{delta}}{delta is equal to \eqn{\delta =
 \frac{\lambda}{\sqrt{1+\lambda^2}}}{\delta = \lambda /
 (1+\lambda^2)^(1/2)}.}
 

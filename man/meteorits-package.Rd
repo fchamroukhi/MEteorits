@@ -16,17 +16,17 @@ sparse mixture-of-experts models for high-dimensional data.
 \code{meteorits} contains the following Mixture-of-Experts models:
 
 \itemize{
-\item NMoE provides a flexible framework for heterogenous data with
-Normal expert regressors network;
-\item SNMoE provides a flexible modeling framework for heterogenous
-data with possibly skewed distributions to generalize the standard Normal
-mixture of expert model;
-\item TMoE provides a flexible and robust modeling framework for
-heterogenous data with possibly heavy-tailed distributions and corrupted by
-atypical observations;
-\item StMoE provides a flexible and robust modeling framework for
-heterogenous data with possibly skewed, heavy-tailed distributions and
-corrupted by atypical observations.
+\item NMoE (Normal Mixtures-of-Experts) provides a flexible framework for
+heterogenous data with Normal expert regressors network;
+\item SNMoE (Skew-Normal Mixtures-of-Experts) provides a flexible
+modeling framework for heterogenous data with possibly skewed
+distributions to generalize the standard Normal mixture of expert model;
+\item tMoE (t Mixtures-of-Experts) provides a flexible and robust
+modeling framework for heterogenous data with possibly heavy-tailed
+distributions and corrupted by atypical observations;
+\item StMoE (Skew t Mixtures-of-Experts) provides a flexible and robust
+modeling framework for heterogenous data with possibly skewed,
+heavy-tailed distributions and corrupted by atypical observations.
 }
 
 For the advantages/differences of each of them, the user is referred to our

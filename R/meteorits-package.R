@@ -10,17 +10,17 @@
 #' `meteorits` contains the following Mixture-of-Experts models:
 #'
 #' \itemize{
-#'   \item NMoE provides a flexible framework for heterogenous data with
-#'   Normal expert regressors network;
-#'   \item SNMoE provides a flexible modeling framework for heterogenous
-#'   data with possibly skewed distributions to generalize the standard Normal
-#'   mixture of expert model;
-#'   \item TMoE provides a flexible and robust modeling framework for
-#'   heterogenous data with possibly heavy-tailed distributions and corrupted by
-#'   atypical observations;
-#'   \item StMoE provides a flexible and robust modeling framework for
-#'   heterogenous data with possibly skewed, heavy-tailed distributions and
-#'   corrupted by atypical observations.
+#'   \item NMoE (Normal Mixtures-of-Experts) provides a flexible framework for
+#'   heterogenous data with Normal expert regressors network;
+#'   \item SNMoE (Skew-Normal Mixtures-of-Experts) provides a flexible
+#'   modeling framework for heterogenous data with possibly skewed
+#'   distributions to generalize the standard Normal mixture of expert model;
+#'   \item tMoE (t Mixtures-of-Experts) provides a flexible and robust
+#'   modeling framework for heterogenous data with possibly heavy-tailed
+#'   distributions and corrupted by atypical observations;
+#'   \item StMoE (Skew t Mixtures-of-Experts) provides a flexible and robust
+#'   modeling framework for heterogenous data with possibly skewed,
+#'   heavy-tailed distributions and corrupted by atypical observations.
 #' }
 #'
 #' For the advantages/differences of each of them, the user is referred to our
@@ -46,6 +46,8 @@
 #' Chamroukhi, F., A. Same, G. Govaert, and P. Aknin. 2009. \emph{Time Series Modeling by a Regression Approach Based on a Latent Process.} Neural Networks 22 (5-6): 593--602. \url{https://chamroukhi.com/papers/Chamroukhi_Neural_Networks_2009.pdf}.
 #'
 #' @import methods
+#' @import pracma
+#' @import MASS
 ## usethis namespace: start
 #' @useDynLib meteorits, .registration = TRUE
 ## usethis namespace: end

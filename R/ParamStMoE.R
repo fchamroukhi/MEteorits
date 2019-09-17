@@ -25,7 +25,7 @@
 #'   \eqn{(1, K)}).
 #' @field lambda The skewness parameters for each experts (matrix of size
 #'   \eqn{(1, K)}).
-#' @field delta delta is equal \eqn{\delta =
+#' @field delta delta is equal to \eqn{\delta =
 #'   \frac{\lambda}{\sqrt{1+\lambda^2}}}{\delta = \lambda /
 #'   (1+\lambda^2)^(1/2)}.
 #' @field nu The degree of freedom for the Student distribution for each

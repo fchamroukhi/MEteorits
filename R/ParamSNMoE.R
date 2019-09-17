@@ -25,7 +25,7 @@
 #'   \eqn{(1, K)}).
 #' @field lambda The skewness parameters for each experts (matrix of size
 #'   \eqn{(1, K)}).
-#' @field delta delta is equal \eqn{\delta =
+#' @field delta delta is equal to \eqn{\delta =
 #'   \frac{\lambda}{\sqrt{1+\lambda^2}}}{\delta = \lambda /
 #'   (1+\lambda^2)^(1/2)}.
 #' @field df The degree of freedom of the SNMoE model representing the
@@ -123,6 +123,7 @@ ParamSNMoE <- setRefClass(
       Z <- matrix(0, nrow = n, ncol = K)
       Z[klas %*% ones(1, K) == ones(n, 1) %*% seq(K)] <- 1
       tau <- Z
+
       res <- IRLS(phiAlpha$XBeta, tau, ones(nrow(tau), 1), alpha)
       alpha <<- res$W
 
@@ -147,6 +148,7 @@ ParamSNMoE <- setRefClass(
       \\code{statSNMoE} of class \\link{StatSNMoE} (which contains the E-step)."
 
       res_irls <- IRLS(phiAlpha$XBeta, statSNMoE$tik, ones(nrow(statSNMoE$tik), 1), alpha, verbose_IRLS)
+
       statSNMoE$piik <- res_irls$piik
       reg_irls <- res_irls$reg_irls
 
@@ -156,6 +158,7 @@ ParamSNMoE <- setRefClass(
 
         # Update the regression coefficients
         tauik_Xbeta <- (statSNMoE$tik[, k] %*% ones(1, p + 1)) * phiBeta$XBeta
+
         beta[, k] <<- solve((t(tauik_Xbeta) %*% phiBeta$XBeta)) %*% (t(tauik_Xbeta) %*% (Y - delta[k] * statSNMoE$E1ik[, k]))
 
         # Update the variances sigma2k

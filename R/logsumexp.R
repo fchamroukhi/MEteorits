@@ -7,7 +7,7 @@ logsumexp <- function(A, margin) {
     A <- xstar + log(apply(exp(M), 1, sum))
   } else{
     xstar <- apply(A, 2, max)
-    M <- M -  matrix(1, nrow = row(M), ncol = 1) %*% xstar
+    M <- M -  matrix(1, nrow = nrow(M), ncol = 1) %*% xstar
     A <- xstar + log(apply(exp(M), 2, sum))
   }
   return(A)

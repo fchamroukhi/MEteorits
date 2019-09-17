@@ -166,9 +166,13 @@ StatSNMoE <- setRefClass(
 
         # E1ik = E[Ui|yi,xi,zik=1]
         E1ik[, k] <<- mu_uk + sigma_uk * dnorm(paramSNMoE$lambda[k] * dik, 0, 1) / pnorm(paramSNMoE$lambda[k] * dik, 0, 1)
+        E1ik[is.nan(E1ik[, k]), k] <<- mu_uk[is.nan(E1ik[, k])] - sigma_uk * paramSNMoE$lambda[k] * dik[is.nan(E1ik[, k])]
+        E1ik[is.infinite(E1ik[, k]), k] <<- mu_uk[is.infinite(E1ik[, k])] - sigma_uk * paramSNMoE$lambda[k] * dik[is.infinite(E1ik[, k])]
 
         # E2ik = E[Ui^2|y,zik=1]
         E2ik[, k] <<- mu_uk ^ 2 + sigma_uk ^ 2 + sigma_uk * mu_uk * dnorm(paramSNMoE$lambda[k] * dik, 0, 1) / pnorm(paramSNMoE$lambda[k] * dik, 0, 1)
+        E2ik[is.nan(E2ik[, k]), k] <<- mu_uk[is.nan(E2ik[, k])] ^ 2 + sigma_uk ^ 2 - sigma_uk * mu_uk[is.nan(E2ik[, k])] * paramSNMoE$lambda[k] * dik[is.nan(E2ik[, k])]
+        E2ik[is.infinite(E2ik[, k]), k] <<- mu_uk[is.infinite(E2ik[, k])] ^ 2 + sigma_uk ^ 2 - sigma_uk * mu_uk[is.infinite(E2ik[, k])] * paramSNMoE$lambda[k] * dik[is.infinite(E2ik[, k])]
 
         # weighted skew normal linear expert likelihood
         piik_fik[, k] <- piik[, k] * (2 / sigmak) * dnorm(dik, 0, 1) * pnorm(paramSNMoE$lambda[k] * dik)
@@ -179,7 +183,9 @@ StatSNMoE <- setRefClass(
       log_sum_piik_fik <<- matrix(log(rowSums(piik_fik)))
 
       # E[Zik|y,x] and E[U^2|y,zik=1]
-      tik <<- piik_fik / (rowSums(piik_fik) %*% ones(1, paramSNMoE$K))
+      # tik <<- piik_fik / (rowSums(piik_fik) %*% ones(1, paramSNMoE$K))
+      log_Tauik <- log_piik_fik - logsumexp(log_piik_fik, 1) %*% ones(1, paramSNMoE$K)
+      tik <<- exp(log_Tauik)
     }
   )
 )
