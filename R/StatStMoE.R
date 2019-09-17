@@ -21,7 +21,7 @@
 #'   from the \eqn{k}-th expert.
 #' @field Ey_k Matrix of dimension \emph{(n, K)} giving the estimated means of
 #'   the experts.
-#' @field Ey Column matrix of dimension \emph{n}.
+#' @field Ey Column matrix of dimension \emph{n} giving the estimated mean of the StMoE.
 #' @field Var_yk Column matrix of dimension \emph{K} giving the estimated means
 #'   of the experts.
 #' @field Vary Column matrix of dimension \emph{n} giving the estimated variance

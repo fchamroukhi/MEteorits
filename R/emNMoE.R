@@ -35,6 +35,15 @@
 #' @return EM returns an object of class [ModelNMoE][ModelNMoE].
 #' @seealso [ModelNMoE], [ParamNMoE], [StatNMoE]
 #' @export
+#'
+#' @examples
+#' data(tempanomalies)
+#' x <- tempanomalies$Year
+#' y <- tempanomalies$AnnualAnomaly
+#'
+#' nmoe <- emNMoE(X = x, Y = y, K = 2, p = 1, verbose = TRUE)
+#'
+#' nmoe$plot()
 emNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
 
   top <- 0

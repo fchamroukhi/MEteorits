@@ -54,3 +54,22 @@ of Yi given \emph{X = xi}.
 \description{
 Draw a sample from a univariate skew-t mixture.
 }
+\examples{
+n <- 500 # Size of the sample
+alphak <- matrix(c(0, 8), ncol = 1) # Parameters of the gating network
+betak <- matrix(c(0, -2.5, 0, 2.5), ncol = 2) # Regression coefficients of the experts
+sigmak <- c(0.5, 0.5) # Standard deviations of the experts
+lambdak <- c(3, 5) # Skewness parameters of the experts
+nuk <- c(5, 7) # Degrees of freedom of the experts network t densities
+x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
+
+# Generate sample of size n
+sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, sigmak = sigmak,
+                          lambdak = lambdak, nuk = nuk, x = x)
+
+# Plot points and estimated means
+plot(x, sample$y, pch = 4)
+lines(x, sample$stats$Ey_k[, 1], col = "blue", lty = "dotted", lwd = 1.5)
+lines(x, sample$stats$Ey_k[, 2], col = "blue", lty = "dotted", lwd = 1.5)
+lines(x, sample$stats$Ey, col = "red", lwd = 1.5)
+}

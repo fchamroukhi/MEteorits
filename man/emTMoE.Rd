@@ -55,6 +55,15 @@ the E-Step (method of the class \link{StatTMoE}) and the M-Step
 relative variation of log-likelihood between two steps of the ECM algorithm
 is less than the \code{threshold} parameter).
 }
+\examples{
+data(tempanomalies)
+x <- tempanomalies$Year
+y <- tempanomalies$AnnualAnomaly
+
+tmoe <- emTMoE(X = x, Y = y, K = 2, p = 1, verbose = TRUE)
+
+tmoe$plot()
+}
 \seealso{
 \link{ModelTMoE}, \link{ParamTMoE}, \link{StatTMoE}
 }

@@ -34,7 +34,7 @@ from the \eqn{k}-th expert.}
 
 \item{\code{Ey_k}}{Matrix of dimension \emph{(n, K)} giving the estimated means of the experts.}
 
-\item{\code{Ey}}{Column matrix of dimension \emph{n}.}
+\item{\code{Ey}}{Column matrix of dimension \emph{n} giving the estimated mean of the NMoE.}
 
 \item{\code{Var_yk}}{Column matrix of dimension \emph{K} giving the estimated means of the experts.}
 

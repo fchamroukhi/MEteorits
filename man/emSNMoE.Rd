@@ -56,6 +56,15 @@ and the M-Step (method of the class \link{ParamSNMoE}) until
 convergence (until the relative variation of log-likelihood between two
 steps of the ECM algorithm is less than the \code{threshold} parameter).
 }
+\examples{
+data(tempanomalies)
+x <- tempanomalies$Year
+y <- tempanomalies$AnnualAnomaly
+
+snmoe <- emSNMoE(X = x, Y = y, K = 2, p = 1, verbose = TRUE)
+
+snmoe$plot()
+}
 \seealso{
 \link{ModelSNMoE}, \link{ParamSNMoE}, \link{StatSNMoE}
 }

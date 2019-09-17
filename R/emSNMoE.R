@@ -36,6 +36,15 @@
 #' @return ECM returns an object of class [ModelSNMoE][ModelSNMoE].
 #' @seealso [ModelSNMoE], [ParamSNMoE], [StatSNMoE]
 #' @export
+#'
+#' @examples
+#' data(tempanomalies)
+#' x <- tempanomalies$Year
+#' y <- tempanomalies$AnnualAnomaly
+#'
+#' snmoe <- emSNMoE(X = x, Y = y, K = 2, p = 1, verbose = TRUE)
+#'
+#' snmoe$plot()
 emSNMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
 
   top <- 0

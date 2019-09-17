@@ -138,7 +138,9 @@ ParamStMoE <- setRefClass(
       nu <<- 50 * rand(1, K)
     },
 
-    MStep = function(statStMoE, calcAlpha = FALSE, calcBeta = FALSE, calcSigma2 = FALSE, calcLambda = FALSE, calcNu = FALSE, verbose_IRLS = FALSE) {
+    MStep = function(statStMoE, calcAlpha = FALSE, calcBeta = FALSE,
+                     calcSigma2 = FALSE, calcLambda = FALSE, calcNu = FALSE,
+                     verbose_IRLS = FALSE) {
       "Method which implements the M-step of the EM algorithm to learn the
       parameters of the StMoE model based on statistics provided by the object
       \\code{statStMoE} of class \\link{StatStMoE} (which contains the E-step)."
