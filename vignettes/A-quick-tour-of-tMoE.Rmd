@@ -102,6 +102,12 @@ tmoe <- emTMoE(X = x, Y = y, K, p, q, n_tries, max_iter,
                threshold, verbose, verbose_IRLS)
 ```
 
+## Summary
+
+```{r}
+tmoe$summary()
+```
+
 ## Plots
 
 ### Mean curve
@@ -162,6 +168,12 @@ verbose_IRLS <- FALSE
 ```{r}
 tmoe <- emTMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
                threshold, verbose, verbose_IRLS)
+```
+
+## Summary
+
+```{r}
+tmoe$summary()
 ```
 
 ## Plots

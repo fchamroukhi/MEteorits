@@ -61,7 +61,7 @@ ParamTMoE <- setRefClass(
       p <<- p
       q <<- q
 
-      df <<- (q + 1) * (K - 1) + (p + 1) * K + K
+      df <<- (q + 1) * (K - 1) + (p + 1) * K + K + K
 
       alpha <<- matrix(0, q + 1, K - 1)
       beta <<- matrix(NA, p + 1, K)
@@ -154,10 +154,10 @@ ParamTMoE <- setRefClass(
 
         # Update the degrees of freedom
         try(nu[k] <<- pracma::fzero(f <- function(nuk) {
-          return(
+          return(suppressWarnings(
             -psigamma(nuk / 2) + log(nuk / 2) + 1 + (1 / sum(statTMoE$tik[, k])) * sum(statTMoE$tik[, k] * (log(statTMoE$Wik[, k]) - statTMoE$Wik[, k]))
             + psigamma((nuk[k] + 1) / 2) - log((nuk[k] + 1) / 2)
-          )
+          ))
         }, nu[k])$x, silent = TRUE)
 
       }

@@ -43,8 +43,33 @@ associated to the SNMoE model.}
   \item{\code{\dots}}{Other graphics parameters.}
 }
 By default, all the graphs mentioned above are produced.}
+
+\item{\code{summary(digits = getOption("digits"))}}{Summary method.
+\describe{
+  \item{\code{digits}}{The number of significant digits to use when
+    printing.}
+}}
 }}
 
+\examples{
+data(tempanomalies)
+x <- tempanomalies$Year
+y <- tempanomalies$AnnualAnomaly
+
+snmoe <- emSNMoE(X = x, Y = y, K = 2, p = 1, verbose = TRUE)
+
+# snmoe is a ModelSNMoE object. It contains some methods such as 'summary' and 'plot'
+snmoe$summary()
+snmoe$plot()
+
+# snmoe has also two fields, stat and param which are reference classes as well
+
+# Log-likelihood:
+snmoe$stat$loglik
+
+# Parameters of the polynomial regressions:
+snmoe$param$beta
+}
 \seealso{
 \link{ParamSNMoE}, \link{StatSNMoE}
 }

@@ -43,6 +43,8 @@
 #'
 #' tmoe <- emTMoE(X = x, Y = y, K = 2, p = 1, verbose = TRUE)
 #'
+#' tmoe$summary()
+#'
 #' tmoe$plot()
 emTMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE) {
 
@@ -76,12 +78,12 @@ emTMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
 
       iter <- iter + 1
       if (verbose) {
-        message("EM - tMoE: Iteration: ", iter, " | log-likelihood: "  , stat$log_lik)
+        message("EM - tMoE: Iteration: ", iter, " | log-likelihood: "  , stat$loglik)
       }
 
-      if (prev_loglik - stat$log_lik > 1e-5) {
+      if (prev_loglik - stat$loglik > 1e-5) {
         if (verbose) {
-          warning("EM log-likelihood is decreasing from ", prev_loglik, "to ", stat$log_lik, "!")
+          warning("EM log-likelihood is decreasing from ", prev_loglik, "to ", stat$loglik, "!")
         }
         top <- top + 1
         if (top > 20)
@@ -89,24 +91,24 @@ emTMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
       }
 
       # Test of convergence
-      converge <- abs((stat$log_lik - prev_loglik) / prev_loglik) <= threshold
+      converge <- abs((stat$loglik - prev_loglik) / prev_loglik) <= threshold
       if (is.na(converge)) {
         converge <- FALSE
       } # Basically for the first iteration when prev_loglik is Inf
 
-      prev_loglik <- stat$log_lik
-      stat$stored_loglik <- c(stat$stored_loglik, stat$log_lik)
+      prev_loglik <- stat$loglik
+      stat$stored_loglik <- c(stat$stored_loglik, stat$loglik)
     }# End of an EM run
 
-    if (stat$log_lik > best_loglik) {
+    if (stat$loglik > best_loglik) {
       statSolution <- stat$copy()
       paramSolution <- param$copy()
 
-      best_loglik <- stat$log_lik
+      best_loglik <- stat$loglik
     }
 
     if (n_tries > 1 && verbose) {
-      message("Max value of the log-likelihood: ", stat$log_lik, "\n\n")
+      message("Max value of the log-likelihood: ", stat$loglik, "\n\n")
     }
   }
 
@@ -114,7 +116,7 @@ emTMoE <- function(X, Y, K, p = 3, q = 1, n_tries = 1, max_iter = 1500, threshol
   statSolution$MAP()
 
   if (n_tries > 1 && verbose) {
-    message("Max value of the log-likelihood: ", statSolution$log_lik, "\n")
+    message("Max value of the log-likelihood: ", statSolution$loglik, "\n")
   }
 
   statSolution$computeStats(paramSolution)

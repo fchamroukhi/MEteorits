@@ -8,6 +8,25 @@
 #'   associated to the TMoE model.
 #' @seealso [ParamTMoE], [StatTMoE]
 #' @export
+#'
+#' @examples
+#' data(tempanomalies)
+#' x <- tempanomalies$Year
+#' y <- tempanomalies$AnnualAnomaly
+#'
+#' tmoe <- emTMoE(X = x, Y = y, K = 2, p = 1, verbose = TRUE)
+#'
+#' # tmoe is a ModelTMoE object. It contains some methods such as 'summary' and 'plot'
+#' tmoe$summary()
+#' tmoe$plot()
+#'
+#' # tmoe has also two fields, stat and param which are reference classes as well
+#'
+#' # Log-likelihood:
+#' tmoe$stat$loglik
+#'
+#' # Parameters of the polynomial regressions:
+#' tmoe$param$beta
 ModelTMoE <- setRefClass(
   "ModelTMoE",
   fields = list(
@@ -92,6 +111,54 @@ ModelTMoE <- setRefClass(
         plot.default(1:length(stat$stored_loglik), stat$stored_loglik, type = "l", col = "blue", xlab = "EM iteration number", ylab = "Observed data log-likelihood", ...)
         title(main = "Log-Likelihood")
       }
+
+    },
+
+    summary = function(digits = getOption("digits")) {
+      "Summary method.
+      \\describe{
+        \\item{\\code{digits}}{The number of significant digits to use when
+          printing.}
+      }"
+
+      title <- paste("Fitted t Mixture-of-Experts model")
+      txt <- paste(rep("-", min(nchar(title) + 4, getOption("width"))), collapse = "")
+
+      # Title
+      cat(txt)
+      cat("\n")
+      cat(title)
+      cat("\n")
+      cat(txt)
+
+      cat("\n")
+      cat("\n")
+      cat(paste0("tMoE model with K = ", param$K, ifelse(param$K > 1, " experts", " expert"), ":"))
+      cat("\n")
+      cat("\n")
+
+      tab <- data.frame("log-likelihood" = stat$loglik, "df" = param$df, "AIC" = stat$AIC,
+                        "BIC" = stat$BIC, "ICL" = stat$ICL, row.names = "", check.names = FALSE)
+      print(tab, digits = digits)
+
+      cat("\nClustering table (Number of observations in each expert):\n")
+      print(table(stat$klas))
+
+      cat("\nRegression coefficients:\n\n")
+      if (param$p > 0) {
+        row.names = c("1", sapply(1:param$p, function(x) paste0("X^", x)))
+      } else {
+        row.names = "1"
+      }
+
+      betas <- data.frame(param$beta, row.names = row.names)
+      colnames(betas) <- sapply(1:param$K, function(x) paste0("Beta(k = ", x, ")"))
+      print(betas, digits = digits)
+
+      cat("\nVariances:\n\n")
+      sigma2 = data.frame(param$sigma2, row.names = NULL)
+      colnames(sigma2) = sapply(1:param$K, function(x) paste0("Sigma2(k = ", x, ")"))
+      print(sigma2, digits = digits, row.names = FALSE)
 
     }
   )

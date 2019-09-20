@@ -59,7 +59,7 @@ StatStMoE <- setRefClass(
     Ey = "matrix",
     Var_yk = "matrix",
     Vary = "matrix",
-    log_lik = "numeric",
+    loglik = "numeric",
     com_loglik = "numeric",
     stored_loglik = "numeric",
     BIC = "numeric",
@@ -84,7 +84,7 @@ StatStMoE <- setRefClass(
       Ey <<- matrix(NA, paramStMoE$n, 1)
       Var_yk <<- matrix(NA, 1, paramStMoE$K)
       Vary <<- matrix(NA, paramStMoE$n, 1)
-      log_lik <<- -Inf
+      loglik <<- -Inf
       com_loglik <<- -Inf
       stored_loglik <<- numeric()
       BIC <<- -Inf
@@ -125,7 +125,7 @@ StatStMoE <- setRefClass(
       "Method to compute the log-likelihood. \\code{reg_irls} is the value of
       the regularization part in the IRLS algorithm."
 
-      log_lik <<- sum(log_sum_piik_fik) + reg_irls
+      loglik <<- sum(log_sum_piik_fik) + reg_irls
 
     },
 
@@ -149,8 +149,8 @@ StatStMoE <- setRefClass(
       Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramStMoE$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
       # BIC, AIC and ICL
-      BIC <<- log_lik - (paramStMoE$df * log(paramStMoE$n) / 2)
-      AIC <<- log_lik - paramStMoE$df
+      BIC <<- loglik - (paramStMoE$df * log(paramStMoE$n) / 2)
+      AIC <<- loglik - paramStMoE$df
 
       ## CL(theta) : complete-data loglikelihood
       zik_log_piik_fk <- z_ik * log_piik_fik
@@ -245,7 +245,7 @@ StatStMoE <- setRefClass(
 
         stme_pdf <<- matrix(rowSums(piik_fik)) # Skew-t mixture of experts density
 
-        log_piik_fik <<- log(piik_fik)
+        log_piik_fik <<- log(piik_fik + .Machine$double.xmin)
 
         log_sum_piik_fik <<- matrix(logsumexp(log_piik_fik, 1))
 

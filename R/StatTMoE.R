@@ -52,7 +52,7 @@ StatTMoE <- setRefClass(
     Ey = "matrix",
     Var_yk = "matrix",
     Vary = "matrix",
-    log_lik = "numeric",
+    loglik = "numeric",
     com_loglik = "numeric",
     stored_loglik = "numeric",
     BIC = "numeric",
@@ -72,7 +72,7 @@ StatTMoE <- setRefClass(
       Ey <<- matrix(NA, paramTMoE$n, 1)
       Var_yk <<- matrix(NA, 1, paramTMoE$K)
       Vary <<- matrix(NA, paramTMoE$n, 1)
-      log_lik <<- -Inf
+      loglik <<- -Inf
       com_loglik <<- -Inf
       stored_loglik <<- numeric()
       BIC <<- -Inf
@@ -106,7 +106,7 @@ StatTMoE <- setRefClass(
       "Method to compute the log-likelihood. \\code{reg_irls} is the value of
       the regularization part in the IRLS algorithm."
 
-      log_lik <<- sum(log_sum_piik_fik) + reg_irls
+      loglik <<- sum(log_sum_piik_fik) + reg_irls
 
     },
 
@@ -128,8 +128,8 @@ StatTMoE <- setRefClass(
       Vary <<- apply(piik * (Ey_k ^ 2 + ones(paramTMoE$n, 1) %*% Var_yk), 1, sum) - Ey ^ 2
 
       # BIC, AIC and ICL
-      BIC <<- log_lik - (paramTMoE$df * log(paramTMoE$n) / 2)
-      AIC <<- log_lik - paramTMoE$df
+      BIC <<- loglik - (paramTMoE$df * log(paramTMoE$n) / 2)
+      AIC <<- loglik - paramTMoE$df
 
       # CL(theta) : complete-data loglikelihood
       zik_log_piik_fk <- z_ik * log_piik_fik
@@ -163,7 +163,7 @@ StatTMoE <- setRefClass(
         piik_fik[, k] <- piik[, k] *  (1 / sigmak * dt((paramTMoE$Y - muk) / sigmak, nuk)) #pdf('tlocationscale', y, muk, sigmak, nuk);
       }
 
-      log_piik_fik <<- log(piik_fik)
+      log_piik_fik <<- log(piik_fik + .Machine$double.xmin)
 
       log_sum_piik_fik <<- matrix(log(rowSums(piik_fik)))
 

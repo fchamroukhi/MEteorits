@@ -52,7 +52,7 @@ StatSNMoE <- setRefClass(
     Ey = "matrix",
     Var_yk = "matrix",
     Vary = "matrix",
-    log_lik = "numeric",
+    loglik = "numeric",
     com_loglik = "numeric",
     stored_loglik = "numeric",
     BIC = "numeric",
@@ -73,7 +73,7 @@ StatSNMoE <- setRefClass(
       Ey <<- matrix(NA, paramSNMoE$n, 1)
       Var_yk <<- matrix(NA, 1, paramSNMoE$K)
       Vary <<- matrix(NA, paramSNMoE$n, 1)
-      log_lik <<- -Inf
+      loglik <<- -Inf
       com_loglik <<- -Inf
       stored_loglik <<- numeric()
       BIC <<- -Inf
@@ -109,7 +109,7 @@ StatSNMoE <- setRefClass(
       "Method to compute the log-likelihood. \\code{reg_irls} is the value of
       the regularization part in the IRLS algorithm."
 
-      log_lik <<- sum(log_sum_piik_fik) + reg_irls
+      loglik <<- sum(log_sum_piik_fik) + reg_irls
 
     },
 
@@ -132,8 +132,8 @@ StatSNMoE <- setRefClass(
 
       # BIC, AIC and ICL
 
-      BIC <<- log_lik - (paramSNMoE$df * log(paramSNMoE$n) / 2)
-      AIC <<- log_lik - paramSNMoE$df
+      BIC <<- loglik - (paramSNMoE$df * log(paramSNMoE$n) / 2)
+      AIC <<- loglik - paramSNMoE$df
 
       # CL(theta) : complete-data loglikelihood
       zik_log_piik_fk <- z_ik * log_piik_fik
@@ -176,9 +176,10 @@ StatSNMoE <- setRefClass(
 
         # weighted skew normal linear expert likelihood
         piik_fik[, k] <- piik[, k] * (2 / sigmak) * dnorm(dik, 0, 1) * pnorm(paramSNMoE$lambda[k] * dik)
+
       }
 
-      log_piik_fik <<- log(piik_fik)
+      log_piik_fik <<- log(piik_fik + .Machine$double.xmin)
 
       log_sum_piik_fik <<- matrix(log(rowSums(piik_fik)))
 

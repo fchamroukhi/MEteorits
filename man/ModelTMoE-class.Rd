@@ -43,8 +43,33 @@ associated to the TMoE model.}
   \item{\code{\dots}}{Other graphics parameters.}
 }
 By default, all the graphs mentioned above are produced.}
+
+\item{\code{summary(digits = getOption("digits"))}}{Summary method.
+\describe{
+  \item{\code{digits}}{The number of significant digits to use when
+    printing.}
+}}
 }}
 
+\examples{
+data(tempanomalies)
+x <- tempanomalies$Year
+y <- tempanomalies$AnnualAnomaly
+
+tmoe <- emTMoE(X = x, Y = y, K = 2, p = 1, verbose = TRUE)
+
+# tmoe is a ModelTMoE object. It contains some methods such as 'summary' and 'plot'
+tmoe$summary()
+tmoe$plot()
+
+# tmoe has also two fields, stat and param which are reference classes as well
+
+# Log-likelihood:
+tmoe$stat$loglik
+
+# Parameters of the polynomial regressions:
+tmoe$param$beta
+}
 \seealso{
 \link{ParamTMoE}, \link{StatTMoE}
 }

@@ -43,8 +43,33 @@ associated to the StMoE model.}
   \item{\code{\dots}}{Other graphics parameters.}
 }
 By default, all the graphs mentioned above are produced.}
+
+\item{\code{summary(digits = getOption("digits"))}}{Summary method.
+\describe{
+  \item{\code{digits}}{The number of significant digits to use when
+    printing.}
+}}
 }}
 
+\examples{
+data(tempanomalies)
+x <- tempanomalies$Year
+y <- tempanomalies$AnnualAnomaly
+
+stmoe <- emStMoE(X = x, Y = y, K = 2, p = 1, verbose = TRUE)
+
+# stmoe is a ModelSTMoE object. It contains some methods such as 'summary' and 'plot'
+stmoe$summary()
+stmoe$plot()
+
+# stmoe has also two fields, stat and param which are reference classes as well
+
+# Log-likelihood:
+stmoe$stat$loglik
+
+# Parameters of the polynomial regressions:
+stmoe$param$beta
+}
 \seealso{
 \link{ParamStMoE}, \link{StatStMoE}
 }

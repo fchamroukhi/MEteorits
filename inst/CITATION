@@ -15,7 +15,7 @@ citEntry(
   year = "2019",
   note = note,
   url = "https://github.com/fchamroukhi/MEteorits",
-  textVersion = paste0("Faicel Chamroukhi, Florian Lecocq and Marius Bartcus (2019).
+  textVersion = paste0("Chamroukhi F, Lecocq F, Bartcus M (2019).
   meteorits: Mixtures-of-Experts Modeling for Complex and Non-Normal Distributions
   ('MEteorits'). ", note, ". https://github.com/fchamroukhi/MEteorits")
 )

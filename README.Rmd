@@ -83,21 +83,17 @@ sigmak <- c(1, 1) # Standard deviations of the experts
 x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 
 # Generate sample of size n
-sample <- sampleUnivNMoE(alphak = alphak, betak = betak, sigmak = sigmak, x = x)
+sample <- sampleUnivNMoE(alphak = alphak, betak = betak, 
+                         sigmak = sigmak, x = x)
 y <- sample$y
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
 q <- 1 # Order of the logistic regression (gating network)
 
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-5
-verbose <- TRUE
-verbose_IRLS <- FALSE
+nmoe <- emNMoE(X = x, Y = y, K = K, p = p, q = q, verbose = TRUE)
 
-nmoe <- emNMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
-               threshold, verbose, verbose_IRLS)
+nmoe$summary()
 
 nmoe$plot()
 ```
@@ -113,14 +109,9 @@ K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
 q <- 1 # Order of the logistic regression (gating network)
 
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-5
-verbose <- TRUE
-verbose_IRLS <- FALSE
+nmoe <- emNMoE(X = x, Y = y, K = K, p = p, q = q, verbose = TRUE)
 
-nmoe <- emNMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
-               threshold, verbose, verbose_IRLS)
+nmoe$summary()
 
 nmoe$plot()
 ```
@@ -149,14 +140,9 @@ K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
 q <- 1 # Order of the logistic regression (gating network)
 
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-5
-verbose <- TRUE
-verbose_IRLS <- FALSE
+tmoe <- emTMoE(X = x, Y = y, K = K, p = p, q = q, verbose = TRUE)
 
-tmoe <- emTMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
-               threshold, verbose, verbose_IRLS)
+tmoe$summary()
 
 tmoe$plot()
 ```
@@ -173,14 +159,9 @@ K <- 4 # Number of regressors/experts
 p <- 2 # Order of the polynomial regression (regressors/experts)
 q <- 1 # Order of the logistic regression (gating network)
 
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-5
-verbose <- TRUE
-verbose_IRLS <- FALSE
+tmoe <- emTMoE(X = x, Y = y, K = K, p = p, q = q, verbose = TRUE)
 
-tmoe <- emTMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
-               threshold, verbose, verbose_IRLS)
+tmoe$summary()
 
 tmoe$plot()
 ```
@@ -200,22 +181,18 @@ sigmak <- c(1, 1) # Standard deviations of the experts
 x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 
 # Generate sample of size n
-sample <- sampleUnivSNMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
-                          lambdak = lambdak, x = x)
+sample <- sampleUnivSNMoE(alphak = alphak, betak = betak, 
+                          sigmak = sigmak, lambdak = lambdak, 
+                          x = x)
 y <- sample$y
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
 q <- 1 # Order of the logistic regression (gating network)
 
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-6
-verbose <- TRUE
-verbose_IRLS <- FALSE
+snmoe <- emSNMoE(X = x, Y = y, K = K, p = p, q = q, verbose = TRUE)
 
-snmoe <- emSNMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
-                 threshold, verbose, verbose_IRLS)
+snmoe$summary()
 
 snmoe$plot()
 ```
@@ -231,14 +208,9 @@ K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
 q <- 1 # Order of the logistic regression (gating network)
 
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-6
-verbose <- TRUE
-verbose_IRLS <- FALSE
+snmoe <- emSNMoE(X = x, Y = y, K = K, p = p, q = q, verbose = TRUE)
 
-snmoe <- emSNMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
-                 threshold, verbose, verbose_IRLS)
+snmoe$summary()
 
 snmoe$plot()
 ```
@@ -259,22 +231,18 @@ nuk <- c(5, 7) # Degrees of freedom of the experts network t densities
 x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 
 # Generate sample of size n
-sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
-                          lambdak = lambdak, nuk = nuk, x = x)
+sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, 
+                          sigmak = sigmak, lambdak = lambdak, 
+                          nuk = nuk, x = x)
 y <- sample$y
 
 K <- 2 # Number of regressors/experts
 p <- 1 # Order of the polynomial regression (regressors/experts)
 q <- 1 # Order of the logistic regression (gating network)
 
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-5
-verbose <- TRUE
-verbose_IRLS <- FALSE
+stmoe <- emStMoE(X = x, Y = y, K = K, p = p, q = q, verbose = TRUE)
 
-stmoe <- emStMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
-                 threshold, verbose, verbose_IRLS)
+stmoe$summary()
 
 stmoe$plot()
 ```
@@ -291,14 +259,9 @@ K <- 4 # Number of regressors/experts
 p <- 2 # Order of the polynomial regression (regressors/experts)
 q <- 1 # Order of the logistic regression (gating network)
 
-n_tries <- 1
-max_iter <- 1500
-threshold <- 1e-5
-verbose <- TRUE
-verbose_IRLS <- FALSE
+stmoe <- emStMoE(X = x, Y = y, K = K, p = p, q = q, verbose = TRUE)
 
-stmoe <- emStMoE(X = x, Y = y, K, p, q, n_tries, max_iter, 
-                 threshold, verbose, verbose_IRLS)
+stmoe$summary()
 
 stmoe$plot()
 ```

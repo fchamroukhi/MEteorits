@@ -62,6 +62,8 @@ y <- tempanomalies$AnnualAnomaly
 
 tmoe <- emTMoE(X = x, Y = y, K = 2, p = 1, verbose = TRUE)
 
+tmoe$summary()
+
 tmoe$plot()
 }
 \seealso{
