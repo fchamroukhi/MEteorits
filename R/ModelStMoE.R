@@ -14,7 +14,7 @@
 #' x <- tempanomalies$Year
 #' y <- tempanomalies$AnnualAnomaly
 #'
-#' stmoe <- emStMoE(X = x, Y = y, K = 2, p = 1, verbose = TRUE)
+#' stmoe <- emStMoE(X = x, Y = y, K = 2, p = 1, threshold = 1e-4, verbose = TRUE)
 #'
 #' # stmoe is a ModelSTMoE object. It contains some methods such as 'summary' and 'plot'
 #' stmoe$summary()
