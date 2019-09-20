@@ -31,16 +31,16 @@ library(meteorits)
 
 # Introduction
 
-**STMoE** (Skew-t Mixture-of-Experts) provides a flexible and robust modelling 
+**StMoE** (Skew-t Mixture-of-Experts) provides a flexible and robust modelling 
 framework for heterogenous data with possibly skewed, heavy-tailed 
-distributions and corrupted by atypical observations. **STMoE** consists of a 
+distributions and corrupted by atypical observations. **StMoE** consists of a 
 mixture of *K* skew-t expert regressors network (of degree *p*) gated by a 
 softmax gating network (of degree *q*) and is represented by:
 
 * The gating network parameters `alpha`'s of the softmax net.
 * The experts network parameters: The location parameters (regression 
 coefficients) `beta`'s, scale parameters `sigma`'s, the skewness parameters 
-`lambda`'s and the degree of freedom parameters `nu`'s. **STMoE** thus 
+`lambda`'s and the degree of freedom parameters `nu`'s. **StMoE** thus 
 generalises mixtures of (normal, skew-normal, t, and skew-t) distributions and 
 mixtures of regressions with these distributions. For example, when $q=0$, we 
 retrieve mixtures of (skew-t, t-, skew-normal, or normal) regressions, and when
@@ -74,7 +74,7 @@ nuk <- c(5, 7) # Degrees of freedom of the experts network t densities
 x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 
 # Generate sample of size n
-sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
+sample <- sampleUnivStMoE(alphak = alphak, betak = betak, sigmak = sigmak, 
                           lambdak = lambdak, nuk = nuk, x = x)
 y <- sample$y
 ```

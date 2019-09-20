@@ -9,7 +9,7 @@ sampleUnivSN <- function(mu, sigma, lambda, n = 1) {
   return(y)
 }
 
-sampleUnivST <- function(mu, sigma, nu, lambda, n = 1) {
+sampleUnivSt <- function(mu, sigma, nu, lambda, n = 1) {
 
   e <- sampleUnivSN(0, 1, lambda, n = 1)
 
@@ -73,7 +73,7 @@ sampleUnivST <- function(mu, sigma, nu, lambda, n = 1) {
 #' x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 #'
 #' # Generate sample of size n
-#' sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, sigmak = sigmak,
+#' sample <- sampleUnivStMoE(alphak = alphak, betak = betak, sigmak = sigmak,
 #'                           lambdak = lambdak, nuk = nuk, x = x)
 #'
 #' # Plot points and estimated means
@@ -81,7 +81,7 @@ sampleUnivST <- function(mu, sigma, nu, lambda, n = 1) {
 #' lines(x, sample$stats$Ey_k[, 1], col = "blue", lty = "dotted", lwd = 1.5)
 #' lines(x, sample$stats$Ey_k[, 2], col = "blue", lty = "dotted", lwd = 1.5)
 #' lines(x, sample$stats$Ey, col = "red", lwd = 1.5)
-sampleUnivSTMoE <- function(alphak, betak, sigmak, lambdak, nuk, x) {
+sampleUnivStMoE <- function(alphak, betak, sigmak, lambdak, nuk, x) {
 
     n <- length(x)
 
@@ -110,7 +110,7 @@ sampleUnivSTMoE <- function(alphak, betak, sigmak, lambdak, nuk, x) {
       lambda <- lambdak[zik == 1]
       nu <- nuk[zik == 1]
 
-      y[i] <- sampleUnivST(mu = mu, sigma = sigma, nu = nu, lambda = lambda)
+      y[i] <- sampleUnivSt(mu = mu, sigma = sigma, nu = nu, lambda = lambda)
       z[i, ] <- t(zik)
       zi[i] <- which.max(zik)
 

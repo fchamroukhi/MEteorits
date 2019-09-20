@@ -48,7 +48,7 @@ Collate:
     utils.R
     sampleUnivNMoE.R
     sampleUnivSNMoE.R
-    sampleUnivSTMoE.R
+    sampleUnivStMoE.R
     sampleUnivTMoE.R
     ParamSNMoE.R
     ParamStMoE.R

@@ -231,7 +231,7 @@ nuk <- c(5, 7) # Degrees of freedom of the experts network t densities
 x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 
 # Generate sample of size n
-sample <- sampleUnivSTMoE(alphak = alphak, betak = betak, 
+sample <- sampleUnivStMoE(alphak = alphak, betak = betak, 
                           sigmak = sigmak, lambdak = lambdak, 
                           nuk = nuk, x = x)
 y <- sample$y
