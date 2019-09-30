@@ -1,6 +1,6 @@
 Type: Package
 Package: meteorits
-Title: Mixtures-of-Experts Modeling for Complex and Non-Normal Distributions ('MEteorits')
+Title: Mixture-of-Experts Modeling for Complex Non-Normal Distributions
 Version: 0.1.0
 Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
     comment = c(ORCID = "0000-0002-5894-3103"),
@@ -9,14 +9,15 @@ Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
     email = "florian.lecocq@outlook.com"),
     person("Marius", "Bartcus", role = c("aut","trl"), comment = "R port",
     email = "marius.bartcus@gmail.com"))
-Description: Provides several original and flexible mixtures-of-experts models 
-    to model, cluster and classify heterogeneous data in many complex 
+Description: Provides a unified mixture-of-experts (ME) modeling and 
+    estimation framework with several original and flexible ME models to 
+    model, cluster and classify heterogeneous data in many complex 
     situations where the data are distributed according to non-normal, 
     possibly skewed distributions, and when they might be corrupted by 
     atypical observations. Mixtures-of-Experts Models for Complex and 
     Non-Normal Distributions ('MEteorits') are originally introduced and 
     written in 'Matlab' by Faicel Chamroukhi. The references are mainly the 
-    following ones.
+    following ones. The references are mainly the following ones.
     Chamroukhi F., Same A., Govaert, G. and Aknin P. (2009) <doi:10.1016/j.neunet.2009.06.040>.
     Chamroukhi F. (2010) <https://chamroukhi.com/FChamroukhi-PhD.pdf>.
     Chamroukhi F. (2015) <arXiv:1506.06707>.
