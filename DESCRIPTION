@@ -14,8 +14,8 @@ Description: Provides a unified mixture-of-experts (ME) modeling and
     model, cluster and classify heterogeneous data in many complex 
     situations where the data are distributed according to non-normal, 
     possibly skewed distributions, and when they might be corrupted by 
-    atypical observations. Mixtures-of-Experts Models for Complex and 
-    Non-Normal Distributions ('MEteorits') are originally introduced and 
+    atypical observations. Mixtures-of-Experts models for complex and 
+    non-normal distributions ('meteorits') are originally introduced and 
     written in 'Matlab' by Faicel Chamroukhi. The references are mainly the 
     following ones. The references are mainly the following ones.
     Chamroukhi F., Same A., Govaert, G. and Aknin P. (2009) <doi:10.1016/j.neunet.2009.06.040>.
