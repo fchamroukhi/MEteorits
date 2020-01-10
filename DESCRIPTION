@@ -1,7 +1,7 @@
 Type: Package
 Package: meteorits
 Title: Mixture-of-Experts Modeling for Complex Non-Normal Distributions
-Version: 0.1.0.9000
+Version: 0.1.1
 Authors@R: c(person("Faicel", "Chamroukhi", role = c("aut"),
     comment = c(ORCID = "0000-0002-5894-3103"),
     email = "faicel.chamroukhi@unicaen.fr"),

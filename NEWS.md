@@ -1,4 +1,4 @@
-# meteorits 0.1.0.9000
+# meteorits 0.1.1
 
 ## Minor Improvements
 
