@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.org/fchamroukhi/MEteorits.svg?branch=master)](https://travis-ci.org/fchamroukhi/MEteorits)
-[![CRAN versions](https://www.r-pkg.org/badges/version/meteorits)](https://cran.r-project.org/web/packages/meteorits/index.html)
+[![CRAN versions](https://www.r-pkg.org/badges/version/meteorits)](https://CRAN.R-project.org/package=meteorits)
 <!-- badges: end -->
 
 MEteorits is an open source toolbox (available in R and Matlab) containing 
