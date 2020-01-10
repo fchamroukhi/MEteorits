@@ -228,7 +228,7 @@ StatStMoE <- setRefClass(
 
         if (calcE3) {
 
-          Integgtx[, k] <- sapply(mik[, k], function(x) try(integrate(f = fx, lower = -Inf, upper = x)$value, silent = TRUE))
+          Integgtx[, k] <- as.numeric(sapply(mik[, k], function(x) try(integrate(f = fx, lower = -Inf, upper = x)$value, silent = TRUE)))
           E3ik[, k] <<- wik[, k] - log((paramStMoE$nu[k] + dik[, k] ^ 2) / 2) - (paramStMoE$nu[k] + 1) / (paramStMoE$nu[k] + dik[, k] ^ 2) + psigamma((paramStMoE$nu[k] + 1) / 2) + ((paramStMoE$lambda[k] * dik[, k] * (dik[, k] ^ 2 - 1)) / sqrt((paramStMoE$nu[k] + 1) * ((paramStMoE$nu[k] + dik[, k] ^ 2) ^ 3))) * dt(mik[, k], paramStMoE$nu[k] + 1) / pt(mik[, k], paramStMoE$nu[k] + 1) + (1 / pt(mik[, k], paramStMoE$nu[k] + 1)) * Integgtx[, k]
         }
 
