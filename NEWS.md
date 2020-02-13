@@ -1,3 +1,9 @@
+# meteorits 0.1.1.9000
+
+## Minor Improvements
+
+* Added CRAN downloads badge in `README.Rmd`.
+
 # meteorits 0.1.1
 
 ## Minor Improvements
